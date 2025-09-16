@@ -46,20 +46,8 @@ function App() {
             onChange={(e) => setRightInput(e.target.value)}
             onButtonClick={() => {
               if (rightInput.trim()) {
-                // For now, create a mock simulation result
-                // You can replace this with actual simulation logic later
-                const result = {
-                  success: true,
-                  simulation: {
-                    status: "simulated",
-                    gasUsed: "21000",
-                    gasPrice: "20000000000",
-                    transactionHash: "0x" + Math.random().toString(16).substr(2, 64),
-                    blockNumber: Math.floor(Math.random() * 1000000) + 18000000
-                  },
-                  inputData: rightInput.trim()
-                };
-                setSimulationResult(result);
+                showToast('This function is not implemented', 'error');
+                setSimulationResult(null);
               } else {
                 showToast('Please enter transaction data to simulate', 'error');
               }
