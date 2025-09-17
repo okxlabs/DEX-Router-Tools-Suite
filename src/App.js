@@ -1,9 +1,11 @@
 import './App.css';
 import { useState } from 'react';
 import { resolve } from './utils/decode_calldata.js';
-import ToolSection from './components/ToolSection.js';
+import DecodeCalldata from './components/DecodeCalldata.js';
+import TxSimulation from './components/TxSimulation.js';
 
 function App() {
+  const [activeTab, setActiveTab] = useState('decode');
   const [leftInput, setLeftInput] = useState('');
   const [rightInput, setRightInput] = useState('');
   const [decodeResult, setDecodeResult] = useState(null);
@@ -18,44 +20,57 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <div className="app-container">
-          <ToolSection
-            title="Decode calldata"
-            placeholder="Enter calldata to decode... (with or without 0x prefix)"
-            value={leftInput}
-            onChange={(e) => setLeftInput(e.target.value)}
-            onButtonClick={() => {
-              if (!leftInput.trim()) {
-                showToast('Please enter calldata to decode', 'error');
-                return;
-              }
-              
-              const result = resolve(leftInput.trim());
-              setDecodeResult(result);
-              showToast('Calldata decoded');
-            }}
-            buttonText="Decode"
-            result={decodeResult}
-            showToast={showToast}
-          />
+        {/* Tab Navigation */}
+        <div className="tab-navigation">
+          <button 
+            className={`tab-button ${activeTab === 'decode' ? 'active' : ''}`}
+            onClick={() => setActiveTab('decode')}
+          >
+            Decode Calldata
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'simulation' ? 'active' : ''}`}
+            onClick={() => setActiveTab('simulation')}
+          >
+            TX Simulation
+          </button>
+        </div>
 
-          <ToolSection
-            title="TX simulation"
-            placeholder="Enter transaction data for simulation..."
-            value={rightInput}
-            onChange={(e) => setRightInput(e.target.value)}
-            onButtonClick={() => {
-              if (rightInput.trim()) {
-                showToast('This function is not implemented', 'error');
-                setSimulationResult(null);
-              } else {
-                showToast('Please enter transaction data to simulate', 'error');
-              }
-            }}
-            buttonText="Simulate"
-            result={simulationResult}
-            showToast={showToast}
-          />
+        {/* Tab Content */}
+        <div className="tab-content">
+          {activeTab === 'decode' && (
+            <DecodeCalldata
+              value={leftInput}
+              onChange={(e) => setLeftInput(e.target.value)}
+              onButtonClick={() => {
+                if (!leftInput.trim()) {
+                  showToast('Please enter calldata to decode', 'error');
+                  return;
+                }
+                
+                const result = resolve(leftInput.trim());
+                setDecodeResult(result);
+                showToast('Calldata decoded');
+              }}
+              result={decodeResult}
+              showToast={showToast}
+            />
+          )}
+
+          {activeTab === 'simulation' && (
+            <TxSimulation
+              onButtonClick={(formData) => {
+                if (formData.transactionData.trim() || formData.fromAddress.trim() || formData.toAddress.trim()) {
+                  showToast('This function is not implemented', 'error');
+                  setSimulationResult(null);
+                } else {
+                  showToast('Please enter transaction data to simulate', 'error');
+                }
+              }}
+              result={simulationResult}
+              showToast={showToast}
+            />
+          )}
         </div>
         
         {/* Toast notification */}
