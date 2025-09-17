@@ -34,14 +34,17 @@ function parseCommission(bytes32Hex) {
     // Check if it's "to B commission" (TO_TOKEN_COMMISSION)
     // 2bbb flags indicate TO_TOKEN_COMMISSION (to B commission)
     const isToB = flag.toLowerCase().endsWith("2bbb");
-    const commissionType = isToB ? "TO_TOKEN_COMMISSION" : "FROM_TOKEN_COMMISSION";
+
+    const commissionAmount = flag.startsWith("0x3ca2") ? "SINGLE" : "DUAL";
+    const commissionToken = isToB ? "TO_TOKEN_COMMISSION" : "FROM_TOKEN_COMMISSION";
+    const commissionType = commissionAmount + "_" + commissionToken;
     
     return { 
-        flag, 
+        flag,
+        commissionType, 
         rate, 
         address, 
-        isToB,
-        commissionType 
+        isToB
     };
 }
 
