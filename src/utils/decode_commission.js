@@ -74,7 +74,6 @@ function extractCommissionInfoFromCalldata(calldataHex) {
                 return {
                     hasCommission: true,
                     referCount: 1,
-                    hasToB: firstCommission.isToB || middleInfo.isToB,
                     middle: middleInfo,
                     first: firstCommission,
                 };
