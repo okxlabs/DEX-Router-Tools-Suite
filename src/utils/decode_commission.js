@@ -31,20 +31,16 @@ function parseCommission(bytes32Hex) {
         throw new Error(`Invalid commission flag: ${flag}. Must be one of: ${allValidFlags.join(', ')}`);
     }
     
-    // Check if it's "to B commission" (TO_TOKEN_COMMISSION)
-    // 2bbb flags indicate TO_TOKEN_COMMISSION (to B commission)
-    const isToB = flag.toLowerCase().endsWith("2bbb");
 
     const commissionAmount = flag.startsWith("0x3ca2") ? "SINGLE" : "DUAL";
-    const commissionToken = isToB ? "TO_TOKEN_COMMISSION" : "FROM_TOKEN_COMMISSION";
+    const commissionToken = flag.endsWith("aaa") ? "FROM_TOKEN_COMMISSION" : "TO_TOKEN_COMMISSION";
     const commissionType = commissionAmount + "_" + commissionToken;
     
     return { 
         flag,
         commissionType, 
         rate, 
-        address, 
-        isToB
+        address
     };
 }
 
