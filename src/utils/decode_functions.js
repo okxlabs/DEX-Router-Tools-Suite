@@ -3,7 +3,6 @@ const { DEXROUTER_ABI } = require('./dexrouter-abi');
 const {
     isBaseRequestTuple,
     isRouterPathArray,
-    isRouterPathTuple,
     isPackedReceiver,
     isPoolsArray,
     isPackedSrcToken,
@@ -13,13 +12,8 @@ const {
     getValue,
     formatBaseRequest,
     formatRouterPathArray,
-    formatRouterPath,
-    decodeRawDataArray,
-    unpackRawData,
     unpackReceiver,
     unpackPoolsArray,
-    unpackUnxswapPool,
-    unpackUniswapV3Pool,
     unpackSrcToken,
     unpackSwapRawdata
 } = require('./formatters');
