@@ -60,12 +60,23 @@ function App() {
           {activeTab === 'simulation' && (
             <TxSimulation
               onButtonClick={(formData) => {
-                if (formData.transactionData.trim() || formData.fromAddress.trim() || formData.toAddress.trim()) {
-                  showToast('This function is not implemented', 'error');
-                  setSimulationResult(null);
-                } else {
-                  showToast('Please enter transaction data to simulate', 'error');
+                // Validate required fields
+                const requiredFields = [
+                  { field: formData.transactionData, name: 'Transaction Data' },
+                  { field: formData.chain, name: 'Chain' },
+                  { field: formData.fromAddress, name: 'From Address' },
+                  { field: formData.toAddress, name: 'To Address' },
+                  { field: formData.value, name: 'Value' }
+                ];
+
+                // Check for empty required fields
+                const emptyFields = requiredFields.filter(({ field }) => !field || !field.trim());
+                
+                if (emptyFields.length > 0) {
+                  showToast(`Please fill in all the fields`, 'error');
+                  return;
                 }
+
               }}
               result={simulationResult}
               showToast={showToast}
