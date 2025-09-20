@@ -329,6 +329,7 @@ function decodeMultipleFromCalldata(calldata) {
     // Add commission info as array
     commissions.forEach((commission) => {
         const commissionCopy = { ...commission };
+        commissionCopy.index = commissionCopy.position; // Keep position as index
         delete commissionCopy.position; // Remove internal position tracking
         result.commissionInfo.push(commissionCopy);
     });
@@ -336,6 +337,7 @@ function decodeMultipleFromCalldata(calldata) {
     // Add trim info as array
     trims.forEach((trim) => {
         const trimCopy = { ...trim };
+        trimCopy.index = trimCopy.position; // Keep position as index
         delete trimCopy.position; // Remove internal position tracking
         result.trimInfo.push(trimCopy);
     });
