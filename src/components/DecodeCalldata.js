@@ -1,30 +1,26 @@
 import React from 'react';
-import './ToolSection.css';
 
-const ToolSection = ({ 
-  title, 
-  placeholder, 
+const DecodeCalldata = ({ 
   value, 
   onChange, 
   onButtonClick, 
-  buttonText, 
   result, 
   showToast 
 }) => {
   return (
-    <div className="tool-section">
-      <h2 className="tool-section-title">{title}</h2>
+    <div className="component-container">
+      <h2 className="component-title">Decode calldata</h2>
       <textarea
         value={value}
         onChange={onChange}
-        placeholder={placeholder}
-        className="tool-section-textarea"
+        placeholder="Enter calldata to decode... (with or without 0x prefix)"
+        className="component-textarea"
       />
       <button
         onClick={onButtonClick}
-        className="tool-section-button"
+        className="component-button"
       >
-        {buttonText}
+        Decode
       </button>
       
       {/* Display results */}
@@ -34,13 +30,13 @@ const ToolSection = ({
           <div
             onClick={() => {
               navigator.clipboard.writeText(JSON.stringify(result, null, 2)).then(() => {
-                showToast(`${title} result copied to clipboard!`, 'success');
+                showToast('Decode calldata result copied to clipboard!', 'success');
               }).catch(() => {
-                showToast(`Failed to copy ${title.toLowerCase()} result`, 'error');
+                showToast('Failed to copy decode result', 'error');
               });
             }}
             className="clipboard-icon"
-            title={`Copy ${title.toLowerCase()} result to clipboard`}
+            title="Copy decode result to clipboard"
           >
             📋
           </div>
@@ -53,4 +49,4 @@ const ToolSection = ({
   );
 };
 
-export default ToolSection;
+export default DecodeCalldata;
