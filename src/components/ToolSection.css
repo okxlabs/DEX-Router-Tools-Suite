@@ -1,0 +1,81 @@
+/* ToolSection component styles */
+.tool-section {
+  flex: 1;
+  text-align: center;
+}
+
+.tool-section-title {
+  color: #61dafb;
+  margin-bottom: 20px;
+}
+
+.tool-section-textarea {
+  padding: 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 600px;
+  min-height: 150px;
+  resize: vertical;
+  font-family: monospace;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.tool-section-button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #61dafb;
+  color: #282c34;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.tool-section-button:hover {
+  background-color: #21a1c4;
+}
+
+.result-container {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #1e1e1e;
+  border-radius: 5px;
+  text-align: left;
+  max-width: 600px;
+  width: 100%;
+  margin: 20px auto 0 auto;
+  position: relative;
+}
+
+.clipboard-icon {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #4CAF50;
+  transition: color 0.2s ease;
+  background-color: #2a2a2a;
+  padding: 5px;
+  border-radius: 3px;
+  z-index: 1;
+}
+
+.clipboard-icon:hover {
+  color: #45a049;
+}
+
+.result-content {
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  max-height: 400px;
+  overflow: auto;
+}
