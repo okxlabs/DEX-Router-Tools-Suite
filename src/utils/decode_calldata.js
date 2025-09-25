@@ -15,9 +15,6 @@ export function resolve(calldata) {
         // Decode multiple trim occurrences using the new decoder
         const multiTrimDecoded = decodeMultipleTrimsFromCalldata(calldata);
         
-        // Keep existing trim functionality
-        // const trimInfo = extractTrimInfoFromCalldata(calldata);
-        
         // Return structured JSON with all decode results
         return {
             ...decodedFunctions,
