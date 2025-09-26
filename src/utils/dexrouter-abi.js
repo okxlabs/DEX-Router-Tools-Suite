@@ -14,6 +14,6 @@ const DEXROUTER_ABI = [
     "function dagSwapTo(uint256 orderId, address receiver, tuple(uint256 fromToken, address toToken, uint256 fromTokenAmount, uint256 minReturnAmount, uint256 deadLine) baseRequest, tuple(address[] mixAdapters, address[] assetTo, uint256[] rawData, bytes[] extraData, uint256 fromToken)[] paths) external payable returns (uint256 returnAmount)",
 ];
 
-module.exports = {
+export {
     DEXROUTER_ABI
 };

@@ -97,7 +97,7 @@ function isSwapWrapRawdata(input, paramName) {
     return input.type === 'uint256' && paramName === 'rawdata';
 }
 
-module.exports = {
+export {
     isBaseRequestTuple,
     isRouterPathArray,
     isRouterPathTuple,

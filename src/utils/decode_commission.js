@@ -1,4 +1,4 @@
-const { ethers } = require("ethers");
+import { ethers } from 'ethers';
 
 // Define flag constants (6 bytes)
 const COMMISSION_FLAGS = {
@@ -124,4 +124,4 @@ function extractCommissionInfoFromCalldata(calldataHex) {
     return { hasCommission: false };
 }
 
-module.exports = { extractCommissionInfoFromCalldata }; 
+export { extractCommissionInfoFromCalldata }; 
