@@ -1,4 +1,4 @@
-const { ethers } = require("ethers");
+import { ethers } from 'ethers';
 
 /**
  * Trim parsing script - used to parse trim data from DEX transaction calldata
@@ -158,6 +158,6 @@ function extractTrimInfoFromCalldata(calldataHex) {
     return { hasTrim: false };
 }
 
-module.exports = { 
+export { 
     extractTrimInfoFromCalldata
 };

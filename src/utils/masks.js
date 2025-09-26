@@ -1,4 +1,4 @@
-const { ethers } = require('ethers');
+import { ethers } from 'ethers';
 
 /**
  * DexRouter Contract Masks
@@ -40,7 +40,7 @@ const SWAP_AMOUNT_MASK = ethers.BigNumber.from("0x7fffffffffffffffffffffffffffff
 const DAG_INPUT_INDEX_MASK = ethers.BigNumber.from("0x0000000000000000ff0000000000000000000000000000000000000000000000");
 const DAG_OUTPUT_INDEX_MASK = ethers.BigNumber.from("0x000000000000000000ff00000000000000000000000000000000000000000000");
 
-module.exports = {
+export {
     ADDRESS_MASK,
     ONE_FOR_ZERO_MASK,
     WETH_UNWRAP_MASK,

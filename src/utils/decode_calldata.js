@@ -1,6 +1,6 @@
-const { decodeFunctions } = require('./decode_functions.js');
-const { extractCommissionInfoFromCalldata } = require('./decode_commission.js');
-const { extractTrimInfoFromCalldata } = require('./decode_trim.js');
+import { decodeFunctions } from './decode_functions.js';
+import { extractCommissionInfoFromCalldata } from './decode_commission.js';
+import { extractTrimInfoFromCalldata } from './decode_trim.js';
 
 export function resolve(calldata) {
     try {

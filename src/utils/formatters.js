@@ -1,5 +1,5 @@
-const { ethers } = require('ethers');
-const {
+import { ethers } from 'ethers';
+import {
     ADDRESS_MASK,
     ONE_FOR_ZERO_MASK,
     WETH_UNWRAP_MASK,
@@ -12,8 +12,8 @@ const {
     SWAP_AMOUNT_MASK,
     DAG_INPUT_INDEX_MASK,
     DAG_OUTPUT_INDEX_MASK
-} = require('./masks');
-const { isRouterPathTuple } = require('./validation');
+} from './masks.js';
+import { isRouterPathTuple } from './validation.js';
 
 /**
  * Convert ethers BigNumbers to strings and process nested data structures
@@ -417,7 +417,7 @@ function unpackDagRawData(rawDataValue) {
     }
 }
 
-module.exports = {
+export {
     getValue,
     formatBaseRequest,
     formatRouterPathArray,
