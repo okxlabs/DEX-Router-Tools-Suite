@@ -1,6 +1,6 @@
 const { decodeFunctions } = require('./decode_functions.js');
-const { decodeMultipleCommissionsFromCalldata } = require('./decode_multi_commission.js');
-const { decodeMultipleTrimsFromCalldata } = require('./decode_multi_trim.js');
+const { extractCommissionInfoFromCalldata } = require('./decode_commission.js');
+const { extractTrimInfoFromCalldata } = require('./decode_trim.js');
 
 export function resolve(calldata) {
     try {
@@ -10,16 +10,16 @@ export function resolve(calldata) {
         const decodedFunctions = decodeFunctions(calldata);
         
         // Decode multiple commission occurrences using the new decoder
-        const multiCommissionDecoded = decodeMultipleCommissionsFromCalldata(calldata);
+        const commissionDecoded = extractCommissionInfoFromCalldata(calldata);
         
         // Decode multiple trim occurrences using the new decoder
-        const multiTrimDecoded = decodeMultipleTrimsFromCalldata(calldata);
+        const trimDecoded = extractTrimInfoFromCalldata(calldata);
         
         // Return structured JSON with all decode results
         return {
             ...decodedFunctions,
-            ...multiCommissionDecoded,
-            ...multiTrimDecoded
+            ...commissionDecoded,
+            ...trimDecoded
         };
     } catch (error) {
         console.error('Decode error:', error);
