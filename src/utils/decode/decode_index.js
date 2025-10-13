@@ -9,9 +9,9 @@ export function resolve(calldata) {
         // Decode function information using the original decoder
         const decodedFunctions = decodeFunctions(calldata);
         
-        // Check if this is an ERC20 function (doesn't need commission/trim processing)
+        // Check if this is an ERC20 or utility function (doesn't need commission/trim processing)
         const isERC20Function = decodedFunctions.function && 
-            ['approve'].includes(decodedFunctions.function.name);
+            ['approve', 'swapWrap'].includes(decodedFunctions.function.name);
         
         if (isERC20Function) {
             // For ERC20 functions, return only the decoded function data
