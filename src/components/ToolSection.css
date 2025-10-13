@@ -79,3 +79,90 @@
   max-height: 400px;
   overflow: auto;
 }
+
+/* Form styles for EncodeCalldata component */
+.encode-form {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  color: #61dafb;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-family: monospace;
+  background-color: #ffffff;
+  color: #282c34;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #61dafb;
+  box-shadow: 0 0 5px rgba(97, 218, 251, 0.3);
+}
+
+/* Component container and common styles */
+.component-container {
+  flex: 1;
+  text-align: center;
+  padding: 20px;
+}
+
+.component-title {
+  color: #61dafb;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.component-textarea {
+  padding: 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  font-family: monospace;
+  word-break: break-all;
+  line-height: 1.4;
+  background-color: #ffffff;
+  color: #282c34;
+}
+
+.component-textarea:focus {
+  outline: none;
+  border-color: #61dafb;
+  box-shadow: 0 0 5px rgba(97, 218, 251, 0.3);
+}
+
+.component-button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #61dafb;
+  color: #282c34;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.component-button:hover {
+  background-color: #21a1c4;
+}
