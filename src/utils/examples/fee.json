@@ -1,0 +1,55 @@
+[
+  {
+    "name": "Dual Commission",
+    "hasCommission": true,
+    "referCount": 2,
+    "hasToB": false,
+    "last": {
+      "flag": "0x22220afc2aaa",
+      "commissionType": "DUAL_FROM_TOKEN_COMMISSION",
+      "rate": "1750000",
+      "address": "0x6eA08ca8F313d860808ef7431fc72c6FbcF4A72D"
+    },
+    "middle": {
+      "isToB": false,
+      "token": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+    },
+    "first": {
+      "flag": "0x22220afc2aaa",
+      "commissionType": "DUAL_FROM_TOKEN_COMMISSION",
+      "rate": "325000",
+      "address": "0xFC7CB22F62176ebA2d66554a5225305Dd734F13f"
+    }
+  },
+  {
+    "name": "Single Commission",
+    "hasCommission": true,
+    "referCount": 1,
+    "middle": {
+      "isToB": true,
+      "token": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+    },
+    "first": {
+      "flag": "0x3ca20afc2bbb",
+      "commissionType": "SINGLE_TO_TOKEN_COMMISSION",
+      "rate": "10000000",
+      "address": "0x9DB698954F6D4d1E4e33A827b7B5D8e801F61B63"
+    }
+  },
+  {
+    "name": "Dual Trim",
+    "hasTrim": true,
+    "expectAmountOut": "100",
+    "trimRate": "50",
+    "trimAddress": "0x09b00b836b210cac2633c276f45e4c3b14595511",
+    "chargeRate": "1000",
+    "chargeAddress": "0xa14d3e126e636ed58dcf6c9d3946d04febf14036"
+  },
+  {
+    "name": "Single Trim",
+    "hasTrim": true,
+    "expectAmountOut": "0",
+    "trimRate": "0",
+    "trimAddress": "0x0000000000000000000000000000000000000064"
+  }
+]

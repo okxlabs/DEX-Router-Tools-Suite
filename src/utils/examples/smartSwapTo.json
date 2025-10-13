@@ -1,0 +1,44 @@
+{
+    "function": {
+        "name": "smartSwapTo",
+        "selector": "0x03b87e5f"
+    },
+    "orderId": "106011",
+    "receiver": "0x3Ba0Ee766BC00c64aBb358f2237982De211f4295",
+    "baseRequest": {
+        "fromToken": "0xa29b8d1cfa805ffce2aad2e40cfd9b5828f84444",
+        "toToken": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "fromTokenAmount": "1",
+        "minReturnAmount": "0",
+        "deadLine": "1760089866"
+    },
+    "batchesAmount": [
+        "0"
+    ],
+    "batches": [
+        [
+            {
+                "mixAdapters": [
+                    "0x5280D6afe6321c958cAce4029616d677957eb43B"
+                ],
+                "assetTo": [
+                    "0x5280D6afe6321c958cAce4029616d677957eb43B"
+                ],
+                "rawData": [
+                    {
+                        "poolAddress": "0x0000000000000000000000000000000000000000",
+                        "reverse": true,
+                        "weight": "10000"
+                    }
+                ],
+                "extraData": [
+                    "0x000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c000000000000000000000000a29b8d1cfa805ffce2aad2e40cfd9b5828f844440000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000405fdf7e5af85e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e4bd96780da"
+                ],
+                "fromToken": "0xa29b8d1cfa805ffce2aad2e40cfd9b5828f84444"
+            }
+        ]
+    ],
+    "extraData": [],
+    "hasCommission": false,
+    "hasTrim": false
+}

@@ -1,0 +1,21 @@
+{
+    "function": {
+        "name": "uniswapV3SwapTo",
+        "selector": "0x0d5f0e3b"
+    },
+    "receiver": {
+        "isOneForZero": false,
+        "isWethUnwrap": false,
+        "address": "0xe984f00b6c46826f94dc30b1a4d703062c4398bb"
+    },
+    "amount": "10000000000000000",
+    "minReturn": "36566005",
+    "pools": [
+        {
+            "isOneForZero": false,
+            "pool": "0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b"
+        }
+    ],
+    "hasCommission": false,
+    "hasTrim": false
+}

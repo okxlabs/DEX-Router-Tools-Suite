@@ -1,0 +1,62 @@
+{
+  "function": {
+    "name": "smartSwapByOrderId",
+    "selector": "0xb80c2f09"
+  },
+  "orderId": "16022044718475456",
+  "baseRequest": {
+    "fromToken": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "toToken": "0x967aEC3276b63c5E2262da9641DB9dbeBB07dC0d",
+    "fromTokenAmount": "495750000000000",
+    "minReturnAmount": "54845710",
+    "deadLine": "1759216600"
+  },
+  "batchesAmount": [
+    "495750000000000"
+  ],
+  "batches": [
+    [
+      {
+        "mixAdapters": [
+          "0x02D0131E5Cc86766e234EbF1eBe33444443b98a3"
+        ],
+        "assetTo": [
+          "0x02D0131E5Cc86766e234EbF1eBe33444443b98a3"
+        ],
+        "rawData": [
+          {
+            "poolAddress": "0xbb913accdabf1f952aae3dfe78e18a0893b395ff",
+            "reverse": true,
+            "weight": "10000"
+          }
+        ],
+        "extraData": [
+          "0x000000000000000000000000f6d226f9dc15d9bb51182815b320d3fbe324e1ba000000000000000000000000b880fd278198bd590252621d4cd071b1842e9bcd"
+        ],
+        "fromToken": "0xf6d226f9dc15d9bb51182815b320d3fbe324e1ba"
+      },
+      {
+        "mixAdapters": [
+          "0x02D0131E5Cc86766e234EbF1eBe33444443b98a3"
+        ],
+        "assetTo": [
+          "0x02D0131E5Cc86766e234EbF1eBe33444443b98a3"
+        ],
+        "rawData": [
+          {
+            "poolAddress": "0x900fd5d77fb52095528b7f88af9299d8cae54b1e",
+            "reverse": true,
+            "weight": "10000"
+          }
+        ],
+        "extraData": [
+          "0x000000000000000000000000b880fd278198bd590252621d4cd071b1842e9bcd000000000000000000000000967aec3276b63c5e2262da9641db9dbebb07dc0d"
+        ],
+        "fromToken": "0xb880fd278198bd590252621d4cd071b1842e9bcd"
+      }
+    ]
+  ],
+  "extraData": [],
+  "hasCommission": false,
+  "hasTrim": false
+}

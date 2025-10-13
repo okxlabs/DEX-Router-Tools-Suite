@@ -1,0 +1,11 @@
+{
+    "function": {
+        "name": "swapWrap",
+        "selector": "0x01617fab"
+    },
+    "orderId": "0",
+    "rawdata": {
+        "reversed": true,
+        "amount": "130482295051271832401"
+    }
+}

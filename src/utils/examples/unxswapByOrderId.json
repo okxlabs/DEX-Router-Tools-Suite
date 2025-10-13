@@ -1,0 +1,23 @@
+{
+    "function": {
+        "name": "unxswapByOrderId",
+        "selector": "0x9871efa4"
+    },
+    "srcToken": {
+        "orderId": "109490",
+        "address": "0x2468065e9102f056506ec6c8d788ea64752d0520"
+    },
+    "amount": "34301511197807535000",
+    "minReturn": "488215591014915462",
+    "pools": [
+        {
+            "isToken0Tax": false,
+            "isToken1Tax": false,
+            "WETH": true,
+            "numerator": "997500000",
+            "address": "0xc1c1fd4a9a346456709d26550f28523534a0bed7"
+        }
+    ],
+    "hasCommission": false,
+    "hasTrim": false
+}
