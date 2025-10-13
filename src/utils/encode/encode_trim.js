@@ -14,20 +14,13 @@ const TRIM_FLAGS = {
  */
 export function addTrimToCalldata(calldata, trimData) {
     try {
-        console.log('=== TRIM ENCODING START ===');
-        console.log('Input calldata length:', calldata.length);
-        console.log('Trim data:', JSON.stringify(trimData, null, 2));
-
         let calldataHex = calldata.replace(/^0x/, '');
-        console.log('Base calldata hex length:', calldataHex.length);
 
         if (trimData.trimRate && trimData.trimAddress && trimData.expectAmountOut) {
             // Check if it's single or dual trim
             const isDualTrim = trimData.trimRate2 && trimData.trimAddress2;
             
             if (isDualTrim) {
-                console.log('Processing DUAL trim...');
-                
                 // DUAL TRIM: 96 bytes (3 x 32-byte blocks)
                 // Based on decode logic: thirdBlock + secondBlock + firstBlock
                 // - thirdBlock: trim_flag + trim_rate2 + trim_address2
@@ -37,18 +30,11 @@ export function addTrimToCalldata(calldata, trimData) {
                 const thirdBlock = encodeTrimBlock(trimData.trimRate2, trimData.trimAddress2, TRIM_FLAGS.DUAL);
                 const secondBlock = encodeExpectAmountBlock(trimData.expectAmountOut, TRIM_FLAGS.DUAL);
                 const firstBlock = encodeTrimBlock(trimData.trimRate, trimData.trimAddress, TRIM_FLAGS.DUAL);
-                
-                console.log('Third block (rate2):', thirdBlock);
-                console.log('Second block (expect):', secondBlock);
-                console.log('First block (rate1):', firstBlock);
-                
+
                 // Encode in order: third + second + first (decoder finds first, looks backwards)
                 calldataHex += thirdBlock + secondBlock + firstBlock;
-                console.log('After appending dual trim blocks, hex length:', calldataHex.length);
                 
             } else {
-                console.log('Processing SINGLE trim...');
-                
                 // SINGLE TRIM: 64 bytes (2 x 32-byte blocks)
                 // Based on decode logic: expectAmountBlock + trimDataBlock
                 // - expectAmountBlock: trim_flag + padding + expect_amount
@@ -56,30 +42,18 @@ export function addTrimToCalldata(calldata, trimData) {
                 
                 const expectAmountBlock = encodeExpectAmountBlock(trimData.expectAmountOut, TRIM_FLAGS.SINGLE);
                 const trimDataBlock = encodeTrimBlock(trimData.trimRate, trimData.trimAddress, TRIM_FLAGS.SINGLE);
-                
-                console.log('Expect amount block:', expectAmountBlock);
-                console.log('Trim data block:', trimDataBlock);
-                
                 // Encode in order: expect + trim (decoder finds trim, looks backwards for expect)
                 calldataHex += expectAmountBlock + trimDataBlock;
-                console.log('After appending single trim blocks, hex length:', calldataHex.length);
             }
         } else {
             throw new Error('Trim data missing required fields: trimRate, trimAddress, expectAmountOut');
         }
 
         const result = '0x' + calldataHex;
-        console.log('=== TRIM ENCODING COMPLETE ===');
-        console.log('Final calldata length:', result.length);
-        console.log('Trim blocks added:', (result.length - calldata.length) / 2, 'bytes');
-        console.log('Trim data starts at position:', calldata.length - 2); // -2 for 0x prefix
-        const trimHex = result.slice(calldata.length);
-        console.log('Trim data in final calldata:', trimHex);
         
         return result;
 
     } catch (error) {
-        console.error('Error adding trim to calldata:', error);
         throw new Error('Failed to encode trim data: ' + error.message);
     }
 }
@@ -93,8 +67,6 @@ export function addTrimToCalldata(calldata, trimData) {
  */
 function encodeTrimBlock(rate, address, flag) {
     try {
-        console.log('Encoding trim block:', { rate, address, flag });
-
         if (!rate || !address || !flag) {
             throw new Error('Trim block missing required fields: rate, address, flag');
         }
@@ -105,12 +77,9 @@ function encodeTrimBlock(rate, address, flag) {
         const addressHex = address.replace(/^0x/, '').toLowerCase().padStart(40, '0');
 
         const result = flagHex + rateHex + addressHex;
-        console.log(`Trim block: flag=${flagHex}, rate=${rateHex}, address=${addressHex}`);
-        console.log(`Trim block total length: ${result.length} chars (${result.length/2} bytes)`);
-
+        
         return result;
     } catch (error) {
-        console.error('Error encoding trim block:', error);
         throw new Error(`Failed to encode trim block: ${error.message}`);
     }
 }
@@ -123,7 +92,6 @@ function encodeTrimBlock(rate, address, flag) {
  */
 function encodeExpectAmountBlock(expectAmount, flag) {
     try {
-        console.log('Encoding expect amount block:', { expectAmount, flag });
 
         if (!expectAmount || !flag) {
             throw new Error('Expect amount block missing required fields: expectAmount, flag');
@@ -135,12 +103,9 @@ function encodeExpectAmountBlock(expectAmount, flag) {
         const expectHex = expectBN.toHexString().replace(/^0x/, '').toLowerCase().padStart(40, '0'); // 20 bytes
 
         const result = flagHex + padding + expectHex;
-        console.log(`Expect block: flag=${flagHex}, padding=${padding}, expect=${expectHex}`);
-        console.log(`Expect block total length: ${result.length} chars (${result.length/2} bytes)`);
 
         return result;
     } catch (error) {
-        console.error('Error encoding expect amount block:', error);
         throw new Error(`Failed to encode expect amount block: ${error.message}`);
     }
 }
@@ -151,7 +116,6 @@ function encodeExpectAmountBlock(expectAmount, flag) {
  * @returns {boolean} True if valid
  */
 export function validateTrimData(trimData) {
-    console.log('Validating trim data:', JSON.stringify(trimData, null, 2));
 
     if (!trimData || typeof trimData !== 'object') {
         throw new Error('Trim data must be an object');
@@ -189,6 +153,6 @@ export function validateTrimData(trimData) {
         throw new Error(`Invalid numeric values in trim data: ${error.message}`);
     }
 
-    console.log('Trim data validation passed');
     return true;
 }
+

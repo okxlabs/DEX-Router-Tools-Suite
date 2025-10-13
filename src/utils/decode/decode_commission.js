@@ -99,18 +99,10 @@ function extractCommissionInfoFromCalldata(calldataHex) {
                 const last = "0x" + calldataHex.slice(firstEnd + 64, firstEnd + 128);
                 
                 try {
-                    console.log('🔍 DUAL COMMISSION DECODING:');
-                    console.log('Found DUAL flag at position:', firstStart);
-                    console.log('First block:', first);
-                    console.log('Middle block:', middle);
-                    console.log('Last block:', last);
-                    
                     // Parse all blocks - they can have different flag types
                     const firstCommission = parseCommission(first);
                     const middleInfo = parseMiddle(middle);
                     const lastCommission = parseCommission(last);
-                    
-                    console.log('✅ Successfully parsed dual commission blocks');
                     
                     // If we successfully parsed all blocks, this is a dual commission
                     return {
@@ -123,7 +115,6 @@ function extractCommissionInfoFromCalldata(calldataHex) {
                     };
                 } catch (error) {
                     // If parsing fails, continue searching
-                    console.log('Failed to parse dual commission at position', firstStart, ':', error.message);
                 }
             }
         }
