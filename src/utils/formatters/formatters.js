@@ -12,8 +12,8 @@ import {
     SWAP_AMOUNT_MASK,
     DAG_INPUT_INDEX_MASK,
     DAG_OUTPUT_INDEX_MASK
-} from './masks.js';
-import { isRouterPathTuple } from './validation.js';
+} from '../core/masks.js';
+import { isRouterPathTuple } from '../core/validation.js';
 
 /**
  * Convert ethers BigNumbers to strings and process nested data structures

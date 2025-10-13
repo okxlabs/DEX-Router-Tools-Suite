@@ -159,5 +159,6 @@ function extractTrimInfoFromCalldata(calldataHex) {
 }
 
 export { 
-    extractTrimInfoFromCalldata
+    extractTrimInfoFromCalldata,
+    TRIM_FLAGS
 };

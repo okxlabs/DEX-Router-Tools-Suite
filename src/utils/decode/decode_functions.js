@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { DEXROUTER_ABI } from './dexrouter-abi.js';
+import { DEXROUTER_ABI } from '../core/abi.js';
 import {
     isBaseRequestTuple,
     isRouterPathArray,
@@ -7,7 +7,7 @@ import {
     isPoolsArray,
     isPackedSrcToken,
     isSwapWrapRawdata
-} from './validation.js';
+} from '../core/validation.js';
 import {
     getValue,
     formatBaseRequest,
@@ -16,7 +16,7 @@ import {
     unpackPoolsArray,
     unpackSrcToken,
     unpackSwapRawdata
-} from './formatters.js';
+} from '../formatters/formatters.js';
 
 // Initialize interface and function selectors once
 const contractInterface = new ethers.utils.Interface(DEXROUTER_ABI);
