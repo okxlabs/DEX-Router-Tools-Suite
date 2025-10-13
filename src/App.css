@@ -238,4 +238,7 @@ html, body {
 
 .toast.error {
   background-color: #f44336;
+  border: 2px solid #d32f2f;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+  font-weight: bold;
 }

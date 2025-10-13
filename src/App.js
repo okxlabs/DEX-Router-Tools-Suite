@@ -2,6 +2,7 @@ import './App.css';
 import { useState } from 'react';
 import { resolve } from './utils/decode/decode_index.js';
 import { encode } from './utils/encode/encode_index.js';
+import { validateEncodedCalldata, validateDecodedJson } from './utils/core/roundtrip_validator.js';
 import DecodeCalldata from './components/DecodeCalldata.js';
 import EncodeCalldata from './components/EncodeCalldata.js';
 
@@ -13,9 +14,9 @@ function App() {
   const [encodeResult, setEncodeResult] = useState(null);
   const [toast, setToast] = useState(null);
 
-  const showToast = (message, type = 'success') => {
+  const showToast = (message, type = 'success', duration = 3000) => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000); // Hide after 3 seconds
+    setTimeout(() => setToast(null), duration);
   };
 
   return (
@@ -49,9 +50,25 @@ function App() {
                   return;
                 }
                 
-                const result = resolve(leftInput.trim());
-                setDecodeResult(result);
-                showToast('Calldata decoded');
+                try {
+                  const originalCalldata = leftInput.trim();
+                  const result = resolve(originalCalldata);
+                  
+                  // Validate the decoded JSON by encoding it back
+                  const validation = validateDecodedJson(originalCalldata, result);
+                  
+                  setDecodeResult(result);
+                  
+                  if (validation.success) {
+                    showToast('✅ Decoding successful and validated!', 'success');
+                  } else {
+                    showToast(`❌ Validation failed: ${validation.summary}`, 'error', 30000); // Red toast for 30 seconds
+                    console.warn('Reverse validation details:', validation);
+                  }
+                } catch (error) {
+                  showToast('Error: Failed to decode calldata', 'error');
+                  setDecodeResult({ success: false, error: error.message });
+                }
               }}
               result={decodeResult}
               showToast={showToast}
@@ -75,8 +92,17 @@ function App() {
                   // Encode the JSON data to calldata
                   const result = encode(jsonData);
                   
+                  // Validate the encoded calldata by decoding it back
+                  const validation = validateEncodedCalldata(jsonData, result);
+                  
                   setEncodeResult(result);
-                  showToast('JSON data successfully encoded to calldata!');
+                  
+                  if (validation.success) {
+                    showToast('✅ Encoding successful and validated!', 'success');
+                  } else {
+                    showToast(`❌ Validation failed: ${validation.summary}`, 'error', 30000); // Red toast for 30 seconds
+                    console.warn('Validation details:', validation);
+                  }
                 } catch (error) {
                   showToast('Error: Invalid JSON format or encoding failed', 'error');
                   setEncodeResult('Error: ' + error.message);
