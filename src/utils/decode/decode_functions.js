@@ -7,7 +7,7 @@ import {
     isPoolsArray,
     isPackedSrcToken,
     isSwapWrapRawdata
-} from '../core/validation.js';
+} from '../core/type_checkers.js';
 import {
     getValue,
     formatBaseRequest,

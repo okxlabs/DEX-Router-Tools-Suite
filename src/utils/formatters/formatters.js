@@ -13,7 +13,7 @@ import {
     DAG_INPUT_INDEX_MASK,
     DAG_OUTPUT_INDEX_MASK
 } from '../core/masks.js';
-import { isRouterPathTuple } from '../core/validation.js';
+import { isRouterPathTuple } from '../core/type_checkers.js';
 
 /**
  * Convert ethers BigNumbers to strings and process nested data structures
