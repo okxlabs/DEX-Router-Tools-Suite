@@ -13,7 +13,8 @@ import {
     prepareSwapWrapParams,
     prepareSwapWrapToWithBaseRequestParams,
     prepareDagSwapByOrderIdParams,
-    prepareDagSwapToParams
+    prepareDagSwapToParams,
+    prepareApproveParams
 } from '../formatters/encode_parameters.js';
 
 // Initialize interface once
@@ -91,6 +92,8 @@ function prepareParameters(jsonData, fragment) {
             return prepareDagSwapByOrderIdParams(jsonData);
         case 'dagSwapTo':
             return prepareDagSwapToParams(jsonData);
+        case 'approve':
+            return prepareApproveParams(jsonData);
         default:
             throw new Error(`Unsupported function: ${fragment.name}`);
     }

@@ -9,10 +9,17 @@ export function resolve(calldata) {
         // Decode function information using the original decoder
         const decodedFunctions = decodeFunctions(calldata);
         
-        // Decode multiple commission occurrences using the new decoder
-        const commissionDecoded = extractCommissionInfoFromCalldata(calldata);
+        // Check if this is an ERC20 function (doesn't need commission/trim processing)
+        const isERC20Function = decodedFunctions.function && 
+            ['approve'].includes(decodedFunctions.function.name);
         
-        // Decode multiple trim occurrences using the new decoder
+        if (isERC20Function) {
+            // For ERC20 functions, return only the decoded function data
+            return decodedFunctions;
+        }
+        
+        // For DEX router functions, decode commission and trim data
+        const commissionDecoded = extractCommissionInfoFromCalldata(calldata);
         const trimDecoded = extractTrimInfoFromCalldata(calldata);
         
         // Return structured JSON with all decode results

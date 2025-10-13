@@ -266,3 +266,25 @@ export function prepareDagSwapToParams(jsonData) {
     
     return [orderId, receiver, prepareBaseRequestTuple(baseRequest), preparePathsTuples(paths)];
 }
+
+/**
+ * Prepare parameters for approve function (ERC20)
+ * ABI: (address spender, uint256 amount)
+ */
+export function prepareApproveParams(jsonData) {
+    const { spender, amount } = jsonData;
+    
+    if (!spender || !amount) {
+        throw new Error('Missing required parameters for approve: spender and amount are required');
+    }
+    
+    // Validate spender is a valid address
+    if (!/^0x[a-fA-F0-9]{40}$/.test(spender)) {
+        throw new Error('Invalid spender address format');
+    }
+    
+    // Convert amount to string to ensure proper handling
+    const amountStr = amount.toString();
+    
+    return [spender, amountStr];
+}

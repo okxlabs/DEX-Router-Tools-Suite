@@ -12,6 +12,8 @@ const DEXROUTER_ABI = [
     "function swapWrapToWithBaseRequest(uint256 orderId, address receiver, tuple(uint256 fromToken, address toToken, uint256 fromTokenAmount, uint256 minReturnAmount, uint256 deadLine) baseRequest) external payable",
     "function dagSwapByOrderId(uint256 orderId, tuple(uint256 fromToken, address toToken, uint256 fromTokenAmount, uint256 minReturnAmount, uint256 deadLine) baseRequest, tuple(address[] mixAdapters, address[] assetTo, uint256[] rawData, bytes[] extraData, uint256 fromToken)[] paths) external payable returns (uint256 returnAmount)",
     "function dagSwapTo(uint256 orderId, address receiver, tuple(uint256 fromToken, address toToken, uint256 fromTokenAmount, uint256 minReturnAmount, uint256 deadLine) baseRequest, tuple(address[] mixAdapters, address[] assetTo, uint256[] rawData, bytes[] extraData, uint256 fromToken)[] paths) external payable returns (uint256 returnAmount)",
+    // ERC20 Functions
+    "function approve(address spender, uint256 amount) external returns (bool)",
 ];
 
 // Auto-generated function selectors
@@ -28,7 +30,9 @@ const FUNCTION_SELECTORS = {
     SWAPWRAP: "0x01617fab",
     SWAPWRAPTOWITHBASEREQUEST: "0x98d2ac62",
     DAGSWAPBYORDERID: "0xf2c42696",
-    DAGSWAPTO: "0x0c307f76"
+    DAGSWAPTO: "0x0c307f76",
+    // ERC20 Function Selectors
+    APPROVE: "0x095ea7b3"
 };
 
 const SELECTOR_TO_FUNCTION = {
@@ -44,7 +48,9 @@ const SELECTOR_TO_FUNCTION = {
     "0x01617fab": "swapWrap",
     "0x98d2ac62": "swapWrapToWithBaseRequest",
     "0xf2c42696": "dagSwapByOrderId",
-    "0x0c307f76": "dagSwapTo"
+    "0x0c307f76": "dagSwapTo",
+    // ERC20 Functions
+    "0x095ea7b3": "approve"
 };
 
 export {

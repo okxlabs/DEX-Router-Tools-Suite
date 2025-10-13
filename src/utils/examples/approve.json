@@ -1,0 +1,8 @@
+{
+  "function": {
+    "name": "approve",
+    "selector": "0x095ea7b3"
+  },
+  "spender": "0x2c34A2Fb1d0b4f55de51E1d0bDEfaDDce6b7cDD6",
+  "amount": "72935557000000000000"
+}
