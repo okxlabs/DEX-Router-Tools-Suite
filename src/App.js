@@ -62,7 +62,7 @@ function App() {
                   if (validation.success) {
                     showToast('✅ Decoding successful and validated!', 'success');
                   } else {
-                    showToast(`❌ Validation failed: ${validation.summary}`, 'error', 30000); // Red toast for 30 seconds
+                    showToast(`${validation.summary}`, 'error', 30000); // Red toast for 30 seconds
                     console.warn('Reverse validation details:', validation);
                   }
                 } catch (error) {
@@ -100,7 +100,7 @@ function App() {
                   if (validation.success) {
                     showToast('✅ Encoding successful and validated!', 'success');
                   } else {
-                    showToast(`❌ Validation failed: ${validation.summary}`, 'error', 30000); // Red toast for 30 seconds
+                    showToast(`${validation.summary}`, 'error', 30000); // Red toast for 30 seconds
                     console.warn('Validation details:', validation);
                   }
                 } catch (error) {

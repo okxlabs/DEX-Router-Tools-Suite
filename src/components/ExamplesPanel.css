@@ -1,10 +1,11 @@
-/* Examples Panel */
+/* Main Panel Layout */
 .examples-panel {
     background: #1e1e1e;
-    border-radius: 8px;
+    border: 1px solid #555;
+    border-radius: 6px;
     padding: 0;
     margin: 0;
-    height: 100%;
+    max-height: calc(100vh - 100px);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -13,20 +14,22 @@
 .examples-header {
     background: #282c34;
     padding: 16px 20px;
-    border-bottom: 1px solid #61dafb;
+    border-bottom: 1px solid #555;
     text-align: left;
 }
 
 .examples-header h3 {
-    margin: 0 0 8px 0;
-    color: #61dafb;
-    font-size: 16px;
+    margin: 0 0 6px 0;
+    color: #fff;
+    font-size: 15px;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .examples-header p {
     margin: 0;
-    color: #cccccc;
+    color: #aaa;
     font-size: 12px;
 }
 
@@ -36,9 +39,9 @@
     padding: 8px 0;
 }
 
-/* Example Item */
+/* Example Items */
 .example-item {
-    border-bottom: 1px solid #2a2a2a;
+    border-bottom: 1px solid #555;
 }
 
 .example-item:last-child {
@@ -47,134 +50,57 @@
 
 .example-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     padding: 12px 20px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    margin: 2px 8px;
 }
 
 .example-header:hover {
-    background: #252525;
-}
-
-.example-arrow {
-    color: #61dafb;
-    font-size: 10px;
-    margin-right: 12px;
-    margin-top: 4px;
-    transition: transform 0.2s ease;
-    width: 10px;
-    flex-shrink: 0;
-}
-
-.example-arrow.expanded {
-    transform: rotate(90deg);
-}
-
-.example-info {
-    flex: 1;
-    text-align: left;
-}
-
-.example-info.clickable {
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-
-.example-info.clickable:hover {
-    background: rgba(97, 218, 251, 0.1);
+    background: #555;
+    transform: translateX(4px);
 }
 
 .example-name {
     color: #61dafb;
     font-weight: 500;
     font-size: 13px;
-    margin-bottom: 4px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .category-badge {
-    background: #61dafb;
-    color: #282c34;
+    background: rgba(97, 218, 251, 0.2);
+    color: #61dafb;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 500;
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: 3px;
     text-transform: uppercase;
 }
 
-.example-description {
-    color: #cccccc;
-    font-size: 11px;
-    line-height: 1.4;
-}
-
-/* Example Details */
-.example-details {
-    padding: 0 20px 16px 42px;
-    background: #151515;
-}
-
-.json-preview {
-    background: #0d1117;
-    border: 1px solid #30363d;
-    border-radius: 6px;
-    padding: 12px;
-    margin: 8px 0;
-    font-size: 10px;
-    line-height: 1.4;
-    color: #e6edf3;
-    overflow-x: auto;
-    max-height: 120px;
-    overflow-y: auto;
-}
-
-.load-example-btn {
-    background: #61dafb;
-    color: #282c34;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-    width: 100%;
-}
-
-.load-example-btn:hover {
-    background: #4fa8c5;
-}
 
 /* Scrollbar Styling */
-.examples-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.examples-list::-webkit-scrollbar-track {
-    background: #1a1a1a;
-}
-
-.examples-list::-webkit-scrollbar-thumb {
-    background: #61dafb;
-    border-radius: 3px;
-}
-
-.examples-list::-webkit-scrollbar-thumb:hover {
-    background: #4fa8c5;
-}
-
+.examples-list::-webkit-scrollbar,
 .json-preview::-webkit-scrollbar {
     width: 4px;
     height: 4px;
 }
 
+.examples-list::-webkit-scrollbar-track {
+    background: #282c34;
+}
+
 .json-preview::-webkit-scrollbar-track {
     background: #0d1117;
+}
+
+.examples-list::-webkit-scrollbar-thumb {
+    background: #61dafb;
+    border-radius: 2px;
 }
 
 .json-preview::-webkit-scrollbar-thumb {
@@ -182,80 +108,155 @@
     border-radius: 2px;
 }
 
+.examples-list::-webkit-scrollbar-thumb:hover {
+    background: #4fa8c5;
+}
+
 .json-preview::-webkit-scrollbar-thumb:hover {
     background: #484f58;
 }
 
-/* Button Rows for Commission and Trim */
-.button-rows {
-    padding: 16px 20px;
-    border-top: 1px solid #2a2a2a;
-    background: #1a1a1a;
+/* Input Grid Layout */
+.input-grid-section {
+    padding: 20px;
+    border-top: 1px solid #555;
+    background: #282c34;
+    flex-shrink: 0;
 }
 
-.button-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
+.input-section {
+    margin-bottom: 20px;
 }
 
-.button-row:last-child {
+.input-section:last-child {
     margin-bottom: 0;
 }
 
-.button-row-label {
+.section-label {
     color: #61dafb;
     font-size: 12px;
     font-weight: 600;
-    min-width: 80px;
-    margin-right: 12px;
-}
-
-.button-group {
+    margin-bottom: 12px;
     display: flex;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.selection-button {
-    background: #282c34;
-    color: #61dafb;
-    border: 1px solid #61dafb;
+.input-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.input-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Input Fields */
+.address-input,
+.rate-input {
+    background: #1e1e1e;
+    color: #fff;
+    border: 1px solid #555;
     border-radius: 4px;
-    padding: 6px 12px;
+    padding: 8px 12px;
     font-size: 12px;
-    font-weight: 600;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.address-input {
+    width: 40%;
+}
+
+.address-input.token-address {
+    width: calc(40% + 20% + 38px); /* Width of address + rate + both gaps */
+}
+
+.address-input.expect-amount {
+    width: calc(40% + 20% + 38px); /* Same width as token-address */
+}
+
+.rate-input {
+    width: 20%;
+}
+
+.address-input:focus,
+.rate-input:focus {
+    outline: none;
+    border-color: #61dafb;
+    box-shadow: 0 0 0 2px rgba(97, 218, 251, 0.2);
+}
+
+.address-input::placeholder,
+.rate-input::placeholder {
+    color: #888;
+}
+
+/* Hide number input spinner arrows */
+.rate-input::-webkit-outer-spin-button,
+.rate-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Toggle Buttons */
+.toggle-group {
+    display: flex;
+    border: 1px solid #555;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 25%;
+    flex-shrink: 0;
+}
+
+.toggle-button {
+    background: #1e1e1e;
+    color: #aaa;
+    border: none;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
-    min-width: 32px;
+    transition: all 0.2s ease;
+    border-right: 1px solid #555;
+    flex: 1;
 }
 
-.selection-button:hover {
+.toggle-button:last-child {
+    border-right: none;
+}
+
+.toggle-button:hover {
+    background: #555;
+    color: #fff;
+}
+
+.toggle-button.active {
     background: #61dafb;
     color: #282c34;
 }
 
-.selection-button.selected {
-    background: #61dafb;
-    color: #282c34;
-    box-shadow: 0 2px 4px rgba(97, 218, 251, 0.3);
+/* Layout Spacers and Special Buttons */
+.rate-input-spacer {
+    width: 25%; /* Match rate-input width for ToB row */
+    padding-right: 12px;
 }
 
-/* Responsive adjustments for button rows */
-@media (max-width: 768px) {
-    .button-rows {
-        padding: 12px 16px;
-    }
-    
-    .button-row-label {
-        min-width: 70px;
-        font-size: 11px;
-    }
-    
-    .selection-button {
-        padding: 4px 8px;
-        font-size: 11px;
-        min-width: 28px;
-    }
+.toggle-group-spacer {
+    width: 25%; /* Match toggle-group width */
+    flex-shrink: 0;
+}
+
+.tob-button {
+    width: 25%; /* Match toggle-group width */
+    flex-shrink: 0;
+    border: 1px solid #555 !important;
+    border-radius: 4px;
 }
 
 /* Responsive Design */
@@ -272,12 +273,31 @@
         padding: 10px 16px;
     }
     
-    .example-details {
-        padding: 0 16px 12px 32px;
-    }
-    
     .category-badge {
         font-size: 9px;
         padding: 1px 4px;
+    }
+    
+    .input-grid-section {
+        padding: 12px 16px;
+    }
+    
+    .input-row {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .address-input,
+    .rate-input {
+        width: 100%;
+    }
+    
+    .toggle-group {
+        align-self: stretch;
+    }
+    
+    .toggle-button {
+        flex: 1;
+        padding: 8px 12px;
     }
 }

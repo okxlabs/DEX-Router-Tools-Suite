@@ -10,77 +10,80 @@ import uniswapV3SwapToWithBaseRequest from '../utils/examples/uniswapV3SwapToWit
 import unxswapByOrderId from '../utils/examples/unxswapByOrderId.json';
 import unxswapTo from '../utils/examples/unxswapTo.json';
 import unxswapToWithBaseRequest from '../utils/examples/unxswapToWithBaseRequest.json';
+import dagSwapByOrderId from '../utils/examples/dagSwapByOrderId.json';
 import approve from '../utils/examples/approve.json';
 
 const ExamplesPanel = ({ onExampleSelect, showToast }) => {
-    const [expandedItems, setExpandedItems] = useState({});
-    const [selectedCommission, setSelectedCommission] = useState(0);
-    const [selectedTrim, setSelectedTrim] = useState(0);
+    
+    // Commission state - address, rate, token type
+    const [commission1, setCommission1] = useState({ address: '', rate: '', isFromToken: true });
+    const [commission2, setCommission2] = useState({ address: '', rate: '', isFromToken: true });
+    
+    // Shared commission settings
+    const [commissionToB, setCommissionToB] = useState(false);
+    const [commissionTokenAddress, setCommissionTokenAddress] = useState('');
+    
+    // Trim state - address and rate pairs
+    const [trim1, setTrim1] = useState({ address: '', rate: '' });
+    const [trim2, setTrim2] = useState({ address: '', rate: '' });
+    
+    // Shared trim settings
+    const [expectAmountOut, setExpectAmountOut] = useState('');
 
     // Organize examples by category
     const examples = [
         { 
             name: 'smartSwapByOrderId', 
             data: smartSwapByOrderId, 
-            description: 'Smart swap with order ID and batches',
-            category: 'Smart Swap'
+            category: 'SMART SWAP'
         },
         { 
             name: 'smartSwapTo', 
             data: smartSwapTo, 
-            description: 'Smart swap to specific receiver',
-            category: 'Smart Swap'
+            category: 'SMART SWAP'
         },
         { 
             name: 'uniswapV3SwapTo', 
             data: uniswapV3SwapTo, 
-            description: 'UniswapV3 swap with commission',
-            category: 'UniswapV3'
+            category: 'UNISWAPV3'
         },
         { 
             name: 'uniswapV3SwapToWithBaseRequest', 
             data: uniswapV3SwapToWithBaseRequest, 
-            description: 'UniswapV3 swap with base request',
-            category: 'UniswapV3'
+            category: 'UNISWAPV3'
         },
         { 
             name: 'unxswapByOrderId', 
             data: unxswapByOrderId, 
-            description: 'Unxswap with order ID',
-            category: 'Unxswap'
+            category: 'UNXSWAP'
         },
         { 
             name: 'unxswapTo', 
             data: unxswapTo, 
-            description: 'Unxswap to receiver',
-            category: 'Unxswap'
+            category: 'UNXSWAP'
         },
         { 
             name: 'unxswapToWithBaseRequest', 
             data: unxswapToWithBaseRequest, 
-            description: 'Unxswap with base request',
-            category: 'Unxswap'
+            category: 'UNXSWAP'
+        },
+        { 
+            name: 'dagSwapByOrderId', 
+            data: dagSwapByOrderId, 
+            category: 'DAG SWAP'
         },
         { 
             name: 'swapWrap', 
             data: swapWrap, 
-            description: 'Simple swap wrap function',
-            category: 'Utility'
+            category: 'UTILITY'
         },
         { 
             name: 'approve', 
             data: approve, 
-            description: 'ERC20 approve function - allows spender to transfer tokens',
             category: 'ERC20'
         }
     ];
 
-    const toggleExample = (exampleName) => {
-        setExpandedItems(prev => ({
-            ...prev,
-            [exampleName]: !prev[exampleName]
-        }));
-    };
 
     const handleExampleClick = (example) => {
         // Generate complete JSON with function + commission + trim based on current state
@@ -103,33 +106,85 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
                 return;
             }
 
-            // For DEX router functions, add commission and trim data
-            const feeData = await import('../utils/examples/fee.json');
+            // For DEX router functions, add commission and trim data based on inputs
             
-            // Add commission data based on current state
-            if (selectedCommission === 0) {
-                completeJson.hasCommission = false;
-            } else {
-                const commissionConfig = feeData.default.find(item => 
-                    item.name === (selectedCommission === 1 ? 'Single Commission' : 'Dual Commission')
-                );
-                if (commissionConfig) {
-                    const { name, ...commissionData } = commissionConfig;
-                    completeJson = { ...completeJson, ...commissionData };
+            // Generate commission data from inputs (0, 1, or 2)
+            const hasCommission1 = commission1.address && commission1.rate;
+            const hasCommission2 = commission2.address && commission2.rate;
+            const commissionCount = (hasCommission1 ? 1 : 0) + (hasCommission2 ? 1 : 0);
+            
+            if (commissionCount > 0) {
+                completeJson.hasCommission = true;
+                completeJson.referCount = commissionCount;
+                
+                if (commissionCount === 2) {
+                    // Dual commission
+                    completeJson.first = {
+                        flag: commission1.isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb",
+                        commissionType: commission1.isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION",
+                        rate: commission1.rate,
+                        address: commission1.address
+                    };
+                    completeJson.last = {
+                        flag: commission2.isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb", 
+                        commissionType: commission2.isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION",
+                        rate: commission2.rate,
+                        address: commission2.address
+                    };
+                    completeJson.middle = {
+                        isToB: commissionToB,
+                        token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+                    };
+                } else {
+                    // Single commission (use first non-empty one)
+                    const activeCommission = hasCommission1 ? commission1 : commission2;
+                    completeJson.first = {
+                        flag: activeCommission.isFromToken ? "0x3ca20afc2aaa" : "0x3ca20afc2bbb",
+                        commissionType: activeCommission.isFromToken ? "SINGLE_FROM_TOKEN_COMMISSION" : "SINGLE_TO_TOKEN_COMMISSION",
+                        rate: activeCommission.rate,
+                        address: activeCommission.address
+                    };
+                    completeJson.middle = {
+                        isToB: commissionToB,
+                        token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+                    };
                 }
+            } else {
+                completeJson.hasCommission = false;
             }
 
-            // Add trim data based on current state
-            if (selectedTrim === 0) {
-                completeJson.hasTrim = false;
-            } else {
-                const trimConfig = feeData.default.find(item => 
-                    item.name === (selectedTrim === 1 ? 'Single Trim' : 'Dual Trim')
-                );
-                if (trimConfig) {
-                    const { name, ...trimData } = trimConfig;
-                    completeJson = { ...completeJson, ...trimData };
+            // Generate trim data from inputs (0, 1, or 2)
+            const hasTrim1 = trim1.address && trim1.rate;
+            const hasTrim2 = trim2.address && trim2.rate;
+            const trimCount = (hasTrim1 ? 1 : 0) + (hasTrim2 ? 1 : 0);
+            
+            if (trimCount > 0) {
+                completeJson.hasTrim = true;
+                
+                // Auto-convert: if only trim2 is filled, treat it as trim1
+                if (!hasTrim1 && hasTrim2) {
+                    completeJson.trimRate = trim2.rate;
+                    completeJson.trimAddress = trim2.address;
+                } else if (hasTrim1 && !hasTrim2) {
+                    // Only trim1 is filled
+                    completeJson.trimRate = trim1.rate;
+                    completeJson.trimAddress = trim1.address;
+                } else if (hasTrim1 && hasTrim2) {
+                    // Both are filled
+                    completeJson.trimRate = trim1.rate;
+                    completeJson.trimAddress = trim1.address;
+                    completeJson.chargeRate = trim2.rate;
+                    completeJson.chargeAddress = trim2.address;
                 }
+                
+                // Always add expectAmountOut and default charge values for single trim
+                completeJson.expectAmountOut = expectAmountOut || "100";
+                if (trimCount === 1) {
+                    completeJson.chargeRate = "0";
+                    completeJson.chargeAddress = "0x0000000000000000000000000000000000000000";
+                }
+            } else {
+                completeJson.hasTrim = false;
             }
 
             // Load the complete JSON into the encoder
@@ -142,123 +197,185 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
         }
     };
 
-    const handleCommissionTrimSelect = (type, count) => {
-        // Update state silently - no toast notifications
-        if (type === 'commission') {
-            setSelectedCommission(count);
-        } else if (type === 'trim') {
-            setSelectedTrim(count);
+    // Input change handlers
+    const handleCommissionChange = (index, field, value) => {
+        if (index === 1) {
+            setCommission1(prev => ({ ...prev, [field]: value }));
+        } else {
+            setCommission2(prev => ({ ...prev, [field]: value }));
         }
-        // State is updated, next function click will use the new state
     };
 
-    const formatJsonPreview = (data) => {
-        // Show a condensed preview of the JSON
-        const { function: func, ...rest } = data;
-        const preview = {
-            function: func.name,
-            ...Object.fromEntries(
-                Object.entries(rest).slice(0, 3).map(([key, value]) => [
-                    key, 
-                    typeof value === 'object' && value !== null ? '...' : value
-                ])
-            )
-        };
-        if (Object.keys(rest).length > 3) {
-            preview['...'] = `+${Object.keys(rest).length - 3} more`;
+    const handleTrimChange = (index, field, value) => {
+        if (index === 1) {
+            setTrim1(prev => ({ ...prev, [field]: value }));
+        } else {
+            setTrim2(prev => ({ ...prev, [field]: value }));
         }
-        return JSON.stringify(preview, null, 2);
     };
+
+
 
     return (
         <div className="examples-panel">
-            <div className="examples-header">
-                <h3>📋 JSON Examples</h3>
-                <p>Click any example to load it into the encoder</p>
-            </div>
-
             <div className="examples-list">
                 {examples.map((example) => (
                     <div key={example.name} className="example-item">
-                        <div className="example-header">
-                            <span 
-                                className={`example-arrow ${expandedItems[example.name] ? 'expanded' : ''}`}
-                                onClick={() => toggleExample(example.name)}
-                            >
-                                ▶
-                            </span>
-                            <div 
-                                className="example-info clickable"
-                                onClick={() => handleExampleClick(example)}
-                            >
-                                <div className="example-name">
-                                    <span className="category-badge">{example.category}</span>
-                                    {example.name}
-                                </div>
-                                <div className="example-description">{example.description}</div>
+                        <div 
+                            className="example-header clickable"
+                            onClick={() => handleExampleClick(example)}
+                        >
+                            <div className="example-name">
+                                <span className="category-badge">{example.category}</span>
+                                {example.name}
                             </div>
                         </div>
-
-                        {expandedItems[example.name] && (
-                            <div className="example-details">
-                                <pre className="json-preview">
-                                    {formatJsonPreview(example.data)}
-                                </pre>
-                            </div>
-                        )}
                     </div>
                 ))}
             </div>
 
-            {/* Commission and Trim Button Rows */}
-            <div className="button-rows">
-                {/* Commission Row */}
-                <div className="button-row">
-                    <div className="button-row-label">Commission:</div>
-                    <div className="button-group">
-                        <button 
-                            className={`selection-button ${selectedCommission === 0 ? 'selected' : ''}`}
-                            onClick={() => handleCommissionTrimSelect('commission', 0)}
-                        >
-                            0
-                        </button>
-                        <button 
-                            className={`selection-button ${selectedCommission === 1 ? 'selected' : ''}`}
-                            onClick={() => handleCommissionTrimSelect('commission', 1)}
-                        >
-                            1
-                        </button>
-                        <button 
-                            className={`selection-button ${selectedCommission === 2 ? 'selected' : ''}`}
-                            onClick={() => handleCommissionTrimSelect('commission', 2)}
-                        >
-                            2
-                        </button>
+            {/* Commission and Trim Input Grid */}
+            <div className="input-grid-section">
+                {/* Commission Section */}
+                <div className="input-section">
+                    <div className="section-label">Commission</div>
+                    <div className="input-grid">
+                        {/* Commission 1 */}
+                        <div className="input-row">
+                            <input
+                                type="text"
+                                className="address-input"
+                                placeholder="Referrer 1 Address"
+                                value={commission1.address}
+                                onChange={(e) => handleCommissionChange(1, 'address', e.target.value)}
+                            />
+                            <input
+                                type="number"
+                                className="rate-input"
+                                placeholder="Rate"
+                                value={commission1.rate}
+                                onChange={(e) => handleCommissionChange(1, 'rate', e.target.value)}
+                            />
+                            <div className="toggle-group">
+                                <button
+                                    className={`toggle-button ${commission1.isFromToken ? 'active' : ''}`}
+                                    onClick={() => handleCommissionChange(1, 'isFromToken', true)}
+                                >
+                                    FromToken
+                                </button>
+                                <button
+                                    className={`toggle-button ${!commission1.isFromToken ? 'active' : ''}`}
+                                    onClick={() => handleCommissionChange(1, 'isFromToken', false)}
+                                >
+                                    ToToken
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* Commission 2 */}
+                        <div className="input-row">
+                            <input
+                                type="text"
+                                className="address-input"
+                                placeholder="Referrer 2 Address"
+                                value={commission2.address}
+                                onChange={(e) => handleCommissionChange(2, 'address', e.target.value)}
+                            />
+                            <input
+                                type="number"
+                                className="rate-input"
+                                placeholder="Rate"
+                                value={commission2.rate}
+                                onChange={(e) => handleCommissionChange(2, 'rate', e.target.value)}
+                            />
+                            <div className="toggle-group">
+                                <button
+                                    className={`toggle-button ${commission2.isFromToken ? 'active' : ''}`}
+                                    onClick={() => handleCommissionChange(2, 'isFromToken', true)}
+                                >
+                                    FromToken
+                                </button>
+                                <button
+                                    className={`toggle-button ${!commission2.isFromToken ? 'active' : ''}`}
+                                    onClick={() => handleCommissionChange(2, 'isFromToken', false)}
+                                >
+                                    ToToken
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* Shared Commission Settings Row */}
+                        <div className="input-row">
+                            <input
+                                type="text"
+                                className="address-input token-address"
+                                placeholder="Token Address"
+                                value={commissionTokenAddress}
+                                onChange={(e) => setCommissionTokenAddress(e.target.value)}
+                            />
+                            <button
+                                className={`toggle-button tob-button ${commissionToB ? 'active' : ''}`}
+                                onClick={() => setCommissionToB(!commissionToB)}
+                            >
+                                ToB Commission
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {/* Trim Row */}
-                <div className="button-row">
-                    <div className="button-row-label">Trim:</div>
-                    <div className="button-group">
-                        <button 
-                            className={`selection-button ${selectedTrim === 0 ? 'selected' : ''}`}
-                            onClick={() => handleCommissionTrimSelect('trim', 0)}
-                        >
-                            0
-                        </button>
-                        <button 
-                            className={`selection-button ${selectedTrim === 1 ? 'selected' : ''}`}
-                            onClick={() => handleCommissionTrimSelect('trim', 1)}
-                        >
-                            1
-                        </button>
-                        <button 
-                            className={`selection-button ${selectedTrim === 2 ? 'selected' : ''}`}
-                            onClick={() => handleCommissionTrimSelect('trim', 2)}
-                        >
-                            2
-                        </button>
+                {/* Trim Section */}
+                <div className="input-section">
+                    <div className="section-label">Trim</div>
+                    <div className="input-grid">
+                        {/* Trim 1 */}
+                        <div className="input-row">
+                            <input
+                                type="text"
+                                className="address-input"
+                                placeholder="Trim Address"
+                                value={trim1.address}
+                                onChange={(e) => handleTrimChange(1, 'address', e.target.value)}
+                            />
+                            <input
+                                type="number"
+                                className="rate-input"
+                                placeholder="Rate"
+                                value={trim1.rate}
+                                onChange={(e) => handleTrimChange(1, 'rate', e.target.value)}
+                            />
+                            <div className="toggle-group-spacer"></div> {/* Spacer to match toggle group width */}
+                        </div>
+                        
+                        {/* Trim 2 */}
+                        <div className="input-row">
+                            <input
+                                type="text"
+                                className="address-input"
+                                placeholder="Charge Address"
+                                value={trim2.address}
+                                onChange={(e) => handleTrimChange(2, 'address', e.target.value)}
+                            />
+                            <input
+                                type="number"
+                                className="rate-input"
+                                placeholder="Rate"
+                                value={trim2.rate}
+                                onChange={(e) => handleTrimChange(2, 'rate', e.target.value)}
+                            />
+                            <div className="toggle-group-spacer"></div> {/* Spacer to match toggle group width */}
+                        </div>
+                        
+                        {/* Expect Amount Out Row */}
+                        <div className="input-row">
+                            <input
+                                type="text"
+                                className="address-input expect-amount"
+                                placeholder="Expect Amount Out"
+                                value={expectAmountOut}
+                                onChange={(e) => setExpectAmountOut(e.target.value)}
+                            />
+                            <div className="toggle-group-spacer"></div> {/* Spacer to match toggle group width */}
+                        </div>
                     </div>
                 </div>
             </div>
