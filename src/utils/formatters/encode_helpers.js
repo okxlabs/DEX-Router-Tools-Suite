@@ -1,4 +1,4 @@
-import { packRawDataArray } from './encode_packers.js';
+import { packRawDataArray, packDagRawDataArray } from './encode_packers.js';
 
 /**
  * Prepare baseRequest tuple from JSON object
@@ -54,6 +54,25 @@ export function preparePathsTuples(paths) {
         routerPath.mixAdapters,
         routerPath.assetTo,
         packRawDataArray(routerPath.rawData), // Pack rawData objects
+        routerPath.extraData,
+        routerPath.fromToken
+    ]);
+}
+
+/**
+ * Prepare DAG RouterPath tuples from JSON array (for DAG paths - 1D array)
+ * @param {Array} paths - 1D array of DAG RouterPath objects
+ * @returns {Array} 1D array of DAG RouterPath tuples
+ */
+export function prepareDagPathsTuples(paths) {
+    if (!Array.isArray(paths)) {
+        throw new Error('DAG paths must be an array');
+    }
+    
+    return paths.map(routerPath => [
+        routerPath.mixAdapters,
+        routerPath.assetTo,
+        packDagRawDataArray(routerPath.rawData), // Pack DAG rawData objects with inputIndex/outputIndex
         routerPath.extraData,
         routerPath.fromToken
     ]);

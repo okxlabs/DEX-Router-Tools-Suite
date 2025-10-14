@@ -8,7 +8,8 @@ import {
 import { 
     prepareBaseRequestTuple, 
     prepareBatchesTuples, 
-    preparePathsTuples 
+    preparePathsTuples,
+    prepareDagPathsTuples 
 } from './encode_helpers.js';
 
 /**
@@ -250,7 +251,7 @@ export function prepareDagSwapByOrderIdParams(jsonData) {
         throw new Error('Missing required parameters for dagSwapByOrderId');
     }
     
-    return [orderId, prepareBaseRequestTuple(baseRequest), preparePathsTuples(paths)];
+    return [orderId, prepareBaseRequestTuple(baseRequest), prepareDagPathsTuples(paths)];
 }
 
 /**
@@ -264,7 +265,7 @@ export function prepareDagSwapToParams(jsonData) {
         throw new Error('Missing required parameters for dagSwapTo');
     }
     
-    return [orderId, receiver, prepareBaseRequestTuple(baseRequest), preparePathsTuples(paths)];
+    return [orderId, receiver, prepareBaseRequestTuple(baseRequest), prepareDagPathsTuples(paths)];
 }
 
 /**

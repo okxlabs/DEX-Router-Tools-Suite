@@ -9,7 +9,9 @@ import {
     IS_TOKEN1_TAX_MASK,
     WETH_MASK,
     NUMERATOR_MASK,
-    SWAP_AMOUNT_MASK
+    SWAP_AMOUNT_MASK,
+    DAG_INPUT_INDEX_MASK,
+    DAG_OUTPUT_INDEX_MASK
 } from '../core/masks.js';
 
 /**
@@ -138,6 +140,50 @@ export function packUnxswapPool(pool) {
 }
 
 /**
+ * Pack DAG rawData object into uint256
+ * @param {Object} rawData - {poolAddress, reverse, weight, inputIndex, outputIndex}
+ * @returns {string} Packed uint256 value
+ */
+export function packDagRawData(rawData) {
+    if (typeof rawData === 'string') {
+        return rawData; // Already packed
+    }
+    
+    const { poolAddress, reverse, weight, inputIndex, outputIndex } = rawData;
+    
+    // Start with the pool address (lower 160 bits)
+    let packed = ethers.BigNumber.from(poolAddress);
+    
+    // Add weight (bits 160-175)
+    if (weight !== undefined && weight !== null) {
+        const weightBN = ethers.BigNumber.from(weight);
+        const weightShifted = weightBN.and(ethers.BigNumber.from('0xFFFF')).shl(160);
+        packed = packed.or(weightShifted);
+    }
+    
+    // Add outputIndex (bits 176-183) - shift left by 176 bits
+    if (outputIndex !== undefined && outputIndex !== null) {
+        const outputIndexBN = ethers.BigNumber.from(outputIndex);
+        const outputIndexShifted = outputIndexBN.and(ethers.BigNumber.from('0xFF')).shl(176);
+        packed = packed.or(outputIndexShifted);
+    }
+    
+    // Add inputIndex (bits 184-191) - shift left by 184 bits  
+    if (inputIndex !== undefined && inputIndex !== null) {
+        const inputIndexBN = ethers.BigNumber.from(inputIndex);
+        const inputIndexShifted = inputIndexBN.and(ethers.BigNumber.from('0xFF')).shl(184);
+        packed = packed.or(inputIndexShifted);
+    }
+    
+    // Set the reverse flag if needed (bit 255)
+    if (reverse) {
+        packed = packed.or(REVERSE_MASK);
+    }
+    
+    return packed.toString();
+}
+
+/**
  * Pack rawData objects into uint256 array
  * @param {Array} rawDataArray - Array of rawData objects
  * @returns {Array} Array of packed uint256 values
@@ -167,4 +213,17 @@ export function packRawDataArray(rawDataArray) {
         
         return packed.toString();
     });
+}
+
+/**
+ * Pack DAG rawData objects into uint256 array (for DAG functions)
+ * @param {Array} rawDataArray - Array of DAG rawData objects
+ * @returns {Array} Array of packed uint256 values
+ */
+export function packDagRawDataArray(rawDataArray) {
+    if (!Array.isArray(rawDataArray)) {
+        return rawDataArray;
+    }
+    
+    return rawDataArray.map(rawData => packDagRawData(rawData));
 }

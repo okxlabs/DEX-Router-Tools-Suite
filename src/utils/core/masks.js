@@ -37,8 +37,9 @@ const NUMERATOR_MASK = ethers.BigNumber.from("0x0000000000000000ffffffff00000000
 const SWAP_AMOUNT_MASK = ethers.BigNumber.from("0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 
 // DAG-specific masks for rawData in dagSwap functions
-const DAG_INPUT_INDEX_MASK = ethers.BigNumber.from("0x0000000000000000ff0000000000000000000000000000000000000000000000");
-const DAG_OUTPUT_INDEX_MASK = ethers.BigNumber.from("0x000000000000000000ff00000000000000000000000000000000000000000000");
+// inputIndex at bits 184-191, outputIndex at bits 176-183
+const DAG_INPUT_INDEX_MASK = ethers.BigNumber.from("0x000000000000ff000000000000000000000000000000000000000000000000000");
+const DAG_OUTPUT_INDEX_MASK = ethers.BigNumber.from("0x0000000000000000ff0000000000000000000000000000000000000000000000");
 
 export {
     ADDRESS_MASK,

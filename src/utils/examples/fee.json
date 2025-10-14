@@ -42,14 +42,14 @@
     "expectAmountOut": "100",
     "trimRate": "50",
     "trimAddress": "0x09b00b836b210cac2633c276f45e4c3b14595511",
-    "chargeRate": "1000",
-    "chargeAddress": "0xa14d3e126e636ed58dcf6c9d3946d04febf14036"
+    "trimRate2": "1000",
+    "trimAddress2": "0xa14d3e126e636ed58dcf6c9d3946d04febf14036"
   },
   {
     "name": "Single Trim",
     "hasTrim": true,
     "expectAmountOut": "0",
-    "trimRate": "0",
-    "trimAddress": "0x0000000000000000000000000000000000000064"
+    "trimRate": "2000",
+    "trimAddress": "0xa14d3e126e636ed58dcf6c9d3946d04febf14036"
   }
 ]
