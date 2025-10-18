@@ -9,7 +9,6 @@ const DecodeCalldata = ({
 }) => {
   return (
     <div className="component-container">
-      <h2 className="component-title">Decode calldata</h2>
       <textarea
         value={value}
         onChange={onChange}

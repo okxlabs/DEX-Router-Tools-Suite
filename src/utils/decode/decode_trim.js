@@ -1,4 +1,4 @@
-const { ethers } = require("ethers");
+import { ethers } from 'ethers';
 
 /**
  * Trim parsing script - used to parse trim data from DEX transaction calldata
@@ -100,8 +100,8 @@ function extractTrimInfoFromCalldata(calldataHex) {
                     trimRate: trimData.rate,
                     trimAddress: trimData.address,
                     expectAmountOut: expectAmountOut,
-                    trimRate2: "0",
-                    trimAddress2: "0x0000000000000000000000000000000000000000"
+                    chargeRate: "0",
+                    chargeAddress: "0x0000000000000000000000000000000000000000"
                 };
             } catch (error) {
                 // If parsing fails, continue to check dual trim
@@ -145,8 +145,8 @@ function extractTrimInfoFromCalldata(calldataHex) {
                         trimRate: trimData1.rate,
                         trimAddress: trimData1.address,
                         expectAmountOut: expectAmountOut,
-                        trimRate2: trimData2.rate,
-                        trimAddress2: trimData2.address
+                        chargeRate: trimData2.rate,
+                        chargeAddress: trimData2.address
                     };
                 } catch (error) {
                     console.error("Failed to parse dual trim data:", error.message);
@@ -158,6 +158,7 @@ function extractTrimInfoFromCalldata(calldataHex) {
     return { hasTrim: false };
 }
 
-module.exports = { 
-    extractTrimInfoFromCalldata
+export { 
+    extractTrimInfoFromCalldata,
+    TRIM_FLAGS
 };

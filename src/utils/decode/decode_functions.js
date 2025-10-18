@@ -1,14 +1,14 @@
-const { ethers } = require('ethers');
-const { DEXROUTER_ABI } = require('./dexrouter-abi');
-const {
+import { ethers } from 'ethers';
+import { DEXROUTER_ABI } from '../core/abi.js';
+import {
     isBaseRequestTuple,
     isRouterPathArray,
     isPackedReceiver,
     isPoolsArray,
     isPackedSrcToken,
     isSwapWrapRawdata
-} = require('./validation');
-const {
+} from '../core/type_checkers.js';
+import {
     getValue,
     formatBaseRequest,
     formatRouterPathArray,
@@ -16,7 +16,7 @@ const {
     unpackPoolsArray,
     unpackSrcToken,
     unpackSwapRawdata
-} = require('./formatters');
+} from '../formatters/formatters.js';
 
 // Initialize interface and function selectors once
 const contractInterface = new ethers.utils.Interface(DEXROUTER_ABI);
@@ -152,6 +152,4 @@ function createErrorResult(message, extra = {}) {
 }
 
 // Export main functionality
-module.exports = {
-    decodeFunctions
-};
+export { decodeFunctions };
