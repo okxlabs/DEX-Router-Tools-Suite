@@ -13,7 +13,7 @@ import unxswapToWithBaseRequest from '../utils/examples/unxswapToWithBaseRequest
 import dagSwapByOrderId from '../utils/examples/dagSwapByOrderId.json';
 import approve from '../utils/examples/approve.json';
 
-const ExamplesPanel = ({ onExampleSelect, showToast }) => {
+const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
     
     // Commission state - address, rate, token type
     const [commission1, setCommission1] = useState({ address: '', rate: '', isFromToken: true });
@@ -90,102 +90,131 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
         generateCompleteJson(example);
     };
 
+    // Extract commission and trim generation logic into reusable function
+    const applyCommissionAndTrimToJson = (baseJson) => {
+        let completeJson = { ...baseJson };
+
+        // Check if this is a function that should NOT have commission/trim
+        const functionsWithoutCommissionTrim = ['approve', 'swapWrap'];
+        const functionName = baseJson.function?.name;
+        
+        if (functionsWithoutCommissionTrim.includes(functionName)) {
+            // For ERC20 and utility functions, remove any existing commission/trim data and return
+            delete completeJson.hasCommission;
+            delete completeJson.referCount;
+            delete completeJson.first;
+            delete completeJson.last;
+            delete completeJson.middle;
+            delete completeJson.hasTrim;
+            delete completeJson.trimRate;
+            delete completeJson.trimAddress;
+            delete completeJson.expectAmountOut;
+            delete completeJson.chargeRate;
+            delete completeJson.chargeAddress;
+            return completeJson;
+        }
+
+        // For DEX router functions, handle commission and trim data based on inputs
+        
+        // Generate commission data from inputs (0, 1, or 2)
+        const hasCommission1 = commission1.address && commission1.rate;
+        const hasCommission2 = commission2.address && commission2.rate;
+        const commissionCount = (hasCommission1 ? 1 : 0) + (hasCommission2 ? 1 : 0);
+        
+        if (commissionCount > 0) {
+            completeJson.hasCommission = true;
+            completeJson.referCount = commissionCount;
+            
+            if (commissionCount === 2) {
+                // Dual commission
+                completeJson.first = {
+                    flag: commission1.isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb",
+                    commissionType: commission1.isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION",
+                    rate: commission1.rate,
+                    address: commission1.address
+                };
+                completeJson.last = {
+                    flag: commission2.isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb", 
+                    commissionType: commission2.isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION",
+                    rate: commission2.rate,
+                    address: commission2.address
+                };
+                completeJson.middle = {
+                    isToB: commissionToB,
+                    token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+                };
+            } else {
+                // Single commission (use first non-empty one)
+                const activeCommission = hasCommission1 ? commission1 : commission2;
+                completeJson.first = {
+                    flag: activeCommission.isFromToken ? "0x3ca20afc2aaa" : "0x3ca20afc2bbb",
+                    commissionType: activeCommission.isFromToken ? "SINGLE_FROM_TOKEN_COMMISSION" : "SINGLE_TO_TOKEN_COMMISSION",
+                    rate: activeCommission.rate,
+                    address: activeCommission.address
+                };
+                completeJson.middle = {
+                    isToB: commissionToB,
+                    token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+                };
+                // Remove last property for single commission
+                delete completeJson.last;
+            }
+        } else {
+            // No commission data - remove all commission-related fields
+            completeJson.hasCommission = false;
+            delete completeJson.referCount;
+            delete completeJson.first;
+            delete completeJson.last;
+            delete completeJson.middle;
+        }
+
+        // Generate trim data from inputs (0, 1, or 2)
+        const hasTrim1 = trim1.address && trim1.rate;
+        const hasTrim2 = trim2.address && trim2.rate;
+        const trimCount = (hasTrim1 ? 1 : 0) + (hasTrim2 ? 1 : 0);
+        
+        if (trimCount > 0) {
+            completeJson.hasTrim = true;
+            
+            // Auto-convert: if only trim2 is filled, treat it as trim1
+            if (!hasTrim1 && hasTrim2) {
+                completeJson.trimRate = trim2.rate;
+                completeJson.trimAddress = trim2.address;
+            } else if (hasTrim1 && !hasTrim2) {
+                // Only trim1 is filled
+                completeJson.trimRate = trim1.rate;
+                completeJson.trimAddress = trim1.address;
+            } else if (hasTrim1 && hasTrim2) {
+                // Both are filled
+                completeJson.trimRate = trim1.rate;
+                completeJson.trimAddress = trim1.address;
+                completeJson.chargeRate = trim2.rate;
+                completeJson.chargeAddress = trim2.address;
+            }
+            
+            // Always add expectAmountOut and default charge values for single trim
+            completeJson.expectAmountOut = expectAmountOut || "100";
+            if (trimCount === 1) {
+                completeJson.chargeRate = "0";
+                completeJson.chargeAddress = "0x0000000000000000000000000000000000000000";
+            }
+        } else {
+            // No trim data - remove all trim-related fields
+            completeJson.hasTrim = false;
+            delete completeJson.trimRate;
+            delete completeJson.trimAddress;
+            delete completeJson.expectAmountOut;
+            delete completeJson.chargeRate;
+            delete completeJson.chargeAddress;
+        }
+
+        return completeJson;
+    };
+
     const generateCompleteJson = async (example) => {
         try {
-            // Start with the base function data
-            let completeJson = { ...example.data };
-
-            // Check if this is a function that should NOT have commission/trim
-            const functionsWithoutCommissionTrim = ['approve', 'swapWrap'];
-            const functionName = example.data.function?.name;
-            
-            if (functionsWithoutCommissionTrim.includes(functionName)) {
-                // For ERC20 and utility functions, just return the base function data
-                onExampleSelect(JSON.stringify(completeJson, null, 2));
-                showToast(`${example.name} loaded!`, 'success');
-                return;
-            }
-
-            // For DEX router functions, add commission and trim data based on inputs
-            
-            // Generate commission data from inputs (0, 1, or 2)
-            const hasCommission1 = commission1.address && commission1.rate;
-            const hasCommission2 = commission2.address && commission2.rate;
-            const commissionCount = (hasCommission1 ? 1 : 0) + (hasCommission2 ? 1 : 0);
-            
-            if (commissionCount > 0) {
-                completeJson.hasCommission = true;
-                completeJson.referCount = commissionCount;
-                
-                if (commissionCount === 2) {
-                    // Dual commission
-                    completeJson.first = {
-                        flag: commission1.isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb",
-                        commissionType: commission1.isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION",
-                        rate: commission1.rate,
-                        address: commission1.address
-                    };
-                    completeJson.last = {
-                        flag: commission2.isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb", 
-                        commissionType: commission2.isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION",
-                        rate: commission2.rate,
-                        address: commission2.address
-                    };
-                    completeJson.middle = {
-                        isToB: commissionToB,
-                        token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-                    };
-                } else {
-                    // Single commission (use first non-empty one)
-                    const activeCommission = hasCommission1 ? commission1 : commission2;
-                    completeJson.first = {
-                        flag: activeCommission.isFromToken ? "0x3ca20afc2aaa" : "0x3ca20afc2bbb",
-                        commissionType: activeCommission.isFromToken ? "SINGLE_FROM_TOKEN_COMMISSION" : "SINGLE_TO_TOKEN_COMMISSION",
-                        rate: activeCommission.rate,
-                        address: activeCommission.address
-                    };
-                    completeJson.middle = {
-                        isToB: commissionToB,
-                        token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-                    };
-                }
-            } else {
-                completeJson.hasCommission = false;
-            }
-
-            // Generate trim data from inputs (0, 1, or 2)
-            const hasTrim1 = trim1.address && trim1.rate;
-            const hasTrim2 = trim2.address && trim2.rate;
-            const trimCount = (hasTrim1 ? 1 : 0) + (hasTrim2 ? 1 : 0);
-            
-            if (trimCount > 0) {
-                completeJson.hasTrim = true;
-                
-                // Auto-convert: if only trim2 is filled, treat it as trim1
-                if (!hasTrim1 && hasTrim2) {
-                    completeJson.trimRate = trim2.rate;
-                    completeJson.trimAddress = trim2.address;
-                } else if (hasTrim1 && !hasTrim2) {
-                    // Only trim1 is filled
-                    completeJson.trimRate = trim1.rate;
-                    completeJson.trimAddress = trim1.address;
-                } else if (hasTrim1 && hasTrim2) {
-                    // Both are filled
-                    completeJson.trimRate = trim1.rate;
-                    completeJson.trimAddress = trim1.address;
-                    completeJson.chargeRate = trim2.rate;
-                    completeJson.chargeAddress = trim2.address;
-                }
-                
-                // Always add expectAmountOut and default charge values for single trim
-                completeJson.expectAmountOut = expectAmountOut || "100";
-                if (trimCount === 1) {
-                    completeJson.chargeRate = "0";
-                    completeJson.chargeAddress = "0x0000000000000000000000000000000000000000";
-                }
-            } else {
-                completeJson.hasTrim = false;
-            }
+            // Apply commission and trim to the example data
+            const completeJson = applyCommissionAndTrimToJson(example.data);
 
             // Load the complete JSON into the encoder
             onExampleSelect(JSON.stringify(completeJson, null, 2));
@@ -211,6 +240,13 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
             setTrim1(prev => ({ ...prev, [field]: value }));
         } else {
             setTrim2(prev => ({ ...prev, [field]: value }));
+        }
+    };
+
+    // Handle generate button click
+    const handleGenerateClick = () => {
+        if (onGenerateClick) {
+            onGenerateClick(applyCommissionAndTrimToJson);
         }
     };
 
@@ -252,7 +288,7 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
                             <input
                                 type="number"
                                 className="rate-input"
-                                placeholder="Rate"
+                                placeholder="Rate (Decimal: 9)"
                                 value={commission1.rate}
                                 onChange={(e) => handleCommissionChange(1, 'rate', e.target.value)}
                             />
@@ -284,7 +320,7 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
                             <input
                                 type="number"
                                 className="rate-input"
-                                placeholder="Rate"
+                                placeholder="Rate (Decimal: 9)"
                                 value={commission2.rate}
                                 onChange={(e) => handleCommissionChange(2, 'rate', e.target.value)}
                             />
@@ -339,7 +375,7 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
                             <input
                                 type="number"
                                 className="rate-input"
-                                placeholder="Rate"
+                                placeholder="Rate (Decimal: 4)"
                                 value={trim1.rate}
                                 onChange={(e) => handleTrimChange(1, 'rate', e.target.value)}
                             />
@@ -358,7 +394,7 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
                             <input
                                 type="number"
                                 className="rate-input"
-                                placeholder="Rate"
+                                placeholder="Rate (Decimal: 4)"
                                 value={trim2.rate}
                                 onChange={(e) => handleTrimChange(2, 'rate', e.target.value)}
                             />
@@ -377,6 +413,17 @@ const ExamplesPanel = ({ onExampleSelect, showToast }) => {
                             <div className="toggle-group-spacer"></div> {/* Spacer to match toggle group width */}
                         </div>
                     </div>
+                </div>
+
+                {/* Generate Button */}
+                <div className="generate-section">
+                    <button
+                        className="generate-button"
+                        onClick={handleGenerateClick}
+                        title="Apply commission and trim settings to current JSON"
+                    >
+                        Generate JSON
+                    </button>
                 </div>
             </div>
         </div>

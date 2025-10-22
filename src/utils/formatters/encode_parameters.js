@@ -189,7 +189,7 @@ export function prepareUniswapV3SwapToWithBaseRequestParams(jsonData) {
     // Pack pools
     const packedPools = pools.map(pool => packUniswapV3Pool(pool));
     
-    return [orderId, receiver, prepareBaseRequestTuple(baseRequest), packedPools];
+    return [orderId, receiver, prepareBaseRequestTuple(baseRequest, 'uniswapV3SwapToWithBaseRequest'), packedPools];
 }
 
 /**
@@ -206,7 +206,7 @@ export function prepareUnxswapToWithBaseRequestParams(jsonData) {
     // Pack pools
     const packedPools = pools.map(pool => packUnxswapPool(pool));
     
-    return [orderId, receiver, prepareBaseRequestTuple(baseRequest), packedPools];
+    return [orderId, receiver, prepareBaseRequestTuple(baseRequest, 'unxswapToWithBaseRequest'), packedPools];
 }
 
 /**

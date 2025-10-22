@@ -109,7 +109,7 @@ function createNamedParameters(inputs, decodedParams, fragment) {
         
         // Special handling for BaseRequest tuple
         if (isBaseRequestTuple(input, value)) {
-            value = formatBaseRequest(value);
+            value = formatBaseRequest(value, fragment.name);
         }
         // Special handling for RouterPath arrays (batches or DAG paths)
         else if (isRouterPathArray(input, value)) {

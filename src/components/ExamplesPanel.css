@@ -259,6 +259,40 @@
     border-radius: 4px;
 }
 
+/* Generate Button Section */
+.generate-section {
+    padding: 16px 20px;
+    border-top: 1px solid #555;
+    background: #282c34;
+    flex-shrink: 0;
+}
+
+.generate-button {
+    width: 100%;
+    padding: 12px 16px;
+    background: #61dafb;
+    color: #282c34;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.generate-button:hover {
+    background: #4fa8c5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(97, 218, 251, 0.3);
+}
+
+.generate-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(97, 218, 251, 0.3);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .examples-panel {
@@ -279,6 +313,10 @@
     }
     
     .input-grid-section {
+        padding: 12px 16px;
+    }
+    
+    .generate-section {
         padding: 12px 16px;
     }
     
