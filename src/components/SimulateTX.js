@@ -1,6 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import HelpTooltip from './HelpTooltip';
+
+// Reusable Form Field Component
+const FormField = ({ label, type = "text", placeholder, value, onChange, options = null }) => (
+  <div className="form-group">
+    <label className="form-label">
+      {label}
+    </label>
+    {options ? (
+      <select
+        className="foundry-input-white"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          appearance: 'none',
+          backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e")',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'right 12px center',
+          backgroundSize: '16px',
+          paddingRight: '40px',
+          cursor: 'pointer'
+        }}
+      >
+        <option value="">{placeholder}</option>
+        {options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+    ) : (
+      <input
+        type={type}
+        className="foundry-input-white"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    )}
+  </div>
+);
+
+// Success Card Component
+const SimulationSuccessCard = ({ accountSlug, projectSlug, simulationResult }) => (
+  <div className="simulation-success-card">
+    <label className="form-label">🎉 Simulation Complete!</label>
+    
+    <div className="tenderly-card">
+      <div className="card-header">
+        <div className="card-icon">🔍</div>
+        <div className="card-content">
+          <h3>View in Tenderly Dashboard</h3>
+          <p>Analyze your transaction simulation with detailed traces and logs</p>
+        </div>
+      </div>
+      
+      <a
+        href={`https://dashboard.tenderly.co/${accountSlug}/${projectSlug}/simulator/${simulationResult.simulation?.id || simulationResult.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="tenderly-link"
+      >
+        🚀 Open Tenderly Simulation →
+      </a>
+    </div>
+  </div>
+);
 
 const SimulateTX = ({ showToast }) => {
   const [formData, setFormData] = useState({
@@ -8,7 +73,6 @@ const SimulateTX = ({ showToast }) => {
     to: '',
     calldata: '',
     chainId: '',
-    customChainId: '',
     msgValue: '',
     gas: '',
     accountSlug: '',
@@ -57,23 +121,9 @@ const SimulateTX = ({ showToast }) => {
     { id: '56', name: 'BSC'},
     { id: '8453', name: 'Base'},
     { id: '42161', name: 'Arbitrum One'},
-    // { id: '137', name: 'Polygon'},
-    // { id: '10', name: 'Optimism'},
-    { id: '43114', name: 'Avalanche'},
-    // { id: '250', name: 'Fantom'},
-    // { id: '100', name: 'Gnosis'},
-    // { id: '534352', name: 'Scroll'},
-    // { id: '5000', name: 'Mantle'},
-    // { id: '1101', name: 'Polygon zkEVM'},
-    // { id: '81457', name: 'Blast'},
-    // { id: '25', name: 'Cronos'},
-    // { id: '324', name: 'zkSync Era'}
+    { id: '43114', name: 'Avalanche'}
   ];
 
-  const getChainName = (chainId) => {
-    const chain = chainOptions.find(chain => chain.id === chainId);
-    return chain ? chain.name : `Chain ${chainId}`;
-  };
 
   const simulateTransaction = async () => {
     // Validate required fields
@@ -82,16 +132,8 @@ const SimulateTX = ({ showToast }) => {
       return;
     }
 
-    // Get the actual chain ID to use
-    const actualChainId = formData.chainId === 'other' ? formData.customChainId : formData.chainId;
-    
-    if (!formData.from || !formData.to || !formData.calldata || !actualChainId) {
+    if (!formData.from || !formData.to || !formData.calldata || !formData.chainId) {
       showToast('Please fill in all transaction fields (From, To, Calldata, Chain ID)', 'error');
-      return;
-    }
-
-    if (formData.chainId === 'other' && !formData.customChainId) {
-      showToast('Please enter a custom chain ID', 'error');
       return;
     }
 
@@ -101,11 +143,11 @@ const SimulateTX = ({ showToast }) => {
     try {
       // Build simulation payload following the exact sample format
       const simulationPayload = {
-        'network_id': actualChainId,
+        'network_id': formData.chainId,
         'from': formData.from,
         'to': formData.to,
         'input': formData.calldata,
-        'gas': formData.gas ? parseInt(formData.gas) : 648318, // Use provided gas or default
+        'gas': formData.gas ? parseInt(formData.gas) : 100000000, // Use provided gas or default
         'value': formData.msgValue ? (parseFloat(formData.msgValue) * 1e18).toString() : '0', // Convert ETH to wei
         'save': true,
         'save_if_fails': true,
@@ -147,194 +189,94 @@ const SimulateTX = ({ showToast }) => {
   return (
     <div className="component-container">
       <div className="foundry-form-section">
+        {/* Transaction Details */}
         <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">
-              From Address
-              <HelpTooltip content="The sender address for the transaction" />
-            </label>
-            <input
-              type="text"
-              className="foundry-input-white"
-              placeholder="0x..."
-              value={formData.from}
-              onChange={(e) => handleInputChange('from', e.target.value)}
-            />
-          </div>
+          <FormField
+            label="From Address"
+            type="text"
+            placeholder="0x..."
+            value={formData.from}
+            onChange={(value) => handleInputChange('from', value)}
+          />
           
-          <div className="form-group">
-            <label className="form-label">
-              To Address
-              <HelpTooltip content="The recipient address for the transaction (contract or EOA)" />
-            </label>
-            <input
-              type="text"
-              className="foundry-input-white"
-              placeholder="0x..."
-              value={formData.to}
-              onChange={(e) => handleInputChange('to', e.target.value)}
-            />
-          </div>
+          <FormField
+            label="To Address"
+            type="text"
+            placeholder="0x..."
+            value={formData.to}
+            onChange={(value) => handleInputChange('to', value)}
+          />
+        </div>
+
+        {/* Network Configuration */}
+        <div className="form-row">
+          <FormField
+            label="Blockchain Network"
+            placeholder="Select a blockchain network..."
+            value={formData.chainId}
+            onChange={(value) => handleInputChange('chainId', value)}
+            options={chainOptions}
+          />
+          
+          <FormField
+            label="Block Height"
+            placeholder="latest"
+            value={formData.blockHeight}
+            onChange={(value) => handleInputChange('blockHeight', value)}
+          />
+        </div>
+
+        {/* Transaction Parameters */}
+        <div className="form-row">
+          <FormField
+            label="msg.value (ETH)"
+            placeholder="0 (optional)"
+            value={formData.msgValue}
+            onChange={(value) => handleInputChange('msgValue', value)}
+          />
+          
+          <FormField
+            label="Gas Limit"
+            placeholder="100000000 (optional)"
+            value={formData.gas}
+            onChange={(value) => handleInputChange('gas', value)}
+          />
+        </div>
+
+        {/* Tenderly Configuration */}
+        <div className="form-row">
+          <FormField
+            label="Account Slug"
+            placeholder="your-account-slug"
+            value={formData.accountSlug}
+            onChange={(value) => handleInputChange('accountSlug', value)}
+          />
+          
+          <FormField
+            label="Project Slug"
+            placeholder="your-project-slug"
+            value={formData.projectSlug}
+            onChange={(value) => handleInputChange('projectSlug', value)}
+          />
         </div>
 
         <div className="form-row">
           <div className="form-group">
-            <label className="form-label">
-              Blockchain Network
-              <HelpTooltip content="Select the blockchain network for your transaction simulation" />
-            </label>
-            <select
-              className="foundry-input-white"
-              value={formData.chainId}
-              onChange={(e) => handleInputChange('chainId', e.target.value)}
-              style={{
-                appearance: 'none',
-                backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e")',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 12px center',
-                backgroundSize: '16px',
-                paddingRight: '40px',
-                cursor: 'pointer'
-              }}
-            >
-              <option value="">Select a blockchain network...</option>
-              {chainOptions.map((chain) => (
-                <option key={chain.id} value={chain.id}>
-                  {chain.name}
-                </option>
-              ))}
-              <option value="other">Other (Custom Chain ID)</option>
-            </select>
-            
-            {formData.chainId === 'other' && (
-              <div style={{ marginTop: '10px' }}>
-                <input
-                  type="text"
-                  className="foundry-input-white"
-                  placeholder="Enter chain ID"
-                  value={formData.customChainId}
-                  onChange={(e) => handleInputChange('customChainId', e.target.value)}
-                  style={{
-                    fontSize: '14px',
-                    fontFamily: 'Monaco, Consolas, "Courier New", monospace'
-                  }}
-                />
-                <div style={{ 
-                  fontSize: '11px', 
-                  color: '#6c757d', 
-                  marginTop: '4px'
-                }}>
-                  💡 Tip: You can find chain IDs at <a href="https://chainlist.org" target="_blank" rel="noopener noreferrer" style={{ color: '#007bff' }}>chainlist.org</a>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              msg.value (ETH)
-              <HelpTooltip content="The amount of ETH to send with the transaction (optional)" />
-            </label>
-            <input
-              type="text"
-              className="foundry-input-white"
-              placeholder="0 (optional)"
-              value={formData.msgValue}
-              onChange={(e) => handleInputChange('msgValue', e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">
-              Gas Limit
-              <HelpTooltip content="Maximum gas units the transaction can consume" />
-            </label>
-            <input
-              type="text"
-              className="foundry-input-white"
-              placeholder="648318 (or leave empty for auto)"
-              value={formData.gas}
-              onChange={(e) => handleInputChange('gas', e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              Block Height
-              <HelpTooltip content="The block number to simulate the transaction at (optional, defaults to latest)" />
-            </label>
-            <input
-              type="text"
-              className="foundry-input-white"
-              placeholder="latest (or specific block number)"
-              value={formData.blockHeight}
-              onChange={(e) => handleInputChange('blockHeight', e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">
-              Account Slug
-              <HelpTooltip content="Your Tenderly account slug (username or organization name) - automatically saved in browser" />
-            </label>
-            <input
-              type="text"
-              className="foundry-input-white"
-              placeholder="your-account-slug"
-              value={formData.accountSlug}
-              onChange={(e) => handleInputChange('accountSlug', e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              Project Slug
-              <HelpTooltip content="Your Tenderly project slug - automatically saved in browser" />
-            </label>
-            <input
-              type="text"
-              className="foundry-input-white"
-              placeholder="your-project-slug"
-              value={formData.projectSlug}
-              onChange={(e) => handleInputChange('projectSlug', e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">
-              Tenderly API Key
-              <HelpTooltip content="Your Tenderly API key for authentication (automatically saved in browser)" />
-            </label>
-            <input
+            <FormField
+              label="Tenderly API Key"
               type="password"
-              className="foundry-input-white"
               placeholder="your-api-key"
               value={formData.tenderlyApiKey}
-              onChange={(e) => handleInputChange('tenderlyApiKey', e.target.value)}
+              onChange={(value) => handleInputChange('tenderlyApiKey', value)}
             />
-            <div style={{ 
-              fontSize: '12px', 
-              color: '#6c757d', 
-              marginTop: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}>
+            <div className="api-key-info">
               <span>ℹ️</span>
               <span>You will need a Tenderly API key to use this service.</span>
               <a 
                 href="https://dashboard.tenderly.co/account/authorization" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                style={{ color: '#007bff', textDecoration: 'none' }}
-                onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
-                onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+                className="api-key-link"
               >
                 Get API Key →
               </a>
@@ -342,109 +284,32 @@ const SimulateTX = ({ showToast }) => {
           </div>
         </div>
 
+        {/* Calldata */}
+        <FormField
+          label="Calldata"
+          placeholder="0x..."
+          value={formData.calldata}
+          onChange={(value) => handleInputChange('calldata', value)}
+        />
 
-        <div className="form-group">
-          <label className="form-label">
-            Calldata
-            <HelpTooltip content="Hex-encoded calldata for the contract function call" />
-          </label>
-          <input
-            type="text"
-            className="foundry-input-white"
-            placeholder="0x... (function selector + encoded parameters)"
-            value={formData.calldata}
-            onChange={(e) => handleInputChange('calldata', e.target.value)}
-          />
-        </div>
-
-        <div className="form-group" style={{ marginTop: '20px' }}>
+        {/* Submit Button */}
+        <div className="form-group submit-section">
           <button
             onClick={simulateTransaction}
             disabled={isSimulating}
-            className="foundry-button"
-            style={{
-              width: '100%',
-              padding: '12px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              backgroundColor: isSimulating ? '#666' : '#4caf50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: isSimulating ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.3s'
-            }}
+            className={`component-button ${isSimulating ? 'loading' : 'success'}`}
           >
             {isSimulating ? 'Simulating...' : 'Simulate Transaction'}
           </button>
         </div>
 
+        {/* Success Result */}
         {simulationResult && (
-          <div className="form-group" style={{ marginTop: '20px' }}>
-            <label className="form-label">🎉 Simulation Complete!</label>
-            
-            {/* Beautiful Tenderly Link Card */}
-            <div style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: '12px',
-              padding: '20px',
-              color: 'white',
-              boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-                <div style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                  borderRadius: '50%', 
-                  width: '40px', 
-                  height: '40px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  marginRight: '15px',
-                  fontSize: '20px'
-                }}>
-                  🔍
-                </div>
-                <div>
-                  <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', fontWeight: 'bold' }}>
-                    View in Tenderly Dashboard
-                  </h3>
-                  <p style={{ margin: '0', fontSize: '14px', opacity: '0.9' }}>
-                    Analyze your transaction simulation with detailed traces and logs
-                  </p>
-                </div>
-              </div>
-              
-              <a
-                href={`https://dashboard.tenderly.co/${formData.accountSlug}/${formData.projectSlug}/simulator/${simulationResult.simulation?.id || simulationResult.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'white',
-                  textDecoration: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  fontWeight: 'bold',
-                  fontSize: '16px',
-                  border: '2px solid rgba(255, 255, 255, 0.3)',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                🚀 Open Tenderly Simulation →
-              </a>
-            </div>
-          </div>
+          <SimulationSuccessCard
+            accountSlug={formData.accountSlug}
+            projectSlug={formData.projectSlug}
+            simulationResult={simulationResult}
+          />
         )}
       </div>
     </div>
