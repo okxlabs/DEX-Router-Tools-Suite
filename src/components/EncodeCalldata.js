@@ -1,6 +1,5 @@
 import React from 'react';
 import ExamplesPanel from './ExamplesPanel';
-import HelpTooltip from './HelpTooltip';
 
 const EncodeCalldata = ({ 
   value, 

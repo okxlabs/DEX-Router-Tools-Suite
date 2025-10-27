@@ -11,27 +11,6 @@
     flex-direction: column;
 }
 
-.examples-header {
-    background: #282c34;
-    padding: 16px 20px;
-    border-bottom: 1px solid #555;
-    text-align: left;
-}
-
-.examples-header h3 {
-    margin: 0 0 6px 0;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.examples-header p {
-    margin: 0;
-    color: #aaa;
-    font-size: 12px;
-}
 
 .examples-list {
     flex: 1;
@@ -84,8 +63,7 @@
 
 
 /* Scrollbar Styling */
-.examples-list::-webkit-scrollbar,
-.json-preview::-webkit-scrollbar {
+.examples-list::-webkit-scrollbar {
     width: 4px;
     height: 4px;
 }
@@ -94,26 +72,13 @@
     background: #282c34;
 }
 
-.json-preview::-webkit-scrollbar-track {
-    background: #0d1117;
-}
-
 .examples-list::-webkit-scrollbar-thumb {
     background: #61dafb;
     border-radius: 2px;
 }
 
-.json-preview::-webkit-scrollbar-thumb {
-    background: #30363d;
-    border-radius: 2px;
-}
-
 .examples-list::-webkit-scrollbar-thumb:hover {
     background: #4fa8c5;
-}
-
-.json-preview::-webkit-scrollbar-thumb:hover {
-    background: #484f58;
 }
 
 /* Input Grid Layout */
@@ -242,10 +207,6 @@
 }
 
 /* Layout Spacers and Special Buttons */
-.rate-input-spacer {
-    width: 25%; /* Match rate-input width for ToB row */
-    padding-right: 12px;
-}
 
 .toggle-group-spacer {
     width: 25%; /* Match toggle-group width */
@@ -299,9 +260,6 @@
         max-height: 300px;
     }
     
-    .examples-header {
-        padding: 12px 16px;
-    }
     
     .example-header {
         padding: 10px 16px;

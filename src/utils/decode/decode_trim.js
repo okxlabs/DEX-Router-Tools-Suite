@@ -18,7 +18,6 @@ import { ethers } from 'ethers';
  * 
  * Usage example:
  * const trimInfo = extractTrimInfoFromCalldata(calldata);
- * console.log("trimInfo:", trimInfo)
  */
 
 // Define trim flag constants (6 bytes)

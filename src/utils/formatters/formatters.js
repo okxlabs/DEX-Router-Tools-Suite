@@ -98,7 +98,6 @@ function bytes32ToAddress(param) {
         
         // _ADDRESS_MASK = 0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff
         // This masks the lower 160 bits (20 bytes) which is the address part
-        const ADDRESS_MASK = ethers.BigNumber.from("0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff");
         
         // assembly { result := and(param, _ADDRESS_MASK) }
         const result = paramBN.and(ADDRESS_MASK);
@@ -462,16 +461,9 @@ function unpackDagRawData(rawDataValue) {
 export {
     getValue,
     formatBaseRequest,
-    bytes32ToAddress,
     formatRouterPathArray,
-    formatRouterPath,
-    decodeRawDataArray,
-    unpackRawData,
     unpackReceiver,
     unpackPoolsArray,
-    unpackUnxswapPool,
-    unpackUniswapV3Pool,
     unpackSrcToken,
-    unpackSwapRawdata,
-    unpackDagRawData
+    unpackSwapRawdata
 };
