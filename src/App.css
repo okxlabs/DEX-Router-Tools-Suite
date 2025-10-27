@@ -301,3 +301,399 @@ html, body {
     max-height: 300px;
   }
 }
+
+/* Simulate TX Component Styles */
+.simulate-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.simulate-form-section {
+  margin-bottom: 30px;
+}
+
+.simulate-title {
+  color: #61dafb;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.simulate-form {
+  background-color: #1e1e1e;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #61dafb;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  font-family: monospace;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: #61dafb;
+  box-shadow: 0 0 8px rgba(97, 218, 251, 0.3);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: monospace;
+  line-height: 1.4;
+}
+
+.simulate-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.simulate-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.simulate-button:hover:not(:disabled) {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+.simulate-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.example-button {
+  background-color: #ff9800;
+  color: white;
+}
+
+.example-button:hover {
+  background-color: #e68900;
+}
+
+.clear-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.clear-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Results Section */
+.simulate-results-section {
+  margin-top: 30px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.result-status {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.result-status.success {
+  color: #4CAF50;
+}
+
+.result-status.error {
+  color: #f44336;
+}
+
+.result-timestamp {
+  color: #888;
+  font-size: 12px;
+}
+
+.simulation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.detail-section {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.detail-section h4 {
+  color: #61dafb;
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #1e1e1e;
+  border-radius: 6px;
+  border: 1px solid #444;
+}
+
+.detail-label {
+  color: #ccc;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: #ffffff;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.detail-value.success {
+  color: #4CAF50;
+}
+
+.detail-value.hash {
+  font-size: 12px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warnings {
+  border-left: 4px solid #ff9800;
+}
+
+.warnings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.warning-item {
+  background-color: #1e1e1e;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border-left: 3px solid #ff9800;
+  color: #ffcc80;
+}
+
+.logs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.log-item {
+  background-color: #1e1e1e;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #444;
+}
+
+.log-address, .log-topics, .log-data {
+  margin-bottom: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.log-address {
+  color: #61dafb;
+}
+
+.log-topics {
+  color: #ffcc80;
+}
+
+.log-data {
+  color: #ccc;
+}
+
+.trace-content, .error-content {
+  background-color: #1e1e1e;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Foundry Command Generator Styles */
+.foundry-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #61dafb;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.foundry-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  font-family: monospace;
+  transition: border-color 0.3s ease;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+.foundry-input:focus {
+  outline: none;
+  border-color: #61dafb;
+  box-shadow: 0 0 8px rgba(97, 218, 251, 0.3);
+}
+
+.foundry-input-white {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background-color: #ffffff;
+  color: #333;
+  font-family: monospace;
+  transition: border-color 0.3s ease;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+.foundry-input-white:focus {
+  outline: none;
+  border-color: #61dafb;
+  box-shadow: 0 0 8px rgba(97, 218, 251, 0.3);
+}
+
+.error-details {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #f44336;
+}
+
+.error-details h4 {
+  color: #f44336;
+  margin: 0 0 15px 0;
+}
+
+/* Responsive Design for Simulate TX */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .simulate-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .simulate-button, .example-button, .clear-button {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
