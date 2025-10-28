@@ -2,33 +2,32 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Reusable Form Field Component
-const FormField = ({ label, type = "text", placeholder, value, onChange, options = null }) => (
+const FormField = ({ label, type = "text", placeholder, value, onChange, options = null, autoComplete, name }) => (
   <div className="form-group">
     <label className="form-label">
       {label}
     </label>
     {options ? (
-      <select
-        className="foundry-input-white"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{
-          appearance: 'none',
-          backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e")',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'right 12px center',
-          backgroundSize: '16px',
-          paddingRight: '40px',
-          cursor: 'pointer'
-        }}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option.id} value={option.id}>
-            {option.name}
-          </option>
-        ))}
-      </select>
+        <select
+          className="foundry-input-white"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          style={{
+            appearance: 'none',
+            backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e")',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 12px center',
+            backgroundSize: '16px',
+            paddingRight: '40px',
+            cursor: 'pointer'
+          }}
+        >
+          {options.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.name}
+            </option>
+          ))}
+        </select>
     ) : (
       <input
         type={type}
@@ -36,6 +35,8 @@ const FormField = ({ label, type = "text", placeholder, value, onChange, options
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        autoComplete={autoComplete}
+        name={name}
       />
     )}
   </div>
@@ -72,27 +73,23 @@ const SimulateTX = ({ showToast }) => {
     from: '',
     to: '',
     calldata: '',
-    chainId: '',
+    chainId: 'other',
+    customChainId: '',
     msgValue: '',
-    gas: '',
     accountSlug: '',
     projectSlug: '',
     tenderlyApiKey: '',
     blockHeight: ''
   });
 
-  // Load saved credentials from localStorage on component mount
+  // Load saved project slug from localStorage (account slug and API key handled by password manager)
   useEffect(() => {
-    const savedAccountSlug = localStorage.getItem('tenderly_account_slug');
     const savedProjectSlug = localStorage.getItem('tenderly_project_slug');
-    const savedApiKey = localStorage.getItem('tenderly_api_key');
 
-    if (savedAccountSlug || savedProjectSlug || savedApiKey) {
+    if (savedProjectSlug) {
       setFormData(prev => ({
         ...prev,
-        accountSlug: savedAccountSlug || '',
-        projectSlug: savedProjectSlug || '',
-        tenderlyApiKey: savedApiKey || ''
+        projectSlug: savedProjectSlug || ''
       }));
     }
   }, []);
@@ -103,13 +100,50 @@ const SimulateTX = ({ showToast }) => {
       [field]: value
     }));
 
-    // Save Tenderly credentials to localStorage
-    if (field === 'accountSlug') {
-      localStorage.setItem('tenderly_account_slug', value);
-    } else if (field === 'projectSlug') {
+    // Handle chain ID field based on network selection
+    if (field === 'chainId') {
+      if (value === 'other') {
+        // Clear the chain ID field when "Other" is selected
+        setFormData(prev => ({
+          ...prev,
+          chainId: value,
+          customChainId: ''
+        }));
+      } else {
+        // Auto-populate chain ID when a predefined network is selected
+        setFormData(prev => ({
+          ...prev,
+          chainId: value,
+          customChainId: value
+        }));
+      }
+    }
+
+    // Handle custom chain ID changes - auto-switch network dropdown
+    if (field === 'customChainId') {
+      // Find matching network for the entered chain ID
+      const matchingNetwork = chainOptions.find(option => option.id === value && option.id !== 'other');
+      
+      if (matchingNetwork) {
+        // Switch to the matching predefined network
+        setFormData(prev => ({
+          ...prev,
+          chainId: matchingNetwork.id,
+          customChainId: value
+        }));
+      } else {
+        // Switch to "other" for custom chain IDs
+        setFormData(prev => ({
+          ...prev,
+          chainId: 'other',
+          customChainId: value
+        }));
+      }
+    }
+
+    // Save only project slug to localStorage (account slug and API key handled by password manager)
+    if (field === 'projectSlug') {
       localStorage.setItem('tenderly_project_slug', value);
-    } else if (field === 'tenderlyApiKey') {
-      localStorage.setItem('tenderly_api_key', value);
     }
   };
 
@@ -117,6 +151,7 @@ const SimulateTX = ({ showToast }) => {
   const [simulationResult, setSimulationResult] = useState(null);
 
   const chainOptions = [
+    { id: 'other', name: 'Custom Chain ID'},
     { id: '1', name: 'Ethereum Mainnet'},
     { id: '56', name: 'BSC'},
     { id: '8453', name: 'Base'},
@@ -132,7 +167,7 @@ const SimulateTX = ({ showToast }) => {
       return;
     }
 
-    if (!formData.from || !formData.to || !formData.calldata || !formData.chainId) {
+    if (!formData.from || !formData.to || !formData.calldata || !formData.customChainId) {
       showToast('Please fill in all transaction fields (From, To, Calldata, Chain ID)', 'error');
       return;
     }
@@ -143,11 +178,11 @@ const SimulateTX = ({ showToast }) => {
     try {
       // Build simulation payload following the exact sample format
       const simulationPayload = {
-        'network_id': formData.chainId,
+        'network_id': formData.customChainId,
         'from': formData.from,
         'to': formData.to,
         'input': formData.calldata,
-        'gas': formData.gas ? parseInt(formData.gas) : 100000000, // Use provided gas or default
+        'gas': 100000000, // Default gas limit
         'value': formData.msgValue ? (parseFloat(formData.msgValue) * 1e18).toString() : '0', // Convert ETH to wei
         'save': true,
         'save_if_fails': true,
@@ -212,17 +247,16 @@ const SimulateTX = ({ showToast }) => {
         <div className="form-row">
           <FormField
             label="Blockchain Network"
-            placeholder="Select a blockchain network..."
             value={formData.chainId}
             onChange={(value) => handleInputChange('chainId', value)}
             options={chainOptions}
           />
           
           <FormField
-            label="Block Height"
-            placeholder="latest"
-            value={formData.blockHeight}
-            onChange={(value) => handleInputChange('blockHeight', value)}
+            label="Chain ID"
+            placeholder="Chain ID (e.g., 1 for Ethereum)"
+            value={formData.customChainId}
+            onChange={(value) => handleInputChange('customChainId', value)}
           />
         </div>
 
@@ -236,39 +270,44 @@ const SimulateTX = ({ showToast }) => {
           />
           
           <FormField
-            label="Gas Limit"
-            placeholder="100000000 (optional)"
-            value={formData.gas}
-            onChange={(value) => handleInputChange('gas', value)}
+            label="Block Height"
+            placeholder="latest"
+            value={formData.blockHeight}
+            onChange={(value) => handleInputChange('blockHeight', value)}
           />
         </div>
 
         {/* Tenderly Configuration */}
-        <div className="form-row">
-          <FormField
-            label="Account Slug"
-            placeholder="your-account-slug"
-            value={formData.accountSlug}
-            onChange={(value) => handleInputChange('accountSlug', value)}
-          />
-          
-          <FormField
-            label="Project Slug"
-            placeholder="your-project-slug"
-            value={formData.projectSlug}
-            onChange={(value) => handleInputChange('projectSlug', value)}
-          />
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
+        <form onSubmit={(e) => { e.preventDefault(); simulateTransaction(); }}>
+          <div className="form-row">
             <FormField
-              label="Tenderly API Key"
-              type="password"
-              placeholder="your-api-key"
-              value={formData.tenderlyApiKey}
-              onChange={(value) => handleInputChange('tenderlyApiKey', value)}
+              label="Account Slug"
+              placeholder="Enter your account slug"
+              value={formData.accountSlug}
+              onChange={(value) => handleInputChange('accountSlug', value)}
+              autoComplete="username"
+              name="tenderly-account-slug"
             />
+            
+            <FormField
+              label="Project Slug"
+              placeholder="Enter your project slug"
+              value={formData.projectSlug}
+              onChange={(value) => handleInputChange('projectSlug', value)}
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <FormField
+                label="Tenderly API Key"
+                type="password"
+                placeholder="Enter your API key"
+                value={formData.tenderlyApiKey}
+                onChange={(value) => handleInputChange('tenderlyApiKey', value)}
+                autoComplete="current-password"
+                name="tenderly-api-key"
+              />
             <div className="api-key-info">
               <span>ℹ️</span>
               <span>You will need a Tenderly API key to use this service.</span>
@@ -292,16 +331,17 @@ const SimulateTX = ({ showToast }) => {
           onChange={(value) => handleInputChange('calldata', value)}
         />
 
-        {/* Submit Button */}
-        <div className="form-group submit-section">
-          <button
-            onClick={simulateTransaction}
-            disabled={isSimulating}
-            className={`component-button ${isSimulating ? 'loading' : 'success'}`}
-          >
-            {isSimulating ? 'Simulating...' : 'Simulate Transaction'}
-          </button>
-        </div>
+          {/* Submit Button */}
+          <div className="form-group submit-section">
+            <button
+              type="submit"
+              disabled={isSimulating}
+              className={`component-button ${isSimulating ? 'loading' : 'success'}`}
+            >
+              {isSimulating ? 'Simulating...' : 'Simulate Transaction'}
+            </button>
+          </div>
+        </form>
 
         {/* Success Result */}
         {simulationResult && (
