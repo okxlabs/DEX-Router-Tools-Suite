@@ -18,7 +18,10 @@ export function addTrimToCalldata(calldata, trimData) {
 
         if (trimData.trimRate && trimData.trimAddress && trimData.expectAmountOut) {
             // Check if it's single or dual trim
-            const isDualTrim = trimData.trimRate2 && trimData.trimAddress2;
+            // Support both old field names (trimRate2, trimAddress2) and new names (chargeRate, chargeAddress)
+            const chargeRate = trimData.trimRate2 || trimData.chargeRate;
+            const chargeAddress = trimData.trimAddress2 || trimData.chargeAddress;
+            const isDualTrim = chargeRate && chargeAddress;
             
             if (isDualTrim) {
                 // DUAL TRIM: 96 bytes (3 x 32-byte blocks)
@@ -27,7 +30,7 @@ export function addTrimToCalldata(calldata, trimData) {
                 // - secondBlock: trim_flag + padding + expect_amount  
                 // - firstBlock: trim_flag + trim_rate1 + trim_address1
                 
-                const thirdBlock = encodeTrimBlock(trimData.trimRate2, trimData.trimAddress2, TRIM_FLAGS.DUAL);
+                const thirdBlock = encodeTrimBlock(chargeRate, chargeAddress, TRIM_FLAGS.DUAL);
                 const secondBlock = encodeExpectAmountBlock(trimData.expectAmountOut, TRIM_FLAGS.DUAL);
                 const firstBlock = encodeTrimBlock(trimData.trimRate, trimData.trimAddress, TRIM_FLAGS.DUAL);
 
@@ -125,12 +128,14 @@ export function validateTrimData(trimData) {
         throw new Error('Trim data must have trimRate, trimAddress, and expectAmountOut properties');
     }
 
-    // Check for dual trim
-    const hasTrimRate2 = trimData.trimRate2 !== undefined;
-    const hasTrimAddress2 = trimData.trimAddress2 !== undefined;
+    // Check for dual trim - support both old and new field names
+    const chargeRate = trimData.trimRate2 || trimData.chargeRate;
+    const chargeAddress = trimData.trimAddress2 || trimData.chargeAddress;
+    const hasTrimRate2 = chargeRate !== undefined;
+    const hasTrimAddress2 = chargeAddress !== undefined;
     
     if (hasTrimRate2 !== hasTrimAddress2) {
-        throw new Error('For dual trim, both trimRate2 and trimAddress2 must be provided');
+        throw new Error('For dual trim, both chargeRate/trimRate2 and chargeAddress/trimAddress2 must be provided');
     }
 
     // Validate addresses
@@ -138,8 +143,8 @@ export function validateTrimData(trimData) {
         throw new Error(`Invalid trimAddress format: ${trimData.trimAddress}. Must be 0x followed by 40 hex characters`);
     }
 
-    if (hasTrimAddress2 && (!trimData.trimAddress2.startsWith('0x') || trimData.trimAddress2.length !== 42)) {
-        throw new Error(`Invalid trimAddress2 format: ${trimData.trimAddress2}. Must be 0x followed by 40 hex characters`);
+    if (hasTrimAddress2 && (!chargeAddress.startsWith('0x') || chargeAddress.length !== 42)) {
+        throw new Error(`Invalid chargeAddress/trimAddress2 format: ${chargeAddress}. Must be 0x followed by 40 hex characters`);
     }
 
     // Validate rates are numbers
@@ -147,7 +152,7 @@ export function validateTrimData(trimData) {
         ethers.BigNumber.from(trimData.trimRate.toString());
         ethers.BigNumber.from(trimData.expectAmountOut.toString());
         if (hasTrimRate2) {
-            ethers.BigNumber.from(trimData.trimRate2.toString());
+            ethers.BigNumber.from(chargeRate.toString());
         }
     } catch (error) {
         throw new Error(`Invalid numeric values in trim data: ${error.message}`);
