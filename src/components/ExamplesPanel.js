@@ -18,6 +18,7 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
     // Commission state - address, rate, token type
     const [commission1, setCommission1] = useState({ address: '', rate: '', isFromToken: true });
     const [commission2, setCommission2] = useState({ address: '', rate: '', isFromToken: true });
+    const [commission3, setCommission3] = useState({ address: '', rate: '', isFromToken: true });
     
     // Shared commission settings
     const [commissionToB, setCommissionToB] = useState(false);
@@ -119,13 +120,40 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
         // Generate commission data from inputs (0, 1, or 2)
         const hasCommission1 = commission1.address && commission1.rate;
         const hasCommission2 = commission2.address && commission2.rate;
-        const commissionCount = (hasCommission1 ? 1 : 0) + (hasCommission2 ? 1 : 0);
+        const hasCommission3 = commission3.address && commission3.rate;
+        const commissionCount = (hasCommission1 ? 1 : 0) + (hasCommission2 ? 1 : 0) + (hasCommission3 ? 1 : 0);
         
         if (commissionCount > 0) {
             completeJson.hasCommission = true;
             completeJson.referCount = commissionCount;
             
-            if (commissionCount === 2) {
+            if (commissionCount === 3) {
+                 // Triple commission
+                 completeJson.first = {
+                     flag: commission1.isFromToken ? "0x33330afc2aaa" : "0x33330afc2bbb",
+                     commissionType: commission1.isFromToken ? "TRIPLE_FROM_TOKEN_COMMISSION" : "TRIPLE_TO_TOKEN_COMMISSION",
+                     rate: commission1.rate,
+                     address: commission1.address
+                 };
+                 completeJson.second = {
+                     flag: commission2.isFromToken ? "0x33330afc2aaa" : "0x33330afc2bbb", 
+                     commissionType: commission2.isFromToken ? "TRIPLE_FROM_TOKEN_COMMISSION" : "TRIPLE_TO_TOKEN_COMMISSION",
+                     rate: commission2.rate,
+                     address: commission2.address
+                 };
+                 completeJson.middle = {
+                     isToB: commissionToB,
+                     token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+                 };
+                 completeJson.third = {
+                     flag: commission3.isFromToken ? "0x33330afc2aaa" : "0x33330afc2bbb",
+                     commissionType: commission3.isFromToken ? "TRIPLE_FROM_TOKEN_COMMISSION" : "TRIPLE_TO_TOKEN_COMMISSION",
+                     rate: commission3.rate,
+                     address: commission3.address
+                 };
+                 // Remove last property for triple commission
+                 delete completeJson.last;
+            } else if (commissionCount === 2) {
                 // Dual commission
                 completeJson.first = {
                     flag: commission1.isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb",
@@ -145,7 +173,7 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                 };
             } else {
                 // Single commission (use first non-empty one)
-                const activeCommission = hasCommission1 ? commission1 : commission2;
+                const activeCommission = hasCommission1 ? commission1 : (hasCommission2 ? commission2 : commission3);
                 completeJson.first = {
                     flag: activeCommission.isFromToken ? "0x3ca20afc2aaa" : "0x3ca20afc2bbb",
                     commissionType: activeCommission.isFromToken ? "SINGLE_FROM_TOKEN_COMMISSION" : "SINGLE_TO_TOKEN_COMMISSION",
@@ -164,6 +192,8 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
             completeJson.hasCommission = false;
             delete completeJson.referCount;
             delete completeJson.first;
+            delete completeJson.second;
+            delete completeJson.third;
             delete completeJson.last;
             delete completeJson.middle;
         }
@@ -230,8 +260,10 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
     const handleCommissionChange = (index, field, value) => {
         if (index === 1) {
             setCommission1(prev => ({ ...prev, [field]: value }));
-        } else {
+        } else if (index === 2) {
             setCommission2(prev => ({ ...prev, [field]: value }));
+        } else {
+            setCommission3(prev => ({ ...prev, [field]: value }));
         }
     };
 
@@ -334,6 +366,38 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                                 <button
                                     className={`toggle-button ${!commission2.isFromToken ? 'active' : ''}`}
                                     onClick={() => handleCommissionChange(2, 'isFromToken', false)}
+                                >
+                                    ToToken
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* Commission 3 */}
+                        <div className="input-row">
+                            <input
+                                type="text"
+                                className="address-input"
+                                placeholder="Referrer 3 Address"
+                                value={commission3.address}
+                                onChange={(e) => handleCommissionChange(3, 'address', e.target.value)}
+                            />
+                            <input
+                                type="number"
+                                className="rate-input"
+                                placeholder="Rate (Decimal: 9)"
+                                value={commission3.rate}
+                                onChange={(e) => handleCommissionChange(3, 'rate', e.target.value)}
+                            />
+                            <div className="toggle-group">
+                                <button
+                                    className={`toggle-button ${commission3.isFromToken ? 'active' : ''}`}
+                                    onClick={() => handleCommissionChange(3, 'isFromToken', true)}
+                                >
+                                    FromToken
+                                </button>
+                                <button
+                                    className={`toggle-button ${!commission3.isFromToken ? 'active' : ''}`}
+                                    onClick={() => handleCommissionChange(3, 'isFromToken', false)}
                                 >
                                     ToToken
                                 </button>
