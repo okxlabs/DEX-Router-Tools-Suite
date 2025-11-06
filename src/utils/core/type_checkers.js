@@ -118,12 +118,6 @@ function isFromTokenWithMode(input, paramName, functionName) {
 }
 
 export {
-    isBaseRequestTuple,
-    isRouterPathArray,
-    isRouterPathTuple,
-    isPackedReceiver,
-    isPoolsArray,
-    isPackedSrcToken,
-    isSwapWrapRawdata,
-    isFromTokenWithMode
+    isBaseRequestTuple, isFromTokenWithMode, isPackedReceiver, isPackedSrcToken, isPoolsArray, isRouterPathArray,
+    isRouterPathTuple, isSwapWrapRawdata
 };

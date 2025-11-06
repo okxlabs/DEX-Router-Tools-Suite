@@ -1,20 +1,20 @@
 import { ethers } from 'ethers';
 import {
     ADDRESS_MASK,
-    ONE_FOR_ZERO_MASK,
-    WETH_UNWRAP_MASK,
-    WEIGHT_MASK,
-    REVERSE_MASK,
-    IS_TOKEN0_TAX_MASK,
-    IS_TOKEN1_TAX_MASK,
-    WETH_MASK,
-    NUMERATOR_MASK,
-    SWAP_AMOUNT_MASK,
     DAG_INPUT_INDEX_MASK,
     DAG_OUTPUT_INDEX_MASK,
-    MODE_NO_TRANSFER_MASK,
+    IS_TOKEN0_TAX_MASK,
+    IS_TOKEN1_TAX_MASK,
     MODE_BY_INVEST_MASK,
-    MODE_PERMIT2_MASK
+    MODE_NO_TRANSFER_MASK,
+    MODE_PERMIT2_MASK,
+    NUMERATOR_MASK,
+    ONE_FOR_ZERO_MASK,
+    REVERSE_MASK,
+    SWAP_AMOUNT_MASK,
+    WEIGHT_MASK,
+    WETH_MASK,
+    WETH_UNWRAP_MASK
 } from '../core/masks.js';
 import { isRouterPathTuple } from '../core/type_checkers.js';
 
@@ -517,12 +517,7 @@ function unpackFromTokenWithMode(fromTokenValue) {
 }
 
 export {
-    getValue,
     formatBaseRequest,
-    formatRouterPathArray,
-    unpackReceiver,
-    unpackPoolsArray,
-    unpackSrcToken,
-    unpackSwapRawdata,
-    unpackFromTokenWithMode
+    formatRouterPathArray, getValue, unpackFromTokenWithMode, unpackPoolsArray, unpackReceiver, unpackSrcToken,
+    unpackSwapRawdata
 };
