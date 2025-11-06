@@ -4,8 +4,6 @@ import { extractTrimInfoFromCalldata } from './decode_trim.js';
 
 export function resolve(calldata) {
     try {
-        console.log('Resolving calldata:', calldata.slice(0, 10)); // Log function selector
-        
         // Decode function information using the original decoder
         const decodedFunctions = decodeFunctions(calldata);
         

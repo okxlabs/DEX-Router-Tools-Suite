@@ -5,6 +5,7 @@ import { encode } from './utils/encode/encode_index.js';
 import { validateEncodedCalldata, validateDecodedJson } from './utils/core/roundtrip_validator.js';
 import DecodeCalldata from './components/DecodeCalldata.js';
 import EncodeCalldata from './components/EncodeCalldata.js';
+import SimulateTX from './components/SimulateTX.js';
 
 function App() {
   const [activeTab, setActiveTab] = useState('decode');
@@ -35,6 +36,12 @@ function App() {
             onClick={() => setActiveTab('encode')}
           >
             Encode Calldata
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'simulate' ? 'active' : ''}`}
+            onClick={() => setActiveTab('simulate')}
+          >
+            Simulate TX
           </button>
         </div>
 
@@ -109,6 +116,12 @@ function App() {
                 }
               }}
               result={encodeResult}
+              showToast={showToast}
+            />
+          )}
+
+          {activeTab === 'simulate' && (
+            <SimulateTX
               showToast={showToast}
             />
           )}

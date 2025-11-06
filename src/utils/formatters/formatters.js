@@ -55,18 +55,59 @@ function getValue(value) {
 /**
  * Format BaseRequest tuple with named fields
  * @param {Array} baseRequestArray - the BaseRequest tuple as array
+ * @param {string} functionName - optional function name to determine decode type
  * @returns {Object} formatted BaseRequest with field names
  */
-function formatBaseRequest(baseRequestArray) {
+function formatBaseRequest(baseRequestArray, functionName) {
     const [fromToken, toToken, fromTokenAmount, minReturnAmount, deadLine] = baseRequestArray;
     
+    // Only apply _bytes32ToAddress conversion for specific functions that need it
+    const needsBytes32ToAddress = functionName && (
+        functionName === 'unxswapToWithBaseRequest' ||
+        functionName === 'uniswapV3SwapToWithBaseRequest'
+        // Add other functions here if they also need this conversion
+    );
+    
     return {
-        fromToken: getValue(fromToken),
+        fromToken: needsBytes32ToAddress ? bytes32ToAddress(fromToken) : getValue(fromToken),
         toToken: getValue(toToken),
         fromTokenAmount: getValue(fromTokenAmount),
         minReturnAmount: getValue(minReturnAmount),
         deadLine: getValue(deadLine)
     };
+}
+
+/**
+ * Convert uint256 to address using _ADDRESS_MASK (equivalent to _bytes32ToAddress in smart contract)
+ * Implements: assembly { result := and(param, _ADDRESS_MASK) }
+ * @param {any} param - BigNumber or string representing uint256
+ * @returns {string} Address format (0x + 40 hex chars)
+ */
+function bytes32ToAddress(param) {
+    if (!param) {
+        return "0x0000000000000000000000000000000000000000";
+    }
+    
+    try {
+        let paramBN;
+        if (param && param._isBigNumber) {
+            paramBN = param;
+        } else {
+            paramBN = ethers.BigNumber.from(param.toString());
+        }
+        
+        // _ADDRESS_MASK = 0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff
+        // This masks the lower 160 bits (20 bytes) which is the address part
+        
+        // assembly { result := and(param, _ADDRESS_MASK) }
+        const result = paramBN.and(ADDRESS_MASK);
+        
+        // Convert to proper address format
+        return "0x" + result.toHexString().slice(2).padStart(40, '0');
+        
+    } catch (error) {
+        return "0x0000000000000000000000000000000000000000";
+    }
 }
 
 /**
@@ -421,14 +462,8 @@ export {
     getValue,
     formatBaseRequest,
     formatRouterPathArray,
-    formatRouterPath,
-    decodeRawDataArray,
-    unpackRawData,
     unpackReceiver,
     unpackPoolsArray,
-    unpackUnxswapPool,
-    unpackUniswapV3Pool,
     unpackSrcToken,
-    unpackSwapRawdata,
-    unpackDagRawData
+    unpackSwapRawdata
 };
