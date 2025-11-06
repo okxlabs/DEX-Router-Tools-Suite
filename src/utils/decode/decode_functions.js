@@ -2,18 +2,20 @@ import { ethers } from 'ethers';
 import { DEXROUTER_ABI } from '../core/abi.js';
 import {
     isBaseRequestTuple,
-    isRouterPathArray,
+    isFromTokenWithMode,
     isPackedReceiver,
-    isPoolsArray,
     isPackedSrcToken,
+    isPoolsArray,
+    isRouterPathArray,
     isSwapWrapRawdata
 } from '../core/type_checkers.js';
 import {
-    getValue,
     formatBaseRequest,
     formatRouterPathArray,
-    unpackReceiver,
+    getValue,
+    unpackFromTokenWithMode,
     unpackPoolsArray,
+    unpackReceiver,
     unpackSrcToken,
     unpackSwapRawdata
 } from '../formatters/formatters.js';
@@ -130,6 +132,10 @@ function createNamedParameters(inputs, decodedParams, fragment) {
         // Special handling for swapWrap rawdata parameter
         else if (isSwapWrapRawdata(input, paramName)) {
             value = unpackSwapRawdata(value);
+        }
+        // Special handling for fromToken parameter with transfer mode (DAG functions)
+        else if (isFromTokenWithMode(input, paramName, fragment.name)) {
+            value = unpackFromTokenWithMode(value);
         }
         
         namedParams[paramName] = value;

@@ -97,6 +97,26 @@ function isSwapWrapRawdata(input, paramName) {
     return input.type === 'uint256' && paramName === 'rawdata';
 }
 
+/**
+ * Check if the parameter is a fromToken parameter that needs transfer mode unpacking
+ * @param {Object} input - the function input definition from ABI
+ * @param {string} paramName - the parameter name
+ * @param {string} functionName - the function name for context
+ * @returns {boolean} true if this is a fromToken parameter that needs transfer mode unpacking
+ */
+function isFromTokenWithMode(input, paramName, functionName) {
+    // Check if it's a uint256 parameter named 'fromToken' in functions that support transfer mode
+    // Both DAG functions and batch functions use processFromTokenWithMode in encoding
+    return input.type === 'uint256' && 
+           paramName === 'fromToken' && 
+           functionName && (
+               functionName.startsWith('dagSwap') ||
+               functionName.startsWith('smartSwap') ||
+               functionName === 'smartSwapByInvest' ||
+               functionName === 'smartSwapByInvestWithRefund'
+           );
+}
+
 export {
     isBaseRequestTuple,
     isRouterPathArray,
@@ -104,5 +124,6 @@ export {
     isPackedReceiver,
     isPoolsArray,
     isPackedSrcToken,
-    isSwapWrapRawdata
+    isSwapWrapRawdata,
+    isFromTokenWithMode
 };

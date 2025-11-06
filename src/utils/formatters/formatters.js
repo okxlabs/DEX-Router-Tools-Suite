@@ -11,7 +11,10 @@ import {
     NUMERATOR_MASK,
     SWAP_AMOUNT_MASK,
     DAG_INPUT_INDEX_MASK,
-    DAG_OUTPUT_INDEX_MASK
+    DAG_OUTPUT_INDEX_MASK,
+    MODE_NO_TRANSFER_MASK,
+    MODE_BY_INVEST_MASK,
+    MODE_PERMIT2_MASK
 } from '../core/masks.js';
 import { isRouterPathTuple } from '../core/type_checkers.js';
 
@@ -150,12 +153,21 @@ function formatRouterPathArray(routerPathArray, functionName) {
 function formatRouterPath(routerPathArray, functionName) {
     const [mixAdapters, assetTo, rawData, extraData, fromToken] = routerPathArray;
     
+    // Check if this function supports transfer mode in fromToken
+    // Both DAG functions and batch functions (smartSwap*, etc.) use processFromTokenWithMode in encoding
+    const supportsTransferMode = functionName && (
+        functionName.startsWith('dagSwap') ||
+        functionName.startsWith('smartSwap') ||
+        functionName === 'smartSwapByInvest' ||
+        functionName === 'smartSwapByInvestWithRefund'
+    );
+    
     return {
         mixAdapters: getValue(mixAdapters),
         assetTo: getValue(assetTo),
         rawData: decodeRawDataArray(rawData, functionName),
         extraData: getValue(extraData),
-        fromToken: getValue(fromToken)
+        fromToken: supportsTransferMode ? unpackFromTokenWithMode(fromToken) : getValue(fromToken)
     };
 }
 
@@ -458,6 +470,52 @@ function unpackDagRawData(rawDataValue) {
     }
 }
 
+/**
+ * Unpack fromToken with transfer mode flags
+ * @param {any} fromTokenValue - the fromToken uint256 value (BigNumber or string)
+ * @returns {Object} unpacked fromToken with address and transfer mode flags
+ */
+function unpackFromTokenWithMode(fromTokenValue) {
+    try {
+        // Convert to BigNumber if it's not already
+        let fromTokenBN;
+        if (fromTokenValue && fromTokenValue._isBigNumber) {
+            fromTokenBN = fromTokenValue;
+        } else {
+            fromTokenBN = ethers.BigNumber.from(fromTokenValue.toString());
+        }
+
+        // Extract address (lower 160 bits)
+        const address = fromTokenBN.and(ADDRESS_MASK);
+        
+        // Extract transfer mode flags
+        const isNoTransfer = !fromTokenBN.and(MODE_NO_TRANSFER_MASK).isZero();
+        const isByInvest = !fromTokenBN.and(MODE_BY_INVEST_MASK).isZero();
+        const isPermit2 = !fromTokenBN.and(MODE_PERMIT2_MASK).isZero();
+        
+        // Determine the mode flag name
+        let flag = 'DEFAULT';
+        if (isNoTransfer) {
+            flag = 'NO_TRANSFER';
+        } else if (isByInvest) {
+            flag = 'BY_INVEST';
+        } else if (isPermit2) {
+            flag = 'PERMIT2';
+        }
+
+        return {
+            address: "0x" + address.toHexString().slice(2).padStart(40, '0'),
+            flag: flag
+        };
+    } catch (error) {
+        // If unpacking fails, return the original value
+        return {
+            original: getValue(fromTokenValue),
+            error: `Failed to unpack fromToken with mode: ${error.message}`
+        };
+    }
+}
+
 export {
     getValue,
     formatBaseRequest,
@@ -465,5 +523,6 @@ export {
     unpackReceiver,
     unpackPoolsArray,
     unpackSrcToken,
-    unpackSwapRawdata
+    unpackSwapRawdata,
+    unpackFromTokenWithMode
 };

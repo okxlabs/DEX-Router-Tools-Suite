@@ -1,4 +1,57 @@
-import { packRawDataArray, packDagRawDataArray } from './encode_packers.js';
+import { ethers } from 'ethers';
+import { packDagRawDataArray, packRawDataArray } from './encode_packers.js';
+
+// Mode constants for fromToken encoding
+export const _MODE_NO_TRANSFER = ethers.BigNumber.from('1').shl(251);
+export const _MODE_BY_INVEST = ethers.BigNumber.from('1').shl(250);
+export const _MODE_PERMIT2 = ethers.BigNumber.from('1').shl(249);
+export const _MODE_DEFAULT = ethers.BigNumber.from('0');
+
+/**
+ * Get mode constant by string name
+ * @param {string} flagName - Flag name like 'NO_TRANSFER', 'BY_INVEST', 'PERMIT2'
+ * @returns {ethers.BigNumber} Mode constant
+ */
+export function getModeByName(flagName) {
+    switch (flagName) {
+        case 'NO_TRANSFER':
+            return _MODE_NO_TRANSFER;
+        case 'BY_INVEST':
+            return _MODE_BY_INVEST;
+        case 'PERMIT2':
+            return _MODE_PERMIT2;
+        case 'DEFAULT':
+        default:
+            return _MODE_DEFAULT;
+    }
+}
+
+/**
+ * Process fromToken with mode flags
+ * @param {Object|string} fromToken - fromToken object with address/flag or direct address
+ * @returns {string} Processed fromToken value as string
+ */
+export function processFromTokenWithMode(fromToken) {
+    if (typeof fromToken === 'object' && fromToken !== null) {
+        // fromToken is a struct with address and flag fields
+        const address = fromToken.address || fromToken;
+        let flag = fromToken.flag || _MODE_DEFAULT;
+        
+        // Handle string flag names
+        if (typeof flag === 'string') {
+            flag = getModeByName(flag);
+        }
+        
+        // Combine address with flag: uint256(uint160(address)) | flag
+        const addressBN = ethers.BigNumber.from(address.toString());
+        const flagBN = ethers.BigNumber.from(flag.toString());
+        return addressBN.or(flagBN).toString();
+    } else {
+        // Fallback: treat as address and apply default mode
+        const addressBN = ethers.BigNumber.from(fromToken.toString());
+        return addressBN.toString();
+    }
+}
 
 /**
  * Prepare baseRequest tuple from JSON object
@@ -35,7 +88,7 @@ export function prepareBatchesTuples(batches) {
             routerPath.assetTo,
             packRawDataArray(routerPath.rawData), // Pack rawData objects
             routerPath.extraData,
-            routerPath.fromToken
+            processFromTokenWithMode(routerPath.fromToken)
         ])
     );
 }
@@ -74,6 +127,6 @@ export function prepareDagPathsTuples(paths) {
         routerPath.assetTo,
         packDagRawDataArray(routerPath.rawData), // Pack DAG rawData objects with inputIndex/outputIndex
         routerPath.extraData,
-        routerPath.fromToken
+        processFromTokenWithMode(routerPath.fromToken)
     ]);
 }
