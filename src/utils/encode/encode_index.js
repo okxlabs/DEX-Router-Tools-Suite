@@ -13,16 +13,16 @@ export function encode(jsonData) {
         // Step 1: Encode the basic function parameters
         let encodedCalldata = encodeFunctions(jsonData);
         
-        // Step 2: Add commission encoding (when needed)
-        if (jsonData.hasCommission) {
-            validateCommissionData(jsonData);
-            encodedCalldata = addCommissionToCalldata(encodedCalldata, jsonData);
-        }
-        
-        // Step 3: Add trim encoding (when needed)
+        // Step 2: Add trim encoding (when needed) - trim comes first
         if (jsonData.hasTrim) {
             validateTrimData(jsonData);
             encodedCalldata = addTrimToCalldata(encodedCalldata, jsonData);
+        }
+        
+        // Step 3: Add commission encoding (when needed) - commission comes last
+        if (jsonData.hasCommission) {
+            validateCommissionData(jsonData);
+            encodedCalldata = addCommissionToCalldata(encodedCalldata, jsonData);
         }
         return encodedCalldata;
         
