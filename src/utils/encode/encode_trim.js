@@ -21,7 +21,14 @@ export function addTrimToCalldata(calldata, trimData) {
             // Support both old field names (trimRate2, trimAddress2) and new names (chargeRate, chargeAddress)
             const chargeRate = trimData.trimRate2 || trimData.chargeRate;
             const chargeAddress = trimData.trimAddress2 || trimData.chargeAddress;
-            const isDualTrim = chargeRate && chargeAddress;
+            
+            // Consider it dual trim only if both values exist AND are meaningful (non-zero)
+            const isValidChargeRate = chargeRate !== undefined && chargeRate !== null && chargeRate !== 0 && chargeRate !== '0';
+            const isValidChargeAddress = chargeAddress !== undefined && chargeAddress !== null && 
+                chargeAddress !== '0x0000000000000000000000000000000000000000' && 
+                chargeAddress !== '0x' && chargeAddress !== '';
+            
+            const isDualTrim = isValidChargeRate && isValidChargeAddress;
             
             if (isDualTrim) {
                 // DUAL TRIM: 96 bytes (3 x 32-byte blocks)
@@ -131,11 +138,27 @@ export function validateTrimData(trimData) {
     // Check for dual trim - support both old and new field names
     const chargeRate = trimData.trimRate2 || trimData.chargeRate;
     const chargeAddress = trimData.trimAddress2 || trimData.chargeAddress;
-    const hasTrimRate2 = chargeRate !== undefined;
-    const hasTrimAddress2 = chargeAddress !== undefined;
     
-    if (hasTrimRate2 !== hasTrimAddress2) {
-        throw new Error('For dual trim, both chargeRate/trimRate2 and chargeAddress/trimAddress2 must be provided');
+    // Consider it dual trim only if both values exist AND are meaningful (non-zero)
+    const isValidChargeRate = chargeRate !== undefined && chargeRate !== null && chargeRate !== 0 && chargeRate !== '0';
+    const isValidChargeAddress = chargeAddress !== undefined && chargeAddress !== null && 
+        chargeAddress !== '0x0000000000000000000000000000000000000000' && 
+        chargeAddress !== '0x' && chargeAddress !== '';
+    
+    const hasDualTrim = isValidChargeRate && isValidChargeAddress;
+    
+    // If one is provided but not valid, or only one is provided, that's an error for dual trim intent
+    const hasChargeRateField = chargeRate !== undefined && chargeRate !== null;
+    const hasChargeAddressField = chargeAddress !== undefined && chargeAddress !== null;
+    
+    if ((hasChargeRateField || hasChargeAddressField) && !hasDualTrim) {
+        if (!isValidChargeRate && hasChargeRateField) {
+            // chargeRate is provided but is 0 or '0' - this is valid for single trim
+        } else if (!isValidChargeAddress && hasChargeAddressField) {
+            // chargeAddress is provided but is zero address - this is valid for single trim  
+        } else if (hasChargeRateField !== hasChargeAddressField) {
+            throw new Error('For dual trim, both chargeRate/trimRate2 and chargeAddress/trimAddress2 must be provided');
+        }
     }
 
     // Validate addresses
@@ -143,7 +166,7 @@ export function validateTrimData(trimData) {
         throw new Error(`Invalid trimAddress format: ${trimData.trimAddress}. Must be 0x followed by 40 hex characters`);
     }
 
-    if (hasTrimAddress2 && (!chargeAddress.startsWith('0x') || chargeAddress.length !== 42)) {
+    if (hasDualTrim && (!chargeAddress.startsWith('0x') || chargeAddress.length !== 42)) {
         throw new Error(`Invalid chargeAddress/trimAddress2 format: ${chargeAddress}. Must be 0x followed by 40 hex characters`);
     }
 
@@ -151,7 +174,7 @@ export function validateTrimData(trimData) {
     try {
         ethers.BigNumber.from(trimData.trimRate.toString());
         ethers.BigNumber.from(trimData.expectAmountOut.toString());
-        if (hasTrimRate2) {
+        if (hasDualTrim) {
             ethers.BigNumber.from(chargeRate.toString());
         }
     } catch (error) {
