@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 
 // Reusable Form Field Component
-const FormField = ({ label, type = "text", placeholder, value, onChange, options = null, autoComplete, name }) => (
+const FormField = ({ label, type = "text", placeholder, value, onChange, options = null, autoComplete, name, required = false }) => (
   <div className="form-group">
     <label className="form-label">
       {label}
+      {required && <span className="required-asterisk"> *</span>}
     </label>
     {options ? (
         <select
@@ -203,6 +204,7 @@ const SimulateTX = ({
             placeholder="0x..."
             value={formData.from}
             onChange={(value) => handleInputChange('from', value)}
+            required={true}
           />
           
           <FormField
@@ -211,6 +213,7 @@ const SimulateTX = ({
             placeholder="0x..."
             value={formData.to}
             onChange={(value) => handleInputChange('to', value)}
+            required={true}
           />
         </div>
 
@@ -226,6 +229,7 @@ const SimulateTX = ({
           <FormField
             label="Chain ID"
             placeholder="Chain ID (e.g., 1 for Ethereum)"
+            required={true}
             value={formData.customChainId}
             onChange={(value) => handleInputChange('customChainId', value)}
           />
@@ -235,7 +239,7 @@ const SimulateTX = ({
         <div className="form-row">
           <FormField
             label="msg.value (ETH)"
-            placeholder="0 (optional)"
+            placeholder="0"
             value={formData.msgValue}
             onChange={(value) => handleInputChange('msgValue', value)}
           />
@@ -258,6 +262,7 @@ const SimulateTX = ({
               onChange={(value) => handleInputChange('accountSlug', value)}
               autoComplete="username"
               name="tenderly-account-slug"
+              required={true}
             />
             
             <FormField
@@ -265,6 +270,7 @@ const SimulateTX = ({
               placeholder="Enter your project slug"
               value={formData.projectSlug}
               onChange={(value) => handleInputChange('projectSlug', value)}
+              required={true}
             />
           </div>
 
@@ -278,6 +284,7 @@ const SimulateTX = ({
                 onChange={(value) => handleInputChange('tenderlyApiKey', value)}
                 autoComplete="current-password"
                 name="tenderly-api-key"
+                required={true}
               />
             <div className="api-key-info">
               <span>ℹ️</span>
@@ -300,6 +307,7 @@ const SimulateTX = ({
           placeholder="0x..."
           value={formData.calldata}
           onChange={(value) => handleInputChange('calldata', value)}
+          required={true}
         />
 
           {/* Submit Button */}
