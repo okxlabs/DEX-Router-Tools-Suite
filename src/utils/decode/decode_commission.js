@@ -128,13 +128,13 @@ function extractCommissionInfoFromCalldata(calldataHex) {
         
         if (result) {
             try {
-                const [first, middle, last] = result.blocks;
+                const [first, middle, second] = result.blocks;
                 return {
                     hasCommission: true,
                     referCount: 2,
                     first: parseCommission(first),
                     middle: parseMiddle(middle),
-                    last: parseCommission(last),
+                    second: parseCommission(second),
                 };
             } catch {
                 // Continue searching
