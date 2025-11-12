@@ -33,10 +33,10 @@ export const applyCommissionAndTrimToJson = (baseJson, commissionData, trimData)
         return completeJson;
     }
 
-    // Apply commission data
+    // Apply commission data first
     completeJson = applyCommissionData(completeJson, commissionData);
     
-    // Apply trim data
+    // Apply trim data second
     completeJson = applyTrimData(completeJson, trimData);
 
     return completeJson;
@@ -139,6 +139,9 @@ const applyCommissionData = (json, commissionData) => {
                 token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
             };
         }
+    } else {
+        // No commission data - explicitly set hasCommission to false
+        json.hasCommission = false;
     }
 
     return json;
@@ -158,8 +161,15 @@ const applyTrimData = (json, trimData) => {
     const hasTrim2 = trim2.address && trim2.rate;
     const trimCount = (hasTrim1 ? 1 : 0) + (hasTrim2 ? 1 : 0);
     
+    // First, remove any existing trim fields to ensure clean state
+    delete json.hasTrim;
+    delete json.trimRate;
+    delete json.trimAddress;
+    delete json.expectAmountOut;
+    delete json.chargeRate;
+    delete json.chargeAddress;
+    
     if (trimCount > 0) {
-        json.hasTrim = true;
         
         // Auto-convert: if only trim2 is filled, treat it as trim1
         if (!hasTrim1 && hasTrim2) {
@@ -183,14 +193,12 @@ const applyTrimData = (json, trimData) => {
             json.chargeRate = "0";
             json.chargeAddress = "0x0000000000000000000000000000000000000000";
         }
+        
+        // Set hasTrim to true AFTER all trim data fields are set
+        json.hasTrim = true;
     } else {
-        // No trim data - remove all trim-related fields
+        // No trim data - set hasTrim to false
         json.hasTrim = false;
-        delete json.trimRate;
-        delete json.trimAddress;
-        delete json.expectAmountOut;
-        delete json.chargeRate;
-        delete json.chargeAddress;
     }
 
     return json;

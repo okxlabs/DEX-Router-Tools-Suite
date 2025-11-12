@@ -238,12 +238,10 @@ html, body {
 
 .encode-examples-section {
   position: fixed;
-  left: 2%;
+  left: 1%;
   top: 50%;
   transform: translateY(-50%);
-  width: 40%;
-  max-width: 600px;
-  min-width: 450px;
+  width: 25%;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
   z-index: 10;
