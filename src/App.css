@@ -1,3 +1,4 @@
+/* Global Styles */
 html, body {
   height: 100vh;
   overflow: hidden;
@@ -25,9 +26,7 @@ html, body {
   box-sizing: border-box;
 }
 
-
-
-/* Tab navigation styles */
+/* Tab Navigation */
 .tab-navigation {
   display: flex;
   justify-content: center;
@@ -67,14 +66,14 @@ html, body {
 }
 
 
-/* Tab content styles */
+/* Tab Content */
 .tab-content {
   width: 100%;
   max-width: 600px;
   padding: 20px;
 }
 
-/* Shared component styles */
+/* Shared Component Styles */
 .component-container {
   width: 600px;
   max-width: 100%;
@@ -160,7 +159,7 @@ html, body {
   overflow: visible;
 }
 
-/* Encode component specific styles - large input, small output */
+/* Encode Component Styles */
 .encode-textarea {
   padding: 15px;
   font-size: 14px;
@@ -203,7 +202,7 @@ html, body {
   overflow: auto;
 }
 
-/* Toast notification styles */
+/* Toast Notifications */
 .toast {
   position: fixed;
   top: 30px;
@@ -230,7 +229,7 @@ html, body {
   font-weight: bold;
 }
 
-/* Encode Layout - Left Panel + Centered Content */
+/* Encode Layout */
 .encode-layout {
   position: relative;
   width: 100%;
@@ -239,7 +238,7 @@ html, body {
 
 .encode-examples-section {
   position: fixed;
-  left: 3%;
+  left: 1%;
   top: 50%;
   transform: translateY(-50%);
   width: 25%;
@@ -257,38 +256,7 @@ html, body {
 }
 
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .encode-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  .encode-examples-section {
-    position: static;
-    transform: none;
-    width: 100%;
-    max-width: 100%;
-    max-height: 400px;
-    left: auto;
-    top: auto;
-    order: 2;
-  }
-  
-  .encode-main-section {
-    order: 1;
-    display: block;
-  }
-}
-
-@media (max-width: 768px) {
-  .encode-examples-section {
-    max-height: 300px;
-  }
-}
-
-
+/* Form Components */
 .form-row {
   display: flex;
   gap: 20px;
@@ -313,18 +281,10 @@ html, body {
   font-size: 14px;
 }
 
-
-
-
-/* Foundry Command Generator Styles */
-.foundry-form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 15px;
+.required-asterisk {
+  color: #ff4444;
+  font-weight: bold;
 }
-
-
 
 .foundry-input-white {
   width: 100%;
@@ -346,8 +306,7 @@ html, body {
   box-shadow: 0 0 8px rgba(97, 218, 251, 0.3);
 }
 
-
-/* Simulation TX Specific Styles */
+/* Simulation Components */
 .submit-section {
   margin-top: 20px;
 }
@@ -444,7 +403,42 @@ html, body {
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .encode-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .encode-examples-section {
+    position: static;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: auto;
+    max-height: 400px;
+    left: auto;
+    top: auto;
+    order: 2;
+  }
+  
+  .encode-main-section {
+    order: 1;
+    display: block;
+  }
+}
+
+@media (max-width: 1024px) {
+  .encode-examples-section {
+    max-height: 350px;
+  }
+}
+
 @media (max-width: 768px) {
+  .encode-examples-section {
+    max-height: 300px;
+  }
+  
   .form-row {
     flex-direction: column;
     gap: 0;

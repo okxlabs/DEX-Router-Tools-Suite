@@ -15,9 +15,45 @@ function App() {
   const [encodeResult, setEncodeResult] = useState(null);
   const [toast, setToast] = useState(null);
 
+  // TX Simulation state - lifted up to preserve content when switching tabs
+  const [simulationState, setSimulationState] = useState({
+    formData: {
+      from: '',
+      to: '',
+      calldata: '',
+      chainId: 'other',
+      customChainId: '',
+      msgValue: '',
+      accountSlug: '',
+      projectSlug: '',
+      tenderlyApiKey: '',
+      blockHeight: ''
+    },
+    isSimulating: false,
+    simulationResult: null
+  });
+
   const showToast = (message, type = 'success', duration = 3000) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
+  };
+
+  // Helper functions to update simulation state
+  const updateSimulationFormData = (field, value) => {
+    setSimulationState(prev => ({
+      ...prev,
+      formData: {
+        ...prev.formData,
+        [field]: value
+      }
+    }));
+  };
+
+  const updateSimulationStatus = (field, value) => {
+    setSimulationState(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
@@ -122,6 +158,9 @@ function App() {
 
           {activeTab === 'simulate' && (
             <SimulateTX
+              simulationState={simulationState}
+              updateSimulationFormData={updateSimulationFormData}
+              updateSimulationStatus={updateSimulationStatus}
               showToast={showToast}
             />
           )}

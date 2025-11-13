@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 
 // Reusable Form Field Component
-const FormField = ({ label, type = "text", placeholder, value, onChange, options = null, autoComplete, name }) => (
+const FormField = ({ label, type = "text", placeholder, value, onChange, options = null, autoComplete, name, required = false }) => (
   <div className="form-group">
     <label className="form-label">
       {label}
+      {required && <span className="required-asterisk"> *</span>}
     </label>
     {options ? (
         <select
@@ -68,54 +69,35 @@ const SimulationSuccessCard = ({ accountSlug, projectSlug, simulationResult }) =
   </div>
 );
 
-const SimulateTX = ({ showToast }) => {
-  const [formData, setFormData] = useState({
-    from: '',
-    to: '',
-    calldata: '',
-    chainId: 'other',
-    customChainId: '',
-    msgValue: '',
-    accountSlug: '',
-    projectSlug: '',
-    tenderlyApiKey: '',
-    blockHeight: ''
-  });
+const SimulateTX = ({ 
+  simulationState,
+  updateSimulationFormData,
+  updateSimulationStatus,
+  showToast 
+}) => {
+  // Destructure state from props
+  const { formData, isSimulating, simulationResult } = simulationState;
 
   // Load saved project slug from localStorage (account slug and API key handled by password manager)
   useEffect(() => {
     const savedProjectSlug = localStorage.getItem('tenderly_project_slug');
 
-    if (savedProjectSlug) {
-      setFormData(prev => ({
-        ...prev,
-        projectSlug: savedProjectSlug || ''
-      }));
+    if (savedProjectSlug && !formData.projectSlug) {
+      updateSimulationFormData('projectSlug', savedProjectSlug);
     }
-  }, []);
+  }, [formData.projectSlug, updateSimulationFormData]);
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    updateSimulationFormData(field, value);
 
     // Handle chain ID field based on network selection
     if (field === 'chainId') {
       if (value === 'other') {
         // Clear the chain ID field when "Other" is selected
-        setFormData(prev => ({
-          ...prev,
-          chainId: value,
-          customChainId: ''
-        }));
+        updateSimulationFormData('customChainId', '');
       } else {
         // Auto-populate chain ID when a predefined network is selected
-        setFormData(prev => ({
-          ...prev,
-          chainId: value,
-          customChainId: value
-        }));
+        updateSimulationFormData('customChainId', value);
       }
     }
 
@@ -126,18 +108,10 @@ const SimulateTX = ({ showToast }) => {
       
       if (matchingNetwork) {
         // Switch to the matching predefined network
-        setFormData(prev => ({
-          ...prev,
-          chainId: matchingNetwork.id,
-          customChainId: value
-        }));
+        updateSimulationFormData('chainId', matchingNetwork.id);
       } else {
         // Switch to "other" for custom chain IDs
-        setFormData(prev => ({
-          ...prev,
-          chainId: 'other',
-          customChainId: value
-        }));
+        updateSimulationFormData('chainId', 'other');
       }
     }
 
@@ -147,8 +121,6 @@ const SimulateTX = ({ showToast }) => {
     }
   };
 
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [simulationResult, setSimulationResult] = useState(null);
 
   const chainOptions = [
     { id: 'other', name: 'Custom Chain ID'},
@@ -172,8 +144,8 @@ const SimulateTX = ({ showToast }) => {
       return;
     }
 
-    setIsSimulating(true);
-    setSimulationResult(null);
+    updateSimulationStatus('isSimulating', true);
+    updateSimulationStatus('simulationResult', null);
 
     try {
       // Build simulation payload following the exact sample format
@@ -206,7 +178,7 @@ const SimulateTX = ({ showToast }) => {
         }
       );
 
-      setSimulationResult(response.data);
+      updateSimulationStatus('simulationResult', response.data);
       showToast('Transaction simulation completed successfully! Click the link below to view in Tenderly.', 'success');
 
     } catch (error) {
@@ -217,7 +189,7 @@ const SimulateTX = ({ showToast }) => {
                           'Unknown error occurred';
       showToast(`Simulation failed: ${errorMessage}`, 'error');
     } finally {
-      setIsSimulating(false);
+      updateSimulationStatus('isSimulating', false);
     }
   };
 
@@ -232,6 +204,7 @@ const SimulateTX = ({ showToast }) => {
             placeholder="0x..."
             value={formData.from}
             onChange={(value) => handleInputChange('from', value)}
+            required={true}
           />
           
           <FormField
@@ -240,6 +213,7 @@ const SimulateTX = ({ showToast }) => {
             placeholder="0x..."
             value={formData.to}
             onChange={(value) => handleInputChange('to', value)}
+            required={true}
           />
         </div>
 
@@ -255,6 +229,7 @@ const SimulateTX = ({ showToast }) => {
           <FormField
             label="Chain ID"
             placeholder="Chain ID (e.g., 1 for Ethereum)"
+            required={true}
             value={formData.customChainId}
             onChange={(value) => handleInputChange('customChainId', value)}
           />
@@ -264,7 +239,7 @@ const SimulateTX = ({ showToast }) => {
         <div className="form-row">
           <FormField
             label="msg.value (ETH)"
-            placeholder="0 (optional)"
+            placeholder="0"
             value={formData.msgValue}
             onChange={(value) => handleInputChange('msgValue', value)}
           />
@@ -287,6 +262,7 @@ const SimulateTX = ({ showToast }) => {
               onChange={(value) => handleInputChange('accountSlug', value)}
               autoComplete="username"
               name="tenderly-account-slug"
+              required={true}
             />
             
             <FormField
@@ -294,6 +270,7 @@ const SimulateTX = ({ showToast }) => {
               placeholder="Enter your project slug"
               value={formData.projectSlug}
               onChange={(value) => handleInputChange('projectSlug', value)}
+              required={true}
             />
           </div>
 
@@ -307,6 +284,7 @@ const SimulateTX = ({ showToast }) => {
                 onChange={(value) => handleInputChange('tenderlyApiKey', value)}
                 autoComplete="current-password"
                 name="tenderly-api-key"
+                required={true}
               />
             <div className="api-key-info">
               <span>ℹ️</span>
@@ -329,6 +307,7 @@ const SimulateTX = ({ showToast }) => {
           placeholder="0x..."
           value={formData.calldata}
           onChange={(value) => handleInputChange('calldata', value)}
+          required={true}
         />
 
           {/* Submit Button */}
