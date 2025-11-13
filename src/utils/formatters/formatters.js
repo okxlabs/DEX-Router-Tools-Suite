@@ -10,6 +10,7 @@ import {
     MODE_PERMIT2_MASK,
     NUMERATOR_MASK,
     ONE_FOR_ZERO_MASK,
+    ORDER_ID_MASK,
     REVERSE_MASK,
     SWAP_AMOUNT_MASK,
     WEIGHT_MASK,
@@ -232,7 +233,7 @@ function unpackRawData(rawDataValue) {
 /**
  * Unpack a receiver uint256 value into its components
  * @param {any} receiverValue - the receiver uint256 value (BigNumber or string)
- * @returns {Object} unpacked receiver with isOneForZero, isWethUnwrap, and address
+ * @returns {Object} unpacked receiver with isOneForZero, isWethUnwrap, orderId, and address
  */
 function unpackReceiver(receiverValue) {
     try {
@@ -248,8 +249,10 @@ function unpackReceiver(receiverValue) {
         const isOneForZero = !receiverBN.and(ONE_FOR_ZERO_MASK).isZero();
         const isWethUnwrap = !receiverBN.and(WETH_UNWRAP_MASK).isZero();
         const address = receiverBN.and(ADDRESS_MASK);
+        const orderId = receiverBN.and(ORDER_ID_MASK).shr(160); // Extract orderId from bits 160-255
 
         return {
+            orderId: orderId.toString(),
             isOneForZero: isOneForZero,
             isWethUnwrap: isWethUnwrap,
             address: "0x" + address.toHexString().slice(2).padStart(40, '0')

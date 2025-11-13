@@ -16,16 +16,49 @@ export function resolve(calldata) {
             return decodedFunctions;
         }
         
+        // Extract orderId for functions that have it embedded in parameters
+        let orderId = null;
+        if (decodedFunctions.function) {
+            const functionName = decodedFunctions.function.name;
+            
+            // For unxswapTo and unxswapByOrderId, orderId is in srcToken
+            if ((functionName === 'unxswapTo' || functionName === 'unxswapByOrderId') && 
+                decodedFunctions.srcToken && decodedFunctions.srcToken.orderId) {
+                orderId = decodedFunctions.srcToken.orderId;
+                // Remove orderId from srcToken to avoid duplication
+                delete decodedFunctions.srcToken.orderId;
+            }
+            // For uniswapV3SwapTo, orderId is in receiver
+            else if (functionName === 'uniswapV3SwapTo' && 
+                     decodedFunctions.receiver && decodedFunctions.receiver.orderId) {
+                orderId = decodedFunctions.receiver.orderId;
+                // Remove orderId from receiver to avoid duplication
+                delete decodedFunctions.receiver.orderId;
+            }
+        }
+        
         // For DEX router functions, decode commission and trim data
         const commissionDecoded = extractCommissionInfoFromCalldata(calldata);
         const trimDecoded = extractTrimInfoFromCalldata(calldata);
         
-        // Return structured JSON with all decode results
-        return {
-            ...decodedFunctions,
-            ...commissionDecoded,
-            ...trimDecoded
+        // Build result with orderId positioned after function field
+        const result = {
+            function: decodedFunctions.function
         };
+        
+        // Add orderId right after function if found
+        if (orderId !== null) {
+            result.orderId = orderId;
+        }
+        
+        // Add remaining decoded function data (excluding function field)
+        const { function: _, ...remainingFunctionData } = decodedFunctions;
+        Object.assign(result, remainingFunctionData);
+        
+        // Add commission and trim data
+        Object.assign(result, commissionDecoded, trimDecoded);
+        
+        return result;
     } catch (error) {
         console.error('Decode error:', error);
         return {
