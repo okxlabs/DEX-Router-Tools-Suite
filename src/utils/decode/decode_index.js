@@ -25,8 +25,8 @@ export function resolve(calldata) {
             if ((functionName === 'unxswapTo' || functionName === 'unxswapByOrderId') && 
                 decodedFunctions.srcToken && decodedFunctions.srcToken.orderId) {
                 orderId = decodedFunctions.srcToken.orderId;
-                // Remove orderId from srcToken to avoid duplication
-                delete decodedFunctions.srcToken.orderId;
+                // Convert srcToken from object to just address string
+                decodedFunctions.srcToken = decodedFunctions.srcToken.address;
             }
             // For uniswapV3SwapTo, orderId is in receiver
             else if (functionName === 'uniswapV3SwapTo' && 

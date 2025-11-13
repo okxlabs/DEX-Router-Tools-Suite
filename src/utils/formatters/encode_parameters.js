@@ -98,14 +98,20 @@ export function prepareSmartSwapByInvestWithRefundParams(jsonData) {
  * ABI: (uint256 receiver, uint256 amount, uint256 minReturn, uint256[] pools)
  */
 export function prepareUniswapV3SwapToParams(jsonData) {
-    const { receiver, amount, minReturn, pools } = jsonData;
+    const { orderId, receiver, amount, minReturn, pools } = jsonData;
     
     if (!receiver || !amount || !minReturn || !pools) {
         throw new Error('Missing required parameters for uniswapV3SwapTo');
     }
     
+    // Merge orderId with receiver object for packing
+    const receiverWithOrderId = {
+        ...receiver,
+        orderId: orderId || receiver.orderId // Use top-level orderId if available, otherwise use receiver.orderId
+    };
+    
     // Pack receiver and pools
-    const packedReceiver = packReceiver(receiver);
+    const packedReceiver = packReceiver(receiverWithOrderId);
     const packedPools = pools.map(pool => packUniswapV3Pool(pool));
     
     return [packedReceiver, amount, minReturn, packedPools];
@@ -144,14 +150,20 @@ export function prepareSmartSwapToParams(jsonData) {
  * ABI: (uint256 srcToken, uint256 amount, uint256 minReturn, bytes32[] pools)
  */
 export function prepareUnxswapByOrderIdParams(jsonData) {
-    const { srcToken, amount, minReturn, pools } = jsonData;
+    const { orderId, srcToken, amount, minReturn, pools } = jsonData;
     
     if (!srcToken || !amount || !minReturn || !pools) {
         throw new Error('Missing required parameters for unxswapByOrderId');
     }
     
+    // Create srcToken object for packing (orderId + address)
+    const srcTokenObj = {
+        orderId: orderId || '0', // Use top-level orderId or default to '0'
+        address: srcToken // srcToken is now just the address string
+    };
+    
     // Pack srcToken and pools
-    const packedSrcToken = packSrcToken(srcToken);
+    const packedSrcToken = packSrcToken(srcTokenObj);
     const packedPools = pools.map(pool => packUnxswapPool(pool));
     
     return [packedSrcToken, amount, minReturn, packedPools];
@@ -162,14 +174,20 @@ export function prepareUnxswapByOrderIdParams(jsonData) {
  * ABI: (uint256 srcToken, uint256 amount, uint256 minReturn, address receiver, bytes32[] pools)
  */
 export function prepareUnxswapToParams(jsonData) {
-    const { srcToken, amount, minReturn, receiver, pools } = jsonData;
+    const { orderId, srcToken, amount, minReturn, receiver, pools } = jsonData;
     
     if (!srcToken || !amount || !minReturn || !receiver || !pools) {
         throw new Error('Missing required parameters for unxswapTo');
     }
     
+    // Create srcToken object for packing (orderId + address)
+    const srcTokenObj = {
+        orderId: orderId || '0', // Use top-level orderId or default to '0'
+        address: srcToken // srcToken is now just the address string
+    };
+    
     // Pack srcToken and pools
-    const packedSrcToken = packSrcToken(srcToken);
+    const packedSrcToken = packSrcToken(srcTokenObj);
     const packedPools = pools.map(pool => packUnxswapPool(pool));
     
     return [packedSrcToken, amount, minReturn, receiver, packedPools];

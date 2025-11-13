@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import {
     ADDRESS_MASK,
     ONE_FOR_ZERO_MASK,
+    ORDER_ID_MASK,
     WETH_UNWRAP_MASK,
     WEIGHT_MASK,
     REVERSE_MASK,
@@ -38,7 +39,7 @@ export function packSrcToken(srcToken) {
 
 /**
  * Pack receiver object into uint256
- * @param {Object} receiver - {isOneForZero, isWethUnwrap, address}
+ * @param {Object} receiver - {orderId, isOneForZero, isWethUnwrap, address}
  * @returns {string} Packed uint256 value
  */
 export function packReceiver(receiver) {
@@ -46,9 +47,15 @@ export function packReceiver(receiver) {
         return receiver; // Already packed
     }
     
-    const { isOneForZero, isWethUnwrap, address } = receiver;
+    const { orderId, isOneForZero, isWethUnwrap, address } = receiver;
     
     let packed = ethers.BigNumber.from(address);
+    
+    // Add orderId if provided (shift left by 160 bits)
+    if (orderId !== undefined && orderId !== null) {
+        const orderIdBN = ethers.BigNumber.from(orderId);
+        packed = packed.or(orderIdBN.shl(160));
+    }
     
     if (isOneForZero) {
         packed = packed.or(ONE_FOR_ZERO_MASK);
