@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/DEX-Router-Tools-Suite/static/css/main.dbfc1a5b.css",
-    "main.js": "/DEX-Router-Tools-Suite/static/js/main.e8dad848.js",
+    "main.css": "/DEX-Router-Tools-Suite/static/css/main.777193e9.css",
+    "main.js": "/DEX-Router-Tools-Suite/static/js/main.5657753c.js",
     "index.html": "/DEX-Router-Tools-Suite/index.html",
-    "main.dbfc1a5b.css.map": "/DEX-Router-Tools-Suite/static/css/main.dbfc1a5b.css.map",
-    "main.e8dad848.js.map": "/DEX-Router-Tools-Suite/static/js/main.e8dad848.js.map"
+    "main.777193e9.css.map": "/DEX-Router-Tools-Suite/static/css/main.777193e9.css.map",
+    "main.5657753c.js.map": "/DEX-Router-Tools-Suite/static/js/main.5657753c.js.map"
   },
   "entrypoints": [
-    "static/css/main.dbfc1a5b.css",
-    "static/js/main.e8dad848.js"
+    "static/css/main.777193e9.css",
+    "static/js/main.5657753c.js"
   ]
 }
