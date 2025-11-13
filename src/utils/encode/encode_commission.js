@@ -13,7 +13,7 @@ const PADDING = '00'.repeat(11); // 11 bytes of padding for middle block
 // Commission structure mapping
 const COMMISSION_STRUCTURE = {
     1: { blocks: ['middle', 'first'], name: 'SINGLE' },
-    2: { blocks: ['first', 'middle', 'last'], name: 'DUAL' },
+    2: { blocks: ['first', 'middle', 'second'], name: 'DUAL' },
     3: { blocks: ['first', 'second', 'middle', 'third'], name: 'TRIPLE' },
 };
 
@@ -98,8 +98,8 @@ export function validateCommissionData(commissionData) {
         throw new Error('Commission data must have middle and first properties');
     }
 
-    if (referCount === 2 && !commissionData.last) {
-        throw new Error('Triple commission data must have last property');
+    if (referCount === 2 && !commissionData.second) {
+        throw new Error('Dual commission data must have second property');
     }
 
     if (referCount === 3 && (!commissionData.second || !commissionData.third)) {
@@ -114,7 +114,7 @@ export function validateCommissionData(commissionData) {
     // Validate commission blocks
     const commissionsToValidate = [commissionData.first];
     if (referCount === 2) {
-        commissionsToValidate.push(commissionData.last);
+        commissionsToValidate.push(commissionData.second);
     }
     if (referCount === 3) {
         commissionsToValidate.push(commissionData.second, commissionData.third);
