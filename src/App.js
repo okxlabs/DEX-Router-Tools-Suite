@@ -3,9 +3,10 @@ import { useState } from 'react';
 import { resolve } from './utils/decode/decode_index.js';
 import { encode } from './utils/encode/encode_index.js';
 import { validateEncodedCalldata, validateDecodedJson } from './utils/core/roundtrip_validator.js';
-import DecodeCalldata from './components/DecodeCalldata.js';
-import EncodeCalldata from './components/EncodeCalldata.js';
-import SimulateTX from './components/SimulateTX.js';
+import { createDecodeOperation, createEncodeOperation, formatJSON } from './utils/componentUtils.js';
+import DecodeCalldata from './components/forms/DecodeCalldata';
+import EncodeCalldata from './components/forms/EncodeCalldata';
+import SimulateTX from './components/SimulateTX';
 
 function App() {
   const [activeTab, setActiveTab] = useState('decode');
@@ -13,6 +14,8 @@ function App() {
   const [rightInput, setRightInput] = useState('');
   const [decodeResult, setDecodeResult] = useState(null);
   const [encodeResult, setEncodeResult] = useState(null);
+  const [decodeValidation, setDecodeValidation] = useState(null);
+  const [encodeValidation, setEncodeValidation] = useState(null);
   const [toast, setToast] = useState(null);
 
   // TX Simulation state - lifted up to preserve content when switching tabs
@@ -56,6 +59,13 @@ function App() {
     }));
   };
 
+  const handleEditFromDecode = (decodedResult) => {
+    // Navigate to encode tab and populate with decoded JSON
+    setActiveTab('encode');
+    setRightInput(formatJSON(decodedResult));
+    showToast('Switched to Encode tab with decoded result!', 'success');
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -87,34 +97,18 @@ function App() {
             <DecodeCalldata
               value={leftInput}
               onChange={(e) => setLeftInput(e.target.value)}
-              onButtonClick={() => {
-                if (!leftInput.trim()) {
-                  showToast('Please enter calldata to decode', 'error');
-                  return;
-                }
-                
-                try {
-                  const originalCalldata = leftInput.trim();
-                  const result = resolve(originalCalldata);
-                  
-                  // Validate the decoded JSON by encoding it back
-                  const validation = validateDecodedJson(originalCalldata, result);
-                  
-                  setDecodeResult(result);
-                  
-                  if (validation.success) {
-                    showToast('✅ Decoding successful and validated!', 'success');
-                  } else {
-                    showToast(`${validation.summary}`, 'error', 30000); // Red toast for 30 seconds
-                    console.warn('Reverse validation details:', validation);
-                  }
-                } catch (error) {
-                  showToast('Error: Failed to decode calldata', 'error');
-                  setDecodeResult({ success: false, error: error.message });
-                }
-              }}
+              validationResult={decodeValidation}
+              onButtonClick={createDecodeOperation(
+                leftInput,
+                resolve,
+                validateDecodedJson,
+                showToast,
+                setDecodeResult,
+                setDecodeValidation
+              )}
               result={decodeResult}
               showToast={showToast}
+              onEdit={handleEditFromDecode}
             />
           )}
 
@@ -122,35 +116,15 @@ function App() {
             <EncodeCalldata
               value={rightInput}
               onChange={(e) => setRightInput(e.target.value)}
-              onButtonClick={() => {
-                if (!rightInput.trim()) {
-                  showToast('Please enter json data to encode', 'error');
-                  return;
-                }
-                
-                try {
-                  // Parse the JSON input
-                  const jsonData = JSON.parse(rightInput.trim());
-                  
-                  // Encode the JSON data to calldata
-                  const result = encode(jsonData);
-                  
-                  // Validate the encoded calldata by decoding it back
-                  const validation = validateEncodedCalldata(jsonData, result);
-                  
-                  setEncodeResult(result);
-                  
-                  if (validation.success) {
-                    showToast('✅ Encoding successful and validated!', 'success');
-                  } else {
-                    showToast(`${validation.summary}`, 'error', 30000); // Red toast for 30 seconds
-                    console.warn('Validation details:', validation);
-                  }
-                } catch (error) {
-                  showToast('Error: Invalid JSON format or encoding failed', 'error');
-                  setEncodeResult('Error: ' + error.message);
-                }
-              }}
+              validationResult={encodeValidation}
+              onButtonClick={createEncodeOperation(
+                rightInput,
+                encode,
+                validateEncodedCalldata,
+                showToast,
+                setEncodeResult,
+                setEncodeValidation
+              )}
               result={encodeResult}
               showToast={showToast}
             />
