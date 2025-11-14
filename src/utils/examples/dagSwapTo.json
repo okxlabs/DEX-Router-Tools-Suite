@@ -1,0 +1,96 @@
+{
+    "function": {
+      "name": "dagSwapTo",
+      "selector": "0x0c307f76"
+    },
+    "orderId": "212785",
+    "receiver": "0x2765Aa14e53f34A608dd5c09e17BeDB2FE4621Cb",
+    "baseRequest": {
+      "fromToken": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "toToken": "0x2b867efD2dE4Ad2B583Ca0CB3dF9C4040Ef4D329",
+      "fromTokenAmount": "110000000",
+      "minReturnAmount": "6232793291697628",
+      "deadLine": "1763029294"
+    },
+    "paths": [
+      {
+        "mixAdapters": [
+          "0x6747BcaF9bD5a5F0758Cbe08903490E45DdfACB5"
+        ],
+        "assetTo": [
+          "0x6747BcaF9bD5a5F0758Cbe08903490E45DdfACB5"
+        ],
+        "rawData": [
+          {
+            "poolAddress": "0x56534741cd8b152df6d48adf7ac51f75169a83b2",
+            "reverse": true,
+            "weight": "10000",
+            "inputIndex": "0",
+            "outputIndex": "1"
+          }
+        ],
+        "extraData": [
+          "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000040000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec70000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c599"
+        ],
+        "fromToken": {
+          "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "flag": "DEFAULT"
+        }
+      },
+      {
+        "mixAdapters": [
+          "0x5745050e787F693ED21E4418D528F78ad9C374A6"
+        ],
+        "assetTo": [
+          "0x5745050e787F693ED21E4418D528F78ad9C374A6"
+        ],
+        "rawData": [
+          {
+            "poolAddress": "0x0000000000000000000000000000000000000000",
+            "reverse": true,
+            "weight": "10000",
+            "inputIndex": "1",
+            "outputIndex": "2"
+          }
+        ],
+        "extraData": [
+          "0x0000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c599000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f4000000000000000000000000000000000000000000000000000000000000000a"
+        ],
+        "fromToken": {
+          "address": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "flag": "DEFAULT"
+        }
+      },
+      {
+        "mixAdapters": [
+          "0x031F1aD10547b8dEB43A36e5491c06A93812023a"
+        ],
+        "assetTo": [
+          "0x1398eE28992A73C7687766e09cda53783cDB6c47"
+        ],
+        "rawData": [
+          {
+            "poolAddress": "0x1398ee28992a73c7687766e09cda53783cdb6c47",
+            "reverse": true,
+            "weight": "10000",
+            "inputIndex": "2",
+            "outputIndex": "3"
+          }
+        ],
+        "extraData": [
+          "0x000000000000000000000000000000000000000000000000000000000000001e"
+        ],
+        "fromToken": {
+          "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "flag": "DEFAULT"
+        }
+      }
+    ],
+    "hasCommission": false,
+    "hasTrim": true,
+    "trimRate": "100",
+    "trimAddress": "0xfa00a9ed787f3793db668bff3e6e6e7db0f92a1b",
+    "expectAmountOut": "7003138529997335",
+    "chargeRate": "0",
+    "chargeAddress": "0x0000000000000000000000000000000000000000"
+  }

@@ -1,37 +1,42 @@
 {
     "function": {
-        "name": "dagSwapByOrderId",
-        "selector": "0xf2c42696"
+      "name": "dagSwapByOrderId",
+      "selector": "0xf2c42696"
     },
     "orderId": "112095",
     "baseRequest": {
-        "fromToken": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
-        "toToken": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-        "fromTokenAmount": "2100000",
-        "minReturnAmount": "388210758133950",
-        "deadLine": "1757058967"
+      "fromToken": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "toToken": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "fromTokenAmount": "2100000",
+      "minReturnAmount": "388210758133950",
+      "deadLine": "1757058967"
     },
     "paths": [
-        {
-            "mixAdapters": [
-                "0x411d2C093e4c2e69Bf0D8E94be1bF13DaDD879c6"
-            ],
-            "assetTo": [
-                "0x411d2C093e4c2e69Bf0D8E94be1bF13DaDD879c6"
-            ],
-            "rawData": [
-                {
-                    "poolAddress": "0xb4cb800910b228ed3d0834cf79d697127bbb00e5",
-                    "reverse": false,
-                    "weight": "10000",
-                    "inputIndex": "0",
-                    "outputIndex": "1"
-                }
-            ],
-            "extraData": [
-                "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000040000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda029130000000000000000000000004200000000000000000000000000000000000006"
-            ],
-            "fromToken": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+      {
+        "mixAdapters": [
+          "0x411d2C093e4c2e69Bf0D8E94be1bF13DaDD879c6"
+        ],
+        "assetTo": [
+          "0x411d2C093e4c2e69Bf0D8E94be1bF13DaDD879c6"
+        ],
+        "rawData": [
+          {
+            "poolAddress": "0xb4cb800910b228ed3d0834cf79d697127bbb00e5",
+            "reverse": false,
+            "weight": "10000",
+            "inputIndex": "0",
+            "outputIndex": "1"
+          }
+        ],
+        "extraData": [
+          "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000040000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda029130000000000000000000000004200000000000000000000000000000000000006"
+        ],
+        "fromToken": {
+          "address": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+          "flag": "DEFAULT"
         }
-    ]
-}
+      }
+    ],
+    "hasCommission": false,
+    "hasTrim": false
+  }

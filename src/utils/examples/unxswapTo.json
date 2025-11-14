@@ -1,24 +1,23 @@
 {
     "function": {
-        "name": "unxswapTo",
-        "selector": "0x08298b5a"
+      "name": "unxswapTo",
+      "selector": "0x08298b5a"
     },
-    "srcToken": {
-        "orderId": "212955",
-        "address": "0x980855ca48b601df572e6877ff908c8bed38bcb5"
-    },
+    "orderId": "212955",
+    "srcToken": "0x980855ca48b601df572e6877ff908c8bed38bcb5",
     "amount": "109976339727411293714952",
     "minReturn": "4924773532991963",
     "receiver": "0x333b96063f66b40382956EDb7A2395F702F006AE",
     "pools": [
-        {
-            "isToken0Tax": false,
-            "isToken1Tax": false,
-            "WETH": true,
-            "numerator": "997500000",
-            "address": "0x8136791092bc7f5ee5971f5dfd83cfb2160f8c16"
-        }
+      {
+        "isToken0Tax": false,
+        "isToken1Tax": false,
+        "WETH": true,
+        "isOneForZero": false,
+        "numerator": "997500000",
+        "address": "0x8136791092bc7f5ee5971f5dfd83cfb2160f8c16"
+      }
     ],
     "hasCommission": false,
     "hasTrim": false
-}
+  }

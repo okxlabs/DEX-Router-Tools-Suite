@@ -12,6 +12,7 @@ import unxswapByOrderId from '../examples/unxswapByOrderId.json';
 import unxswapTo from '../examples/unxswapTo.json';
 import unxswapToWithBaseRequest from '../examples/unxswapToWithBaseRequest.json';
 import dagSwapByOrderId from '../examples/dagSwapByOrderId.json';
+import dagSwapTo from '../examples/dagSwapTo.json';
 import approve from '../examples/approve.json';
 
 /**
@@ -58,6 +59,11 @@ export const getFunctionExamples = () => {
         { 
             name: 'dagSwapByOrderId', 
             data: dagSwapByOrderId, 
+            category: 'DAG SWAP'
+        },
+        { 
+            name: 'dagSwapTo', 
+            data: dagSwapTo, 
             category: 'DAG SWAP'
         },
         { 

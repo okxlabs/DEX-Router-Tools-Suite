@@ -10,6 +10,7 @@ import {
     MODE_PERMIT2_MASK,
     NUMERATOR_MASK,
     ONE_FOR_ZERO_MASK,
+    ORDER_ID_MASK,
     REVERSE_MASK,
     SWAP_AMOUNT_MASK,
     WEIGHT_MASK,
@@ -232,7 +233,7 @@ function unpackRawData(rawDataValue) {
 /**
  * Unpack a receiver uint256 value into its components
  * @param {any} receiverValue - the receiver uint256 value (BigNumber or string)
- * @returns {Object} unpacked receiver with isOneForZero, isWethUnwrap, and address
+ * @returns {Object} unpacked receiver with isOneForZero, isWethUnwrap, orderId, and address
  */
 function unpackReceiver(receiverValue) {
     try {
@@ -248,8 +249,10 @@ function unpackReceiver(receiverValue) {
         const isOneForZero = !receiverBN.and(ONE_FOR_ZERO_MASK).isZero();
         const isWethUnwrap = !receiverBN.and(WETH_UNWRAP_MASK).isZero();
         const address = receiverBN.and(ADDRESS_MASK);
+        const orderId = receiverBN.and(ORDER_ID_MASK).shr(160); // Extract orderId from bits 160-255
 
         return {
+            orderId: orderId.toString(),
             isOneForZero: isOneForZero,
             isWethUnwrap: isWethUnwrap,
             address: "0x" + address.toHexString().slice(2).padStart(40, '0')
@@ -295,7 +298,7 @@ function unpackPoolsArray(poolsArray, functionName) {
 }
 
 /**
- * Unpack a single unxswap pool with all masks (isToken0Tax + isToken1Tax + WETH + numeratorMask value + address)
+ * Unpack a single unxswap pool with all masks (isToken0Tax + isToken1Tax + WETH + isOneForZero + numeratorMask value + address)
  * @param {any} poolValue - the pool uint256 value
  * @returns {Object} unpacked pool with boolean flags, numerator value, and address
  */
@@ -313,6 +316,7 @@ function unpackUnxswapPool(poolValue) {
         const isToken0Tax = !poolBN.and(IS_TOKEN0_TAX_MASK).isZero();
         const isToken1Tax = !poolBN.and(IS_TOKEN1_TAX_MASK).isZero();
         const isWETH = !poolBN.and(WETH_MASK).isZero();
+        const isOneForZero = !poolBN.and(ONE_FOR_ZERO_MASK).isZero();
         const numeratorValue = poolBN.and(NUMERATOR_MASK).shr(160);
         const address = poolBN.and(ADDRESS_MASK);
 
@@ -320,6 +324,7 @@ function unpackUnxswapPool(poolValue) {
             isToken0Tax: isToken0Tax,
             isToken1Tax: isToken1Tax,
             WETH: isWETH,
+            isOneForZero: isOneForZero,
             numerator: numeratorValue.toString(),
             address: "0x" + address.toHexString().slice(2).padStart(40, '0')
         };

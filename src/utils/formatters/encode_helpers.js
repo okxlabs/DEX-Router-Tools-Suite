@@ -56,15 +56,28 @@ export function processFromTokenWithMode(fromToken) {
 /**
  * Prepare baseRequest tuple from JSON object
  * @param {Object} baseRequest - BaseRequest object
+ * @param {string} functionName - Optional function name to determine encoding type
+ * @param {string|number} orderId - Optional orderId to encode with fromToken for specific functions
  * @returns {Array} BaseRequest tuple
  */
-export function prepareBaseRequestTuple(baseRequest) {
+export function prepareBaseRequestTuple(baseRequest, functionName, orderId) {
     if (!baseRequest) {
         throw new Error('Missing baseRequest parameter');
     }
     
+    let fromToken = baseRequest.fromToken;
+    
+    // For unxswapToWithBaseRequest, encode orderId with fromToken address
+    if (functionName === 'unxswapToWithBaseRequest' && orderId) {
+        // Encode as: (orderId << 160) | address(fromToken)
+        // fromToken should be the address, orderId gets shifted and combined
+        const orderIdBN = ethers.BigNumber.from(orderId.toString());
+        const fromTokenBN = ethers.BigNumber.from(fromToken.toString());
+        fromToken = orderIdBN.shl(160).or(fromTokenBN).toString();
+    }
+    
     return [
-        baseRequest.fromToken,
+        fromToken,
         baseRequest.toToken,
         baseRequest.fromTokenAmount,
         baseRequest.minReturnAmount,
