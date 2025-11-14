@@ -114,7 +114,7 @@ export function packUniswapV3Pool(pool) {
 
 /**
  * Pack pool object into bytes32 (for unxswap functions)
- * @param {Object} pool - {isToken0Tax, isToken1Tax, WETH, numerator, address}
+ * @param {Object} pool - {isToken0Tax, isToken1Tax, WETH, numerator, address, isOneForZero}
  * @returns {string} Packed bytes32 value
  */
 export function packUnxswapPool(pool) {
@@ -122,7 +122,7 @@ export function packUnxswapPool(pool) {
         return pool; // Already packed
     }
     
-    const { isToken0Tax, isToken1Tax, WETH, numerator, address } = pool;
+    const { isToken0Tax, isToken1Tax, WETH, numerator, address, isOneForZero } = pool;
     
     let packed = ethers.BigNumber.from(address);
     
@@ -136,6 +136,10 @@ export function packUnxswapPool(pool) {
     
     if (WETH) {
         packed = packed.or(WETH_MASK);
+    }
+    
+    if (isOneForZero) {
+        packed = packed.or(ONE_FOR_ZERO_MASK);
     }
     
     // Add numerator value

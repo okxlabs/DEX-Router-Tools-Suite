@@ -13,6 +13,7 @@
         "isToken0Tax": false,
         "isToken1Tax": false,
         "WETH": true,
+        "isOneForZero": false,
         "numerator": "997500000",
         "address": "0x8136791092bc7f5ee5971f5dfd83cfb2160f8c16"
       }

@@ -55,6 +55,13 @@ export function resolve(calldata) {
         const { function: _, ...remainingFunctionData } = decodedFunctions;
         Object.assign(result, remainingFunctionData);
         
+        // For unxswapToWithBaseRequest, extract fromTokenAddr from baseRequest
+        if (decodedFunctions.function && 
+            decodedFunctions.function.name === 'unxswapToWithBaseRequest' && 
+            result.baseRequest && result.baseRequest.fromTokenAddr) {
+            result.fromTokenAddr = result.baseRequest.fromTokenAddr;
+        }
+        
         // Add commission and trim data
         Object.assign(result, commissionDecoded, trimDecoded);
         

@@ -224,7 +224,7 @@ export function prepareUnxswapToWithBaseRequestParams(jsonData) {
     // Pack pools
     const packedPools = pools.map(pool => packUnxswapPool(pool));
     
-    return [orderId, receiver, prepareBaseRequestTuple(baseRequest, 'unxswapToWithBaseRequest'), packedPools];
+    return [orderId, receiver, prepareBaseRequestTuple(baseRequest, 'unxswapToWithBaseRequest', orderId), packedPools];
 }
 
 /**

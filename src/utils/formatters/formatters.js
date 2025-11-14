@@ -298,7 +298,7 @@ function unpackPoolsArray(poolsArray, functionName) {
 }
 
 /**
- * Unpack a single unxswap pool with all masks (isToken0Tax + isToken1Tax + WETH + numeratorMask value + address)
+ * Unpack a single unxswap pool with all masks (isToken0Tax + isToken1Tax + WETH + isOneForZero + numeratorMask value + address)
  * @param {any} poolValue - the pool uint256 value
  * @returns {Object} unpacked pool with boolean flags, numerator value, and address
  */
@@ -316,6 +316,7 @@ function unpackUnxswapPool(poolValue) {
         const isToken0Tax = !poolBN.and(IS_TOKEN0_TAX_MASK).isZero();
         const isToken1Tax = !poolBN.and(IS_TOKEN1_TAX_MASK).isZero();
         const isWETH = !poolBN.and(WETH_MASK).isZero();
+        const isOneForZero = !poolBN.and(ONE_FOR_ZERO_MASK).isZero();
         const numeratorValue = poolBN.and(NUMERATOR_MASK).shr(160);
         const address = poolBN.and(ADDRESS_MASK);
 
@@ -323,6 +324,7 @@ function unpackUnxswapPool(poolValue) {
             isToken0Tax: isToken0Tax,
             isToken1Tax: isToken1Tax,
             WETH: isWETH,
+            isOneForZero: isOneForZero,
             numerator: numeratorValue.toString(),
             address: "0x" + address.toHexString().slice(2).padStart(40, '0')
         };
