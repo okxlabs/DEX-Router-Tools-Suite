@@ -14,8 +14,8 @@ const ONE_FOR_ZERO_MASK = ethers.BigNumber.from("0x80000000000000000000000000000
 // WETH unwrap mask (bit 253)
 const WETH_UNWRAP_MASK = ethers.BigNumber.from("0x2000000000000000000000000000000000000000000000000000000000000000");
 
-// Order ID mask (bits 160-255)
-const ORDER_ID_MASK = ethers.BigNumber.from("0xffffffffffffffffffffffff0000000000000000000000000000000000000000");
+// Order ID mask (bits 160-252) - extracts orderId without contamination from isWethUnwrap (bit 253) and isOneForZero (bit 255) flags
+const ORDER_ID_MASK = ethers.BigNumber.from("0x1fffffffffffffffffffffff0000000000000000000000000000000000000000");
 
 // Weight mask for rawData (bits 160-175)
 const WEIGHT_MASK = ethers.BigNumber.from("0x00000000000000000000ffff0000000000000000000000000000000000000000");

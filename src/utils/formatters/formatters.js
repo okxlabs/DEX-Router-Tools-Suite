@@ -249,7 +249,7 @@ function unpackReceiver(receiverValue) {
         const isOneForZero = !receiverBN.and(ONE_FOR_ZERO_MASK).isZero();
         const isWethUnwrap = !receiverBN.and(WETH_UNWRAP_MASK).isZero();
         const address = receiverBN.and(ADDRESS_MASK);
-        const orderId = receiverBN.and(ORDER_ID_MASK).shr(160); // Extract orderId from bits 160-255
+        const orderId = receiverBN.and(ORDER_ID_MASK).shr(160);
 
         return {
             orderId: orderId.toString(),
