@@ -81,8 +81,8 @@ html, body {
   text-align: center;
 }
 
-
-.component-textarea {
+/* Textarea styles */
+.base-textarea {
   padding: 15px;
   font-size: 14px;
   border-radius: 8px;
@@ -90,14 +90,17 @@ html, body {
   background-color: #ffffff;
   width: 600px;
   max-width: 100%;
-  min-height: 8vh;
-  max-height: 15vh;
   resize: vertical;
   font-family: monospace;
   box-sizing: border-box;
   word-break: break-all;
   line-height: 1.4;
   color: #333;
+}
+
+.component-textarea {
+  min-height: 8vh;
+  max-height: 15vh;
 }
 
 .component-button {
@@ -110,13 +113,16 @@ html, body {
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.3s ease;
+  width: 180px;
+  white-space: nowrap;
 }
 
 .component-button:hover {
   background-color: #21a1c4;
 }
 
-.result-container {
+/* Result container styles */
+.base-result-container {
   margin-top: 20px;
   padding: 15px;
   background-color: #1e1e1e;
@@ -126,78 +132,40 @@ html, body {
   width: 100%;
   margin: 20px auto 0 auto;
   position: relative;
+}
+
+.result-container {
   max-height: 50vh;
   overflow-y: auto;
 }
 
-.clipboard-icon {
-  position: absolute;
-  top: 10px;
-  right: 25px;
-  cursor: pointer;
-  font-size: 18px;
-  color: #4CAF50;
-  transition: color 0.2s ease;
-  background-color: #2a2a2a;
-  padding: 5px;
-  border-radius: 3px;
-  z-index: 1;
-}
 
-.clipboard-icon:hover {
-  color: #45a049;
-}
-
-.result-content {
+/* Result content styles */
+.base-result-content {
   color: #ffffff;
   font-size: 11px;
   line-height: 1.4;
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
+}
+
+.result-content {
   height: 100%;
   overflow: visible;
 }
 
 /* Encode Component Styles */
 .encode-textarea {
-  padding: 15px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: 1px solid #555;
-  background-color: #ffffff;
-  width: 600px;
-  max-width: 100%;
   min-height: 50vh;
   max-height: 70vh;
-  resize: vertical;
-  font-family: monospace;
-  word-break: break-all;
-  line-height: 1.4;
-  color: #333;
-  box-sizing: border-box;
 }
 
 .encode-result-container {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #1e1e1e;
-  border-radius: 5px;
-  text-align: left;
-  max-width: 600px;
-  width: 100%;
-  margin: 20px auto 0 auto;
-  position: relative;
   min-height: 60px;
 }
 
 .encode-result-content {
-  color: #ffffff;
-  font-size: 11px;
-  line-height: 1.4;
-  white-space: pre-wrap;
-  word-break: break-all;
-  margin: 0;
   max-height: 120px;
   overflow: auto;
 }
@@ -311,15 +279,6 @@ html, body {
   margin-top: 20px;
 }
 
-.component-button.loading {
-  background-color: #666;
-  cursor: not-allowed;
-}
-
-.component-button.success {
-  background-color: #4caf50;
-  cursor: pointer;
-}
 
 .api-key-info {
   font-size: 12px;
@@ -443,4 +402,190 @@ html, body {
     flex-direction: column;
     gap: 0;
   }
+}
+
+
+@keyframes slideDown {
+  from {
+    transform: translateX(-50%) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+
+/* Loading Button Styles */
+.loading-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.loading-button.loading {
+  background-color: #666 !important;
+  cursor: not-allowed;
+}
+
+.loading-button.success {
+  background-color: #4CAF50 !important;
+  animation: successPulse 0.6s ease-out;
+  min-width: 180px;
+  width: 180px;
+}
+
+.loading-button.error {
+  background-color: #f44336 !important;
+  color: white !important;
+  animation: errorPulse 0.6s ease-out;
+  min-width: 180px;
+  width: 180px;
+}
+
+.loading-button.disabled {
+  background-color: #444 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 24px;
+}
+
+.loading-content .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.success-content .success-icon {
+  animation: bounceIn 0.6s ease-out;
+}
+
+/* Copy Button Styles */
+.copy-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #4CAF50;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.copy-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.copy-button:active {
+  transform: translateY(0);
+}
+
+
+/* Button Row Styles */
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+
+/* Result Header Styles */
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #333;
+}
+
+.result-title {
+  color: #61dafb;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.result-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.result-actions .copy-button,
+.result-actions .edit-button {
+  min-width: 60px;
+  height: 32px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.result-actions .copy-button {
+  color: #4CAF50;
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.result-actions .copy-button:hover {
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.result-actions .edit-button {
+  color: #FF9800;
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.result-actions .edit-button:hover {
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+/* Button Animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes errorPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive adjustments for new components */
+@media (max-width: 768px) {
+  .button-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
 }

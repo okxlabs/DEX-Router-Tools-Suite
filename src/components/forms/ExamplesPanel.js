@@ -1,35 +1,27 @@
 import React, { useState } from 'react';
 import './ExamplesPanel.css';
-import { getFunctionExamples } from '../utils/encode/jsonFunctionUtils';
-import { applyCommissionAndTrimToJson } from '../utils/encode/commissionTrimUtils';
+import { getFunctionExamples } from '../../utils/encode/jsonFunctionUtils';
+import { applyCommissionAndTrimToJson } from '../../utils/encode/commissionTrimUtils';
+
+const INITIAL_COMMISSION = { address: '', rate: '', isFromToken: true };
+const INITIAL_TRIM = { address: '', rate: '' };
 
 const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
-    // Commission state - address, rate, token type
-    const [commission1, setCommission1] = useState({ address: '', rate: '', isFromToken: true });
-    const [commission2, setCommission2] = useState({ address: '', rate: '', isFromToken: true });
-    const [commission3, setCommission3] = useState({ address: '', rate: '', isFromToken: true });
-    
-    // Shared commission settings
+    const [commission1, setCommission1] = useState(INITIAL_COMMISSION);
+    const [commission2, setCommission2] = useState(INITIAL_COMMISSION);
+    const [commission3, setCommission3] = useState(INITIAL_COMMISSION);
     const [commissionToB, setCommissionToB] = useState(false);
     const [commissionTokenAddress, setCommissionTokenAddress] = useState('');
-    
-    // Trim state - address and rate pairs
-    const [trim1, setTrim1] = useState({ address: '', rate: '', isToB: false });
-    const [trim2, setTrim2] = useState({ address: '', rate: '' });
-    
-    // Shared trim settings
+    const [trim1, setTrim1] = useState({ ...INITIAL_TRIM, isToB: false });
+    const [trim2, setTrim2] = useState(INITIAL_TRIM);
     const [expectAmountOut, setExpectAmountOut] = useState('');
 
-    // Get examples from utility function
     const examples = getFunctionExamples();
 
-
     const handleExampleClick = (example) => {
-        // Generate complete JSON with function + commission + trim based on current state
         generateCompleteJson(example);
     };
 
-    // Helper function to get current commission and trim data
     const getCurrentCommissionAndTrimData = () => {
         const commissionData = {
             commission1,
@@ -50,42 +42,34 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
 
     const generateCompleteJson = async (example) => {
         try {
-            // Get current commission and trim data
             const { commissionData, trimData } = getCurrentCommissionAndTrimData();
-            
-            // Apply commission and trim to the example data
             const completeJson = applyCommissionAndTrimToJson(example.data, commissionData, trimData);
 
-            // Load the complete JSON into the encoder
             onExampleSelect(JSON.stringify(completeJson, null, 2));
             showToast(`${example.name} loaded!`, 'success');
-
         } catch (error) {
             console.error('Failed to generate complete JSON:', error);
             showToast('Failed to load configuration', 'error');
         }
     };
 
-    // Input change handlers
+    const commissionSetters = [setCommission1, setCommission2, setCommission3];
+    const trimSetters = [setTrim1, setTrim2];
+
     const handleCommissionChange = (index, field, value) => {
-        if (index === 1) {
-            setCommission1(prev => ({ ...prev, [field]: value }));
-        } else if (index === 2) {
-            setCommission2(prev => ({ ...prev, [field]: value }));
-        } else {
-            setCommission3(prev => ({ ...prev, [field]: value }));
+        const setter = commissionSetters[index - 1];
+        if (setter) {
+            setter(prev => ({ ...prev, [field]: value }));
         }
     };
 
     const handleTrimChange = (index, field, value) => {
-        if (index === 1) {
-            setTrim1(prev => ({ ...prev, [field]: value }));
-        } else {
-            setTrim2(prev => ({ ...prev, [field]: value }));
+        const setter = trimSetters[index - 1];
+        if (setter) {
+            setter(prev => ({ ...prev, [field]: value }));
         }
     };
 
-    // Handle generate button click
     const handleGenerateClick = () => {
         if (onGenerateClick) {
             const { commissionData, trimData } = getCurrentCommissionAndTrimData();
@@ -111,13 +95,10 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                 ))}
             </div>
 
-            {/* Commission and Trim Input Grid */}
             <div className="input-grid-section">
-                {/* Commission Section */}
                 <div className="input-section">
                     <div className="section-label">Commission</div>
                     <div className="input-grid">
-                        {/* Commission 1 */}
                         <div className="input-row">
                             <input
                                 type="text"
@@ -149,7 +130,6 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                             </div>
                         </div>
                         
-                        {/* Commission 2 */}
                         <div className="input-row">
                             <input
                                 type="text"
@@ -181,7 +161,6 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                             </div>
                         </div>
                         
-                        {/* Commission 3 */}
                         <div className="input-row">
                             <input
                                 type="text"
@@ -213,7 +192,6 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                             </div>
                         </div>
                         
-                        {/* Shared Commission Settings Row */}
                         <div className="input-row">
                             <input
                                 type="text"
@@ -232,11 +210,9 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                     </div>
                 </div>
 
-                {/* Trim Section */}
                 <div className="input-section">
                     <div className="section-label">Trim</div>
                     <div className="input-grid">
-                        {/* Trim 1 */}
                         <div className="input-row">
                             <input
                                 type="text"
@@ -260,7 +236,6 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                             </button>
                         </div>
                         
-                        {/* Trim 2 */}
                         <div className="input-row">
                             <input
                                 type="text"
@@ -278,7 +253,6 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                             />
                         </div>
                         
-                        {/* Expect Amount Out Row */}
                         <div className="input-row">
                             <input
                                 type="text"
@@ -291,7 +265,6 @@ const ExamplesPanel = ({ onExampleSelect, showToast, onGenerateClick }) => {
                     </div>
                 </div>
 
-                {/* Generate Button */}
                 <div className="generate-section">
                     <button
                         className="generate-button"
