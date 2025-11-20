@@ -6,7 +6,7 @@ import { validateEncodedCalldata, validateDecodedJson } from './utils/core/round
 import { createDecodeOperation, createEncodeOperation, formatJSON } from './utils/componentUtils.js';
 import DecodeCalldata from './components/forms/DecodeCalldata';
 import EncodeCalldata from './components/forms/EncodeCalldata';
-import SimulateTX from './components/SimulateTX';
+import SimulateTX from './components/simulate/SimulateTX';
 
 function App() {
   const [activeTab, setActiveTab] = useState('decode');
