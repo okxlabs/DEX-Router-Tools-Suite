@@ -17,7 +17,8 @@ const EncodeCalldata = ({
   onChange, 
   onButtonClick, 
   result, 
-  showToast
+  showToast,
+  onSimulate
 }) => {
   const buttonState = useButtonState();
   const { isLoading, showSuccess, showError, lastProcessedValue, resetButtonStates, setButtonState } = buttonState;
@@ -66,6 +67,14 @@ const EncodeCalldata = ({
 
   const handleInputChange = createInputChangeHandler(onChange, lastProcessedValue, resetButtonStates);
   const handleCopy = createCopyHandler(showToast);
+  
+  const handleSimulate = () => {
+    if (!result) {
+      showToast('Please encode calldata first', 'error');
+      return;
+    }
+    onSimulate(result);
+  };
 
   return (
     <div className="encode-layout">
@@ -102,6 +111,7 @@ const EncodeCalldata = ({
             result={result}
             title="Encoded Calldata"
             onCopy={handleCopy}
+            onSimulate={onSimulate ? handleSimulate : undefined}
             className="encode-result-container"
             contentClassName="encode-result-content"
           />

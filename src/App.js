@@ -66,6 +66,13 @@ function App() {
     showToast('Switched to Encode tab with decoded result!', 'success');
   };
 
+  const handleSimulateFromEncode = (calldata) => {
+    // Navigate to simulate tab and populate with encoded calldata
+    setActiveTab('simulate');
+    updateSimulationFormData('calldata', calldata);
+    showToast('Switched to Simulate TX tab with encoded calldata!', 'success');
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -127,6 +134,7 @@ function App() {
               )}
               result={encodeResult}
               showToast={showToast}
+              onSimulate={handleSimulateFromEncode}
             />
           )}
 

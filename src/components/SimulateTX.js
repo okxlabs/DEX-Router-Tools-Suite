@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LoadingButton from './ui/LoadingButton';
+import ResultDisplay from './ui/ResultDisplay';
+import { chainOptions, rpcUrlOptions } from '../utils/networkConfig';
 
 const SELECT_STYLES = {
   appearance: 'none',
@@ -45,6 +47,7 @@ const FormField = ({ label, type = "text", placeholder, value, onChange, options
   </div>
 );
 
+
 const SimulationSuccessCard = ({ accountSlug, projectSlug, simulationResult }) => (
   <div className="simulation-success-card">
     <label className="form-label">🎉 Simulation Complete!</label>
@@ -77,6 +80,12 @@ const SimulateTX = ({
   showToast 
 }) => {
   const { formData, isSimulating, simulationResult } = simulationState;
+  
+  // Initialize activeTab from localStorage or default to 'tenderly'
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('simulation_active_tab') || 'tenderly';
+  });
+
   useEffect(() => {
     const savedProjectSlug = localStorage.getItem('tenderly_project_slug');
 
@@ -84,6 +93,12 @@ const SimulateTX = ({
       updateSimulationFormData('projectSlug', savedProjectSlug);
     }
   }, [formData.projectSlug, updateSimulationFormData]);
+
+  // Save active tab to localStorage whenever it changes
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    localStorage.setItem('simulation_active_tab', tab);
+  };
 
   const handleInputChange = (field, value) => {
     updateSimulationFormData(field, value);
@@ -106,20 +121,72 @@ const SimulateTX = ({
       }
     }
 
+    if (field === 'rpcUrlPreset') {
+      if (value === 'custom') {
+        updateSimulationFormData('rpcUrl', '');
+      } else {
+        const selectedRpc = rpcUrlOptions.find(option => option.id === value);
+        if (selectedRpc) {
+          updateSimulationFormData('rpcUrl', selectedRpc.url);
+        }
+      }
+    }
+
+    if (field === 'rpcUrl') {
+      const matchingRpc = rpcUrlOptions.find(option => option.url === value && option.id !== 'custom');
+      
+      if (matchingRpc) {
+        updateSimulationFormData('rpcUrlPreset', matchingRpc.id);
+      } else {
+        updateSimulationFormData('rpcUrlPreset', 'custom');
+      }
+    }
+
     if (field === 'projectSlug') {
       localStorage.setItem('tenderly_project_slug', value);
     }
   };
 
-  const chainOptions = [
-    { id: 'other', name: 'Custom Chain ID'},
-    { id: '1', name: 'Ethereum Mainnet'},
-    { id: '56', name: 'BSC'},
-    { id: '8453', name: 'Base'},
-    { id: '42161', name: 'Arbitrum One'},
-    { id: '43114', name: 'Avalanche'}
-  ];
+  const generateFoundryCommand = () => {
+    // Validate required fields for Foundry
+    if (!formData.from || !formData.to || !formData.calldata || !formData.rpcUrl) {
+      showToast('Please fill in all required fields (From, To, Calldata, RPC URL)', 'error');
+      return;
+    }
 
+    // Build the cast call command
+    let command = 'cast call';
+    
+    // Add the target contract address
+    command += ` ${formData.to}`;
+    
+    // Add the calldata
+    command += ` "${formData.calldata}"`;
+    
+    // Add the --from flag
+    command += ` --from ${formData.from}`;
+    
+    // Add the --rpc-url flag
+    command += ` --rpc-url ${formData.rpcUrl}`;
+    
+    // Add msg.value if specified
+    if (formData.msgValue && formData.msgValue !== '0' && formData.msgValue !== '') {
+      const valueInWei = (parseFloat(formData.msgValue) * 1e18).toString();
+      command += ` --value ${valueInWei}`;
+    }
+    
+    // Add block height if specified
+    if (formData.blockHeight && formData.blockHeight !== 'latest' && formData.blockHeight !== '') {
+      command += ` --block ${formData.blockHeight}`;
+    }
+
+    // Add --trace flag for detailed execution trace
+    command += ` --trace`;
+
+    // Store the generated command in simulationResult for display
+    updateSimulationStatus('simulationResult', { foundryCommand: command });
+    showToast('Foundry command generated successfully!', 'success');
+  };
 
   const simulateTransaction = async () => {
     // Validate required fields
@@ -179,7 +246,96 @@ const SimulateTX = ({
     }
   };
 
-  return (
+  const renderFoundryTab = () => (
+    <div className="component-container">
+        {/* Transaction Details */}
+        <div className="form-row">
+          <FormField
+            label="From Address"
+            type="text"
+            placeholder="0x..."
+            value={formData.from}
+            onChange={(value) => handleInputChange('from', value)}
+            required={true}
+          />
+          
+          <FormField
+            label="To Address"
+            type="text"
+            placeholder="0x..."
+            value={formData.to}
+            onChange={(value) => handleInputChange('to', value)}
+            required={true}
+          />
+        </div>
+
+        {/* RPC Configuration */}
+        <div className="form-row">
+          <FormField
+            label="RPC Network"
+            value={formData.rpcUrlPreset || 'custom'}
+            onChange={(value) => handleInputChange('rpcUrlPreset', value)}
+            options={rpcUrlOptions}
+          />
+          
+          <FormField
+            label="RPC URL"
+            type="text"
+            placeholder="https://..."
+            value={formData.rpcUrl || ''}
+            onChange={(value) => handleInputChange('rpcUrl', value)}
+            required={true}
+          />
+        </div>
+
+        {/* Transaction Parameters */}
+        <div className="form-row">
+          <FormField
+            label="msg.value (ETH)"
+            placeholder="0"
+            value={formData.msgValue}
+            onChange={(value) => handleInputChange('msgValue', value)}
+          />
+          
+          <FormField
+            label="Block Height"
+            placeholder="latest"
+            value={formData.blockHeight}
+            onChange={(value) => handleInputChange('blockHeight', value)}
+          />
+        </div>
+
+        {/* Calldata */}
+        <FormField
+          label="Calldata"
+          placeholder="0x..."
+          value={formData.calldata}
+          onChange={(value) => handleInputChange('calldata', value)}
+          required={true}
+        />
+
+        <div className="form-group submit-section">
+          <LoadingButton
+            type="submit"
+            loading={isSimulating}
+            className="component-button"
+            onClick={generateFoundryCommand}
+          >
+            Generate Command
+          </LoadingButton>
+        </div>
+
+        {simulationResult && simulationResult.foundryCommand && (
+          <ResultDisplay
+            result={simulationResult.foundryCommand}
+            title="⚒️ Foundry Cast Call Command (with Trace)"
+            onCopy={() => showToast('Command copied to clipboard!', 'success')}
+          />
+        )}
+    </div>
+  );
+
+  const renderTenderlyTab = () => (
     <div className="component-container">
         {/* Transaction Details */}
         <div className="form-row">
@@ -313,6 +469,32 @@ const SimulateTX = ({
             simulationResult={simulationResult}
           />
         )}
+    </div>
+  );
+
+  return (
+    <div>
+      {/* Tab Navigation */}
+      <div className="simulation-tab-navigation">
+        <button
+          className={`simulation-tab-button ${activeTab === 'foundry' ? 'active' : ''}`}
+          onClick={() => handleTabChange('foundry')}
+        >
+          Foundry
+        </button>
+        <button
+          className={`simulation-tab-button ${activeTab === 'tenderly' ? 'active' : ''}`}
+          onClick={() => handleTabChange('tenderly')}
+        >
+          Tenderly
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className="simulation-tab-content">
+        {activeTab === 'foundry' && renderFoundryTab()}
+        {activeTab === 'tenderly' && renderTenderlyTab()}
+      </div>
     </div>
   );
 };
