@@ -68,7 +68,9 @@ function formatBaseRequest(baseRequestArray, functionName) {
     // Only apply _bytes32ToAddress conversion for specific functions that need it
     const needsBytes32ToAddress = functionName && (
         functionName === 'unxswapToWithBaseRequest' ||
-        functionName === 'uniswapV3SwapToWithBaseRequest'
+        functionName === 'uniswapV3SwapToWithBaseRequest' ||
+        functionName === 'dagSwapByOrderId' ||
+        functionName === 'dagSwapTo'
         // Add other functions here if they also need this conversion
     );
     
