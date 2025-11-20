@@ -7,6 +7,7 @@ const ResultDisplay = ({
   title = "Result", 
   onCopy, 
   onEdit,
+  onSimulate,
   className = "result-container",
   contentClassName = "result-content"
 }) => {
@@ -26,6 +27,15 @@ const ResultDisplay = ({
               title="Edit in Encode page"
             >
               Edit
+            </button>
+          )}
+          {onSimulate && (
+            <button
+              className="copy-button simulate-button"
+              onClick={() => onSimulate(result)}
+              title="Simulate transaction"
+            >
+              Simulate
             </button>
           )}
           <CopyButton

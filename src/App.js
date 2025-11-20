@@ -6,7 +6,7 @@ import { validateEncodedCalldata, validateDecodedJson } from './utils/core/round
 import { createDecodeOperation, createEncodeOperation, formatJSON } from './utils/componentUtils.js';
 import DecodeCalldata from './components/forms/DecodeCalldata';
 import EncodeCalldata from './components/forms/EncodeCalldata';
-import SimulateTX from './components/SimulateTX';
+import SimulateTX from './components/simulate/SimulateTX';
 
 function App() {
   const [activeTab, setActiveTab] = useState('decode');
@@ -64,6 +64,13 @@ function App() {
     setActiveTab('encode');
     setRightInput(formatJSON(decodedResult));
     showToast('Switched to Encode tab with decoded result!', 'success');
+  };
+
+  const handleSimulateFromEncode = (calldata) => {
+    // Navigate to simulate tab and populate with encoded calldata
+    setActiveTab('simulate');
+    updateSimulationFormData('calldata', calldata);
+    showToast('Switched to Simulate TX tab with encoded calldata!', 'success');
   };
 
   return (
@@ -127,6 +134,7 @@ function App() {
               )}
               result={encodeResult}
               showToast={showToast}
+              onSimulate={handleSimulateFromEncode}
             />
           )}
 
