@@ -1,0 +1,398 @@
+/* ============================================
+   Import Theme Variables
+   ============================================ */
+@import '../../styles/theme.css';
+
+/* ============================================
+   SHARED PANEL STYLES
+   ============================================ */
+
+/* Base Panel Container - Responsive with fixed desktop width */
+.commission-panel,
+.trim-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: 0;
+    margin-bottom: var(--spacing-md);
+    overflow: hidden;
+    width: 420px;
+    box-sizing: border-box;
+}
+
+/* Panel Header */
+.panel-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.panel-title {
+    color: var(--text-primary);
+    font-size: var(--font-base);
+    font-weight: 500;
+}
+
+/* Panel Content */
+.panel-content {
+    padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+/* Shared Input Styles */
+.panel-input {
+    background: var(--bg-input);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    padding: 0.625rem 0.875rem;  /* 10px 14px */
+    font-size: var(--font-md);
+    min-width: 0;
+    transition: all 0.2s ease;
+}
+
+.panel-input:focus {
+    outline: none;
+    border-color: var(--border-hover);
+}
+
+.panel-input::placeholder {
+    color: var(--text-placeholder);
+}
+
+/* Hide number input spinner arrows */
+.panel-input::-webkit-outer-spin-button,
+.panel-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Small Rate Input - Fixed width for consistency */
+.rate-input-small {
+    width: 5rem;      /* 80px */
+    min-width: 5rem;
+    flex: 0 0 5rem;
+}
+
+/* Rate Input Wrapper - For percentage display */
+.rate-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.rate-input-wrapper .rate-input-small {
+    padding-right: 1.5rem; /* Make room for % symbol */
+    width: 100%;
+}
+
+.rate-input-wrapper .rate-unit {
+    position: absolute;
+    right: 0.5rem;
+    color: var(--text-muted);
+    font-size: var(--font-sm);
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Toggle Buttons (ToB, Token Direction) */
+.tob-toggle {
+    background: var(--transparent);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: var(--font-xs);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    min-width: 3.75rem;  /* 60px */
+    text-align: center;
+}
+
+.tob-toggle.active {
+    background: var(--primary);
+    color: var(--bg-panel);
+}
+
+.tob-toggle:hover:not(.active) {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+}
+
+/* Token Toggle Group */
+.token-toggle-group {
+    display: flex;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    flex-shrink: 0;
+    width: 5.625rem;  /* 90px */
+}
+
+.token-toggle {
+    background: var(--transparent);
+    color: var(--text-muted);
+    border: none;
+    border-right: 1px solid var(--border-primary);
+    padding: var(--spacing-sm) 0;
+    font-size: var(--font-xs);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    flex: 1;
+    text-align: center;
+}
+
+.token-toggle:last-child {
+    border-right: none;
+}
+
+.token-toggle.active {
+    background: var(--primary);
+    color: var(--bg-panel);
+}
+
+.token-toggle:hover:not(.active) {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* Action Buttons */
+.add-button {
+    background: var(--transparent);
+    border: none;
+    color: var(--primary);
+    font-size: var(--font-md);
+    font-weight: 500;
+    cursor: pointer;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    transition: all 0.2s ease;
+}
+
+.add-button:hover:not(:disabled) {
+    color: var(--primary-hover);
+}
+
+.add-button:disabled {
+    color: var(--text-disabled);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.remove-button {
+    background: var(--transparent);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    width: 2rem;      /* 32px */
+    height: 2rem;
+    font-size: var(--font-xl);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.remove-button:hover {
+    background: var(--danger-hover);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.generate-button {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--primary);
+    color: var(--bg-panel);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: var(--spacing-lg);
+}
+
+.generate-button:hover {
+    background: var(--primary-hover);
+}
+
+.generate-button:active {
+    transform: scale(0.98);
+}
+
+/* Sidebar Buttons Container */
+.sidebar-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    width: 420px;
+}
+
+/* Reset Button */
+.reset-button {
+    flex: 1;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--neutral-500);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reset-button:hover {
+    background: var(--neutral-600);
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+}
+
+.reset-button:active {
+    transform: scale(0.98);
+}
+
+/* Generate Button in Sidebar */
+.sidebar-buttons .generate-button {
+    flex: 1;
+    margin-top: 0;
+}
+
+/* ============================================
+   COMMISSION PANEL SPECIFIC
+   ============================================ */
+
+.token-address-row {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.token-address-row .panel-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.commissions-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: 100%;
+}
+
+.commission-item {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.commission-item .panel-input {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+/* ============================================
+   TRIM PANEL SPECIFIC
+   ============================================ */
+
+.trim-section {
+    margin-bottom: 0.625rem;  /* 10px */
+}
+
+.section-subtitle {
+    color: var(--text-muted);
+    font-size: var(--font-sm);
+    margin-bottom: var(--spacing-sm);
+    text-align: left;
+}
+
+.trim-row {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.trim-row .panel-input.rate-input-small {
+    flex: 0 0 5rem;
+}
+
+/* Expect Amount Out input - align left with limited width */
+.trim-section > .panel-input {
+    width: auto;
+    max-width: 100%;
+    display: block;
+}
+
+/* ============================================
+   FUNCTIONS PANEL SPECIFIC
+   ============================================ */
+
+.functions-panel {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.functions-panel select {
+    width: auto;
+}
+
+.functions-panel .foundry-input-white {
+    background-color: var(--bg-panel-alt);
+    color: var(--text-primary);
+    line-height: normal;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN (Mobile-First Approach)
+   ============================================ */
+
+/* Tablet breakpoint */
+@media (max-width: 768px) {
+    .commission-panel,
+    .trim-panel {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .panel-header,
+    .panel-content {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+}
+
+/* Mobile breakpoint */
+@media (max-width: 480px) {
+    .token-address-row,
+    .trim-row,
+    .commission-item {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .rate-input-small {
+        width: 100%;
+        max-width: 100%;
+        flex: 1;
+    }
+    
+    .token-toggle-group,
+    .tob-toggle {
+        width: 100%;
+    }
+    
+    .panel-input {
+        width: 100%;
+    }
+}

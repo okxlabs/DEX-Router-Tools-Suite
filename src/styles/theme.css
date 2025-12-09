@@ -1,0 +1,91 @@
+/* ============================================
+   THEME VARIABLES
+   Design system with 3 core color families
+   ============================================ */
+:root {
+    /* ===== PRIMARY (Accent/Brand Color) ===== */
+    --primary: #7dd3fc;        /* Sky blue */
+    --primary-hover: #38bdf8;  /* Bright sky */
+    --primary-dark: #0ea5e9;   /* Deep sky */
+
+    /* ===== NEUTRAL (Grays/Backgrounds) ===== */
+    --neutral-100: #0a0a0a;      /* Darkest - input backgrounds */
+    --neutral-200: #1a1a1a;      /* Dark - panel backgrounds */
+    --neutral-300: #1e1e1e;      /* Medium dark - alt backgrounds */
+    --neutral-400: #282c34;      /* Medium - app background */
+    --neutral-500: #333;         /* Mid - borders, active states */
+    --neutral-600: #444;         /* Mid-light - disabled states */
+    --neutral-700: #555;         /* Light - borders, inactive */
+    --neutral-800: #666;         /* Lighter - placeholders, loading */
+    --neutral-900: #888;         /* Lightest - muted text */
+    
+    /* ===== DANGER (Errors) ===== */
+    --danger: #ff4444;
+    --danger-dark: #d32f2f;
+    --danger-hover: #2a0000;
+    
+    /* ===== SUCCESS ===== */
+    --success: #4CAF50;
+    
+    /* ===== ADDITIONAL COLORS ===== */
+    --warning: #FF9800;
+    --info: #007bff;
+    
+    /* ===== SEMANTIC BACKGROUNDS ===== */
+    --bg-app: var(--neutral-400);
+    --bg-panel: var(--neutral-200);
+    --bg-panel-alt: var(--neutral-300);
+    --bg-input: var(--neutral-100);
+    --bg-result: var(--neutral-300);
+    --bg-textarea: #ffffff;
+    --bg-hover: #2a2a2a;
+    --bg-active: var(--neutral-500);
+    --bg-disabled: var(--neutral-600);
+    --bg-loading: var(--neutral-800);
+    
+    /* ===== SEMANTIC BORDERS ===== */
+    --border-primary: var(--neutral-500);
+    --border-hover: var(--neutral-700);
+    --border-active: var(--neutral-600);
+    
+    /* ===== SEMANTIC TEXT ===== */
+    --text-primary: #ffffff;
+    --text-secondary: var(--neutral-900);
+    --text-muted: var(--neutral-900);
+    --text-disabled: var(--neutral-700);
+    --text-placeholder: var(--neutral-800);
+    --text-dark: #333;
+    --text-info: #6c757d;
+    
+    /* ===== TRANSPARENCY ===== */
+    --transparent: transparent;
+    --overlay-light: rgba(255, 255, 255, 0.1);
+    --overlay-medium: rgba(255, 255, 255, 0.15);
+    --overlay-card: rgba(255, 255, 255, 0.2);
+    --overlay-card-border: rgba(255, 255, 255, 0.3);
+    --shadow: rgba(0, 0, 0, 0.3);
+    
+    /* ===== SPACING SCALE ===== */
+    --spacing-xs: 0.25rem;   /* 4px */
+    --spacing-sm: 0.5rem;    /* 8px */
+    --spacing-md: 0.75rem;   /* 12px */
+    --spacing-lg: 1rem;      /* 16px */
+    --spacing-xl: 1.25rem;   /* 20px */
+    --spacing-2xl: 2rem;     /* 32px */
+    
+    /* ===== FONT SIZES ===== */
+    --font-xs: 0.6875rem;    /* 11px */
+    --font-sm: 0.75rem;      /* 12px */
+    --font-md: 0.8125rem;    /* 13px */
+    --font-base: 0.875rem;   /* 14px */
+    --font-lg: 1rem;         /* 16px */
+    --font-xl: 1.25rem;      /* 20px */
+    
+    /* ===== BORDER RADIUS ===== */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    
+    /* ===== GRADIENTS (Optional - for special cards) ===== */
+    --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}

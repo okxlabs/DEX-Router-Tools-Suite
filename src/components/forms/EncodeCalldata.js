@@ -1,5 +1,7 @@
-import React from 'react';
-import ExamplesPanel from './ExamplesPanel';
+import React, { useRef } from 'react';
+import FunctionsPanel from './FunctionsPanel';
+import CommissionPanel from './CommissionPanel';
+import TrimPanel from './TrimPanel';
 import LoadingButton from '../ui/LoadingButton';
 import ResultDisplay from '../ui/ResultDisplay';
 import { 
@@ -11,6 +13,7 @@ import {
   safeJSONParse,
   formatJSON
 } from '../../utils/componentUtils';
+import { applyCommissionAndTrimToJson } from '../../utils/encode/commissionTrimUtils';
 
 const EncodeCalldata = ({ 
   value, 
@@ -21,18 +24,37 @@ const EncodeCalldata = ({
 }) => {
   const buttonState = useButtonState();
   const { isLoading, showSuccess, showError, lastProcessedValue, resetButtonStates, setButtonState } = buttonState;
+  
+  const commissionDataRef = useRef({ commissions: [], commissionToB: false, commissionTokenAddress: '' });
+  const trimDataRef = useRef({ trim1: { address: '', rate: '', isToB: false }, trim2: { address: '', rate: '' }, expectAmountOut: '' });
+  const commissionPanelRef = useRef(null);
+  const trimPanelRef = useRef(null);
 
-  const handleExampleSelect = (exampleJson) => {
-    resetButtonStates();
-    onChange({ target: { value: exampleJson } });
+  const handleExampleSelect = (example) => {
+    try {
+      const completeJson = applyCommissionAndTrimToJson(example.data, commissionDataRef.current, trimDataRef.current);
+      resetButtonStates();
+      onChange({ target: { value: JSON.stringify(completeJson, null, 2) } });
+    } catch (error) {
+      console.error('Failed to load example:', error);
+      showToast('Failed to load example', 'error');
+    }
   };
 
-  const handleGenerateClick = (applyCommissionAndTrimToJson) => {
+  const handleCommissionChange = (commissionData) => {
+    commissionDataRef.current = commissionData;
+  };
+
+  const handleTrimChange = (trimData) => {
+    trimDataRef.current = trimData;
+  };
+
+  const handleGenerateClick = () => {
     const currentJson = safeJSONParse(value, showToast, 'Please enter JSON data first');
     if (!currentJson) return;
     
     try {
-      const updatedJson = applyCommissionAndTrimToJson(currentJson);
+      const updatedJson = applyCommissionAndTrimToJson(currentJson, commissionDataRef.current, trimDataRef.current);
       const formattedJson = formatJSON(updatedJson);
       
       resetButtonStates();
@@ -42,6 +64,20 @@ const EncodeCalldata = ({
       showToast('Error: Failed to apply commission and trim settings', 'error');
       console.error('Generate JSON error:', error);
     }
+  };
+
+  const handleReset = () => {
+    // Reset commission panel
+    if (commissionPanelRef.current) {
+      commissionPanelRef.current.reset();
+    }
+    
+    // Reset trim panel
+    if (trimPanelRef.current) {
+      trimPanelRef.current.reset();
+    }
+    
+    showToast('All fields have been reset!', 'success');
   };
 
   const handleEncode = async () => {
@@ -69,16 +105,13 @@ const EncodeCalldata = ({
 
   return (
     <div className="encode-layout">
-      <div className="encode-examples-section">
-        <ExamplesPanel 
-          onExampleSelect={handleExampleSelect}
-          onGenerateClick={handleGenerateClick}
-          showToast={showToast}
-        />
-      </div>
-      
       <div className="encode-main-section">
         <div className="component-container">
+          <FunctionsPanel 
+            onExampleSelect={handleExampleSelect}
+            showToast={showToast}
+          />
+          
           <textarea
             value={value}
             onChange={handleInputChange}
@@ -105,6 +138,27 @@ const EncodeCalldata = ({
             className="encode-result-container"
             contentClassName="encode-result-content"
           />
+        </div>
+      </div>
+      
+      <div className="encode-sidebar">
+        <CommissionPanel ref={commissionPanelRef} onCommissionChange={handleCommissionChange} />
+        <TrimPanel ref={trimPanelRef} onTrimChange={handleTrimChange} />
+        <div className="sidebar-buttons">
+          <button
+            className="reset-button"
+            onClick={handleReset}
+            title="Reset all fields to default"
+          >
+            Reset
+          </button>
+          <button
+            className="generate-button"
+            onClick={handleGenerateClick}
+            title="Apply commission and trim settings to current JSON"
+          >
+            Generate JSON
+          </button>
         </div>
       </div>
     </div>

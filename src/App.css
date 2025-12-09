@@ -1,3 +1,8 @@
+/* ============================================
+   Import Theme Variables
+   ============================================ */
+@import './styles/theme.css';
+
 /* Global Styles */
 html, body {
   height: 100vh;
@@ -13,14 +18,14 @@ html, body {
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--bg-app);
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: var(--text-primary);
   padding-top: 30px;
   overflow-y: auto;
   box-sizing: border-box;
@@ -39,8 +44,8 @@ html, body {
   padding: 16px 32px;
   font-size: 18px;
   font-weight: bold;
-  background-color: #555;
-  color: #ffffff;
+  background-color: var(--neutral-700);
+  color: var(--text-primary);
   border: none;
   cursor: pointer;
   transition: all 0.5s ease;
@@ -57,12 +62,12 @@ html, body {
 }
 
 .tab-button:hover {
-  background-color: #666;
+  background-color: var(--neutral-800);
 }
 
 .tab-button.active {
-  background-color: #61dafb;
-  color: #282c34;
+  background-color: var(--primary);
+  color: var(--bg-app);
 }
 
 
@@ -86,8 +91,8 @@ html, body {
   padding: 15px;
   font-size: 14px;
   border-radius: 8px;
-  border: 1px solid #555;
-  background-color: #ffffff;
+  border: 1px solid var(--border-hover);
+  background-color: var(--bg-textarea);
   width: 600px;
   max-width: 100%;
   resize: vertical;
@@ -95,7 +100,7 @@ html, body {
   box-sizing: border-box;
   word-break: break-all;
   line-height: 1.4;
-  color: #333;
+  color: var(--text-dark);
 }
 
 .component-textarea {
@@ -106,8 +111,8 @@ html, body {
 .component-button {
   padding: 15px 40px;
   font-size: 16px;
-  background-color: #61dafb;
-  color: #282c34;
+  background-color: var(--primary);
+  color: var(--bg-app);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -118,14 +123,14 @@ html, body {
 }
 
 .component-button:hover {
-  background-color: #21a1c4;
+  background-color: var(--primary-dark);
 }
 
 /* Result container styles */
 .base-result-container {
   margin-top: 20px;
   padding: 15px;
-  background-color: #1e1e1e;
+  background-color: var(--bg-result);
   border-radius: 5px;
   text-align: left;
   max-width: 600px;
@@ -142,7 +147,7 @@ html, body {
 
 /* Result content styles */
 .base-result-content {
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 11px;
   line-height: 1.4;
   white-space: pre-wrap;
@@ -176,53 +181,38 @@ html, body {
   top: 30px;
   left: 50%;
   transform: translateX(-50%);
-  color: white;
+  color: var(--text-primary);
   padding: 12px 20px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px var(--shadow);
   z-index: 1000;
   animation: slideDown 0.3s ease-out;
 }
 
 .toast.success {
-  background-color: #4CAF50;
+  background-color: var(--success);
 }
 
 .toast.error {
-  background-color: #f44336;
-  border: 2px solid #d32f2f;
+  background-color: var(--danger);
+  border: 2px solid var(--danger-dark);
   box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
   font-weight: bold;
 }
 
 /* Encode Layout */
 .encode-layout {
-  position: relative;
-  width: 100%;
-  height: 100%;
+    display: flex;
+    gap: 12px;
+  padding: 0 12px;
 }
 
-.encode-examples-section {
-  position: fixed;
-  left: 1%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 25%;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  z-index: 10;
-}
 
-.encode-main-section {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.encode-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
 }
-
 
 /* Form Components */
 .form-row {
@@ -243,14 +233,14 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #61dafb;
+  color: var(--primary);
   margin-bottom: 8px;
   font-weight: bold;
   font-size: 14px;
 }
 
 .required-asterisk {
-  color: #ff4444;
+  color: var(--danger);
   font-weight: bold;
 }
 
@@ -259,9 +249,9 @@ html, body {
   padding: 12px;
   font-size: 14px;
   border-radius: 8px;
-  border: 1px solid #555;
-  background-color: #ffffff;
-  color: #333;
+  border: 1px solid var(--border-hover);
+  background-color: var(--bg-textarea);
+  color: var(--text-dark);
   font-family: monospace;
   transition: border-color 0.3s ease;
   height: 40px;
@@ -270,7 +260,7 @@ html, body {
 
 .foundry-input-white:focus {
   outline: none;
-  border-color: #61dafb;
+  border-color: var(--primary);
   box-shadow: 0 0 8px rgba(97, 218, 251, 0.3);
 }
 
@@ -282,7 +272,7 @@ html, body {
 
 .api-key-info {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--text-info);
   margin-top: -8px;
   display: flex;
   align-items: center;
@@ -290,7 +280,7 @@ html, body {
 }
 
 .api-key-link {
-  color: #007bff;
+  color: var(--info);
   text-decoration: none;
 }
 
@@ -303,10 +293,10 @@ html, body {
 }
 
 .tenderly-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-purple);
   border-radius: 12px;
   padding: 20px;
-  color: white;
+  color: var(--text-primary);
   box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
 }
 
@@ -317,7 +307,7 @@ html, body {
 }
 
 .card-icon {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--overlay-card);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -342,22 +332,22 @@ html, body {
 
 .tenderly-link {
   display: inline-block;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
+  background-color: var(--overlay-card);
+  color: var(--text-primary);
   text-decoration: none;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: bold;
   font-size: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--overlay-card-border);
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .tenderly-link:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--overlay-card-border);
   transform: translateY(-2px);
-  color: white;
+  color: var(--text-primary);
   text-decoration: none;
 }
 
@@ -369,7 +359,7 @@ html, body {
     gap: 16px;
   }
   
-  .encode-examples-section {
+  .encode-sidebar {
     position: static;
     transform: none;
     width: 100%;
@@ -388,13 +378,13 @@ html, body {
 }
 
 @media (max-width: 1024px) {
-  .encode-examples-section {
+  .encode-sidebar {
     max-height: 350px;
   }
 }
 
 @media (max-width: 768px) {
-  .encode-examples-section {
+  .encode-sidebar {
     max-height: 300px;
   }
   
@@ -425,27 +415,27 @@ html, body {
 }
 
 .loading-button.loading {
-  background-color: #666 !important;
+  background-color: var(--bg-loading) !important;
   cursor: not-allowed;
 }
 
 .loading-button.success {
-  background-color: #4CAF50 !important;
+  background-color: var(--success) !important;
   animation: successPulse 0.6s ease-out;
   min-width: 180px;
   width: 180px;
 }
 
 .loading-button.error {
-  background-color: #f44336 !important;
-  color: white !important;
+  background-color: var(--danger) !important;
+  color: var(--text-primary) !important;
   animation: errorPulse 0.6s ease-out;
   min-width: 180px;
   width: 180px;
 }
 
 .loading-button.disabled {
-  background-color: #444 !important;
+  background-color: var(--bg-disabled) !important;
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -474,10 +464,10 @@ html, body {
 
 /* Copy Button Styles */
 .copy-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--overlay-light);
+  border: 1px solid var(--overlay-card);
   border-radius: 6px;
-  color: #4CAF50;
+  color: var(--success);
   cursor: pointer;
   padding: 8px 12px;
   font-size: 14px;
@@ -486,7 +476,7 @@ html, body {
 }
 
 .copy-button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--overlay-medium);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
@@ -513,11 +503,11 @@ html, body {
   align-items: center;
   margin-bottom: 4px;
   padding-bottom: 4px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .result-title {
-  color: #61dafb;
+  color: var(--primary);
   font-weight: bold;
   font-size: 14px;
 }
@@ -540,7 +530,7 @@ html, body {
 }
 
 .result-actions .copy-button {
-  color: #4CAF50;
+  color: var(--success);
   border-color: rgba(76, 175, 80, 0.3);
 }
 
@@ -549,7 +539,7 @@ html, body {
 }
 
 .result-actions .edit-button {
-  color: #FF9800;
+  color: var(--warning);
   border-color: rgba(255, 152, 0, 0.3);
 }
 
