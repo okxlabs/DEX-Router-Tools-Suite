@@ -1,0 +1,496 @@
+{
+  "chain": "arb",
+  "chainName": "Arbitrum One",
+  "contract": "0x368E01160C2244B0363a35B3fF0A971E44a89284",
+  "method": "uniswapV3",
+  "methodName": "uniswapV3SwapTo",
+  "timestamp": "2025-12-15T04:38:59.891Z",
+  "results": [
+    {
+      "scenario": "basic",
+      "swapType": "ERC20->ERC20",
+      "description": "Basic ERC20->ERC20 swap",
+      "breakdown": {
+        "total": "0x282b6",
+        "totalDecimal": 164534,
+        "beforeSwap": 10370,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 114521,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 114521,
+        "afterSwap": 39643,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 164534
+        }
+      },
+      "timestamp": "2025-12-15T04:38:36.710Z"
+    },
+    {
+      "scenario": "fromToken_single_commission",
+      "swapType": "ERC20->ERC20",
+      "description": "ERC20->ERC20 with single fromToken commission",
+      "breakdown": {
+        "total": "0x3345b",
+        "totalDecimal": 210011,
+        "beforeSwap": 101724,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 80921,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 80921,
+        "afterSwap": 27366,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 210011
+        }
+      },
+      "timestamp": "2025-12-15T04:38:37.959Z"
+    },
+    {
+      "scenario": "fromToken_double_commission",
+      "swapType": "ERC20->ERC20",
+      "description": "ERC20->ERC20 with double fromToken commission",
+      "breakdown": {
+        "total": "0x36cef",
+        "totalDecimal": 224495,
+        "beforeSwap": 111887,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 80921,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 80921,
+        "afterSwap": 31687,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 224495
+        }
+      },
+      "timestamp": "2025-12-15T04:38:39.411Z"
+    },
+    {
+      "scenario": "toToken_single_commission",
+      "swapType": "ERC20->ERC20",
+      "description": "ERC20->ERC20 with single toToken commission",
+      "breakdown": {
+        "total": "0x32110",
+        "totalDecimal": 205072,
+        "beforeSwap": 13666,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 114521,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 114521,
+        "afterSwap": 76885,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 205072
+        }
+      },
+      "timestamp": "2025-12-15T04:38:40.659Z"
+    },
+    {
+      "scenario": "toToken_double_commission",
+      "swapType": "ERC20->ERC20",
+      "description": "ERC20->ERC20 with double toToken commission",
+      "breakdown": {
+        "total": "0x34193",
+        "totalDecimal": 213395,
+        "beforeSwap": 13666,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 114521,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 114521,
+        "afterSwap": 85208,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 213395
+        }
+      },
+      "timestamp": "2025-12-15T04:38:41.887Z"
+    },
+    {
+      "scenario": "max_gas_scenario",
+      "swapType": "ERC20->ERC20",
+      "description": "ERC20->ERC20 max gas (double commission + TRIM)",
+      "breakdown": {
+        "total": "0x3ced5",
+        "totalDecimal": 249557,
+        "beforeSwap": 13666,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 114521,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 114521,
+        "afterSwap": 121370,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 249557
+        }
+      },
+      "timestamp": "2025-12-15T04:38:43.126Z"
+    },
+    {
+      "scenario": "basic",
+      "swapType": "ETH->ERC20",
+      "description": "Basic ETH->ERC20 swap",
+      "breakdown": {
+        "total": "0x21fe6",
+        "totalDecimal": 139238,
+        "beforeSwap": 46961,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 63122,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 63122,
+        "afterSwap": 29155,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 139238
+        }
+      },
+      "timestamp": "2025-12-15T04:38:44.359Z"
+    },
+    {
+      "scenario": "fromToken_single_commission",
+      "swapType": "ETH->ERC20",
+      "description": "ETH->ERC20 with single fromToken commission",
+      "breakdown": {
+        "total": "0x254c7",
+        "totalDecimal": 152775,
+        "beforeSwap": 60288,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 63122,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 63122,
+        "afterSwap": 29365,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 152775
+        }
+      },
+      "timestamp": "2025-12-15T04:38:45.753Z"
+    },
+    {
+      "scenario": "fromToken_double_commission",
+      "swapType": "ETH->ERC20",
+      "description": "ETH->ERC20 with double fromToken commission",
+      "breakdown": {
+        "total": "0x28803",
+        "totalDecimal": 165891,
+        "beforeSwap": 73615,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 63122,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 63122,
+        "afterSwap": 29154,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 165891
+        }
+      },
+      "timestamp": "2025-12-15T04:38:47.017Z"
+    },
+    {
+      "scenario": "toToken_single_commission",
+      "swapType": "ETH->ERC20",
+      "description": "ETH->ERC20 with single toToken commission",
+      "breakdown": {
+        "total": "0x2c6fa",
+        "totalDecimal": 182010,
+        "beforeSwap": 50211,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 80222,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 80222,
+        "afterSwap": 51577,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 182010
+        }
+      },
+      "timestamp": "2025-12-15T04:38:48.426Z"
+    },
+    {
+      "scenario": "toToken_double_commission",
+      "swapType": "ETH->ERC20",
+      "description": "ETH->ERC20 with double toToken commission",
+      "breakdown": {
+        "total": "0x2ec08",
+        "totalDecimal": 191496,
+        "beforeSwap": 50211,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 80222,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 80222,
+        "afterSwap": 61063,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 191496
+        }
+      },
+      "timestamp": "2025-12-15T04:38:49.816Z"
+    },
+    {
+      "scenario": "max_gas_scenario",
+      "swapType": "ETH->ERC20",
+      "description": "ETH->ERC20 max gas (double commission + TRIM)",
+      "breakdown": {
+        "total": "0x32995",
+        "totalDecimal": 207253,
+        "beforeSwap": 50211,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 80222,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 80222,
+        "afterSwap": 76820,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 207253
+        }
+      },
+      "timestamp": "2025-12-15T04:38:51.046Z"
+    },
+    {
+      "scenario": "basic",
+      "swapType": "ERC20->ETH",
+      "description": "Basic ERC20->ETH swap",
+      "breakdown": {
+        "total": "0x2dda5",
+        "totalDecimal": 187813,
+        "beforeSwap": 574,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 125521,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 125521,
+        "afterSwap": 61718,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 187813
+        }
+      },
+      "timestamp": "2025-12-15T04:38:52.599Z"
+    },
+    {
+      "scenario": "fromToken_single_commission",
+      "swapType": "ERC20->ETH",
+      "description": "ERC20->ETH with single fromToken commission",
+      "breakdown": {
+        "total": "0x39c58",
+        "totalDecimal": 236632,
+        "beforeSwap": 91928,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 91921,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 91921,
+        "afterSwap": 52783,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 236632
+        }
+      },
+      "timestamp": "2025-12-15T04:38:53.857Z"
+    },
+    {
+      "scenario": "fromToken_double_commission",
+      "swapType": "ERC20->ETH",
+      "description": "ERC20->ETH with double fromToken commission",
+      "breakdown": {
+        "total": "0x3c99c",
+        "totalDecimal": 248220,
+        "beforeSwap": 102091,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 91921,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 91921,
+        "afterSwap": 54208,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 248220
+        }
+      },
+      "timestamp": "2025-12-15T04:38:55.119Z"
+    },
+    {
+      "scenario": "toToken_single_commission",
+      "swapType": "ERC20->ETH",
+      "description": "ERC20->ETH with single toToken commission",
+      "breakdown": {
+        "total": "0x33041",
+        "totalDecimal": 208961,
+        "beforeSwap": 574,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 125521,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 125521,
+        "afterSwap": 82866,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 208961
+        }
+      },
+      "timestamp": "2025-12-15T04:38:56.347Z"
+    },
+    {
+      "scenario": "toToken_double_commission",
+      "swapType": "ERC20->ETH",
+      "description": "ERC20->ETH with double toToken commission",
+      "breakdown": {
+        "total": "0x35a26",
+        "totalDecimal": 219686,
+        "beforeSwap": 574,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 125521,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 125521,
+        "afterSwap": 93591,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 219686
+        }
+      },
+      "timestamp": "2025-12-15T04:38:57.577Z"
+    },
+    {
+      "scenario": "max_gas_scenario",
+      "swapType": "ERC20->ETH",
+      "description": "ERC20->ETH max gas (double commission + TRIM)",
+      "breakdown": {
+        "total": "0x3ae59",
+        "totalDecimal": 241241,
+        "beforeSwap": 574,
+        "adapters": [
+          {
+            "name": "uniswapV3_adapter",
+            "selector": "0x128acb08",
+            "to": "0xc6962004f452be9203591991d15f6b388e09e8d0",
+            "gasUsed": 125521,
+            "type": "CALL"
+          }
+        ],
+        "totalAdapterGas": 125521,
+        "afterSwap": 115146,
+        "mainMethod": {
+          "name": "uniswapV3SwapTo",
+          "selector": "0x0d5f0e3b",
+          "gasUsed": 241241
+        }
+      },
+      "timestamp": "2025-12-15T04:38:58.886Z"
+    }
+  ]
+}
