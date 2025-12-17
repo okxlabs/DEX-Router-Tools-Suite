@@ -24,12 +24,20 @@ module.exports = {
         token1: '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // USDC
       },
 
-      // DagSwap Adapter (UniswapV2-style)
+      // DagSwap Adapter - supports both UniswapV2 and UniswapV3 pools
+      // token0/token1 fetched dynamically from pool contract
+      // Use POOL_TYPE env var or options.poolType to select: 'uniV2' | 'uniV3'
       dagSwap: {
-        adapter: '0x808ca026D4c45d6A41c1e807c41044480b7699eF',
-        pool: '0xF64Dfe17C8b87F012FCf50FbDA1D62bfA148366a',
-        token0: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', // WETH
-        token1: '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // USDC
+        uniV2: {
+          adapter: '0x808ca026D4c45d6A41c1e807c41044480b7699eF',
+          pool: '0xF64Dfe17C8b87F012FCf50FbDA1D62bfA148366a',
+        },
+        uniV3: {
+          adapter: '0x6747BcaF9bD5a5F0758Cbe08903490E45DdfACB5',
+          pool: '0xC6962004f452bE9203591991D15f6b388e09E8D0',  // WETH-USDC 0.05%
+          // sqrtPriceX96: set to 0 to use default (MIN/MAX based on direction)
+          sqrtPriceX96: '0',
+        },
       },
 
       // Test amounts

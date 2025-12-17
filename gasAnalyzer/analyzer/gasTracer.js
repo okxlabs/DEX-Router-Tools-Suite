@@ -83,31 +83,34 @@ class GasTracer {
   }
 
   /**
-   * Recursively analyze calls to find adapters
+   * Analyze direct child calls to find adapters (no recursive - avoid double counting)
+   * dagSwap adapter already includes the gas of nested pool calls (e.g. uniswapV3 swap)
    */
-  analyzeCallsForAdapters(calls, components) {
+  analyzeCallsForAdapters(calls, components, depth = 0) {
     for (const call of calls) {
       const callSelector = call.input?.slice(0, 10);
 
       // Check if this is a known adapter
-      let isAdapter = false;
       for (const [methodKey, methodConfig] of Object.entries(config.methods)) {
         if (methodConfig.adapterSelectors.includes(callSelector)) {
-          components.adapters.push({
-            name: `${methodKey}_adapter`,
-            selector: callSelector,
-            to: call.to,
-            gasUsed: parseInt(call.gasUsed, 16),
-            type: call.type
-          });
-          isAdapter = true;
+          // Only count top-level adapter calls (depth 0) to avoid double-counting
+          // e.g., dagSwap_adapter already includes uniswapV3 swap gas
+          if (depth === 0) {
+            components.adapters.push({
+              name: `${methodKey}_adapter`,
+              selector: callSelector,
+              to: call.to,
+              gasUsed: parseInt(call.gasUsed, 16),
+              type: call.type
+            });
+          }
           break;
         }
       }
 
-      // Recursively analyze nested calls
+      // Recursively analyze nested calls (but only for detection, not for gas counting)
       if (call.calls) {
-        this.analyzeCallsForAdapters(call.calls, components);
+        this.analyzeCallsForAdapters(call.calls, components, depth + 1);
       }
     }
   }

@@ -117,7 +117,7 @@ class DynamicGasAnalyzer {
 
     // Generate base calldata
     console.log('\nGenerating base calldata...');
-    const baseResult = CalldataEncoder.generate(this.method, this.chain, swapType, blockNumber);
+    const baseResult = await CalldataEncoder.generate(this.method, this.chain, swapType, blockNumber);
 
     console.log(`✓ Base calldata generated`);
     console.log(`  Method: ${baseResult.metadata.method}`);

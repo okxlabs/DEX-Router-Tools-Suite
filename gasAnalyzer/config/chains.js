@@ -36,7 +36,8 @@ module.exports = {
     dagSwap: {
       selector: '0xf2c42696',
       name: 'dagSwapByOrderId',
-      adapterSelectors: ['0x30e6ae31', '0x6f7929f2']  // Removed 0x0a5ea466 (claimToken - Before stage)
+      // sellBase: 0x30e6ae31, sellQuote: 0x6f7929f2 (same for both UniV2 and UniV3 adapters)
+      adapterSelectors: ['0x30e6ae31', '0x6f7929f2']
     },
     unxSwap: {
       selector: '0x9871efa4',
