@@ -9,10 +9,13 @@ class ScenarioBuilder {
   /**
    * Extract fromToken and toToken addresses from calldata
    * For ETH-related scenarios, infer correct token address from swapType
+   * @param {string} calldata - The base calldata
+   * @param {string} swapType - Swap type
+   * @param {string} chain - Chain identifier (default: 'arb')
    */
-  static extractTokenAddresses(calldata, swapType) {
+  static extractTokenAddresses(calldata, swapType, chain = 'arb') {
     const poolConfig = require('../config/pools');
-    const poolCfg = poolConfig.pools.arb;
+    const poolCfg = poolConfig.pools[chain] || poolConfig.pools.arb;
     const ETH_ADDRESS = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
     // For ETH-related scenarios, return correct token based on swapType
@@ -149,9 +152,13 @@ class ScenarioBuilder {
 
   /**
    * Get calldata suffix for scenario name
+   * @param {string} scenarioName - Scenario name
+   * @param {string} baseCalldata - Base calldata
+   * @param {string} swapType - Swap type
+   * @param {string} chain - Chain identifier (default: 'arb')
    */
-  static getSuffixForScenario(scenarioName, baseCalldata, swapType) {
-    const { fromToken, toToken } = ScenarioBuilder.extractTokenAddresses(baseCalldata, swapType);
+  static getSuffixForScenario(scenarioName, baseCalldata, swapType, chain = 'arb') {
+    const { fromToken, toToken } = ScenarioBuilder.extractTokenAddresses(baseCalldata, swapType, chain);
 
     const suffixMap = {
       'basic': '',
@@ -169,9 +176,13 @@ class ScenarioBuilder {
 
   /**
    * Build complete calldata for scenario
+   * @param {string} baseCalldata - Base calldata
+   * @param {string} scenarioName - Scenario name
+   * @param {string} swapType - Swap type
+   * @param {string} chain - Chain identifier (default: 'arb')
    */
-  static buildCalldata(baseCalldata, scenarioName, swapType) {
-    const suffix = ScenarioBuilder.getSuffixForScenario(scenarioName, baseCalldata, swapType);
+  static buildCalldata(baseCalldata, scenarioName, swapType, chain = 'arb') {
+    const suffix = ScenarioBuilder.getSuffixForScenario(scenarioName, baseCalldata, swapType, chain);
     return baseCalldata + suffix;
   }
 
@@ -225,62 +236,63 @@ class ScenarioBuilder {
    * @param {string} baseCalldata - Base calldata
    * @param {string} swapType - Swap type
    * @param {string} swapAmount - Swap amount (hex string with 0x prefix), for calculating ETH->ERC20 extra value
+   * @param {string} chain - Chain identifier (default: 'arb')
    */
-  static generateAllScenarios(baseCalldata, swapType = 'ERC20->ETH', swapAmount = '0x0') {
+  static generateAllScenarios(baseCalldata, swapType = 'ERC20->ETH', swapAmount = '0x0', chain = 'arb') {
     const scenarios = [
       {
         name: 'basic',
         swapType,
-        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'basic', swapType),
+        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'basic', swapType, chain),
         description: `Basic ${swapType} swap`,
         extraValue: '0x0'
       },
       {
         name: 'fromToken_single_commission',
         swapType,
-        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'fromToken_single_commission', swapType),
+        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'fromToken_single_commission', swapType, chain),
         description: `${swapType} with single fromToken commission`,
         extraValue: ScenarioBuilder.calculateExtraValue('fromToken_single_commission', swapType, swapAmount)
       },
       {
         name: 'fromToken_double_commission',
         swapType,
-        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'fromToken_double_commission', swapType),
+        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'fromToken_double_commission', swapType, chain),
         description: `${swapType} with double fromToken commission`,
         extraValue: ScenarioBuilder.calculateExtraValue('fromToken_double_commission', swapType, swapAmount)
       },
       {
         name: 'toToken_single_commission',
         swapType,
-        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'toToken_single_commission', swapType),
+        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'toToken_single_commission', swapType, chain),
         description: `${swapType} with single toToken commission`,
         extraValue: '0x0'
       },
       {
         name: 'toToken_double_commission',
         swapType,
-        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'toToken_double_commission', swapType),
+        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'toToken_double_commission', swapType, chain),
         description: `${swapType} with double toToken commission`,
         extraValue: '0x0'
       },
       {
         name: 'trim_single',
         swapType,
-        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'trim_single', swapType),
+        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'trim_single', swapType, chain),
         description: `${swapType} with trim single address`,
         extraValue: '0x0'
       },
       {
         name: 'trim_double',
         swapType,
-        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'trim_double', swapType),
+        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'trim_double', swapType, chain),
         description: `${swapType} with trim double address`,
         extraValue: '0x0'
       },
       {
         name: 'max_gas_scenario',
         swapType,
-        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'max_gas_scenario', swapType),
+        calldata: ScenarioBuilder.buildCalldata(baseCalldata, 'max_gas_scenario', swapType, chain),
         description: `${swapType} with toToken double commission + trim double address`,
         extraValue: ScenarioBuilder.calculateExtraValue('max_gas_scenario', swapType, swapAmount)
       }

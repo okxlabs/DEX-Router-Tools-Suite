@@ -4,7 +4,7 @@ module.exports = {
     eth: {
       name: 'Ethereum Mainnet',
       chainId: 1,
-      rpcUrl: 'https://docs-demo.ethereum-mainnet.quiknode.pro/',
+      rpcUrl: 'https://docs-demo.quiknode.pro/',
       contract: '0x5E1f62Dac767b0491e3CE72469C217365D5B48cC',
       explorer: 'https://etherscan.io'
     },

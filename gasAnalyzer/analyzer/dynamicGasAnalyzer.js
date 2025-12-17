@@ -124,8 +124,8 @@ class DynamicGasAnalyzer {
     console.log(`  Pool: ${baseResult.metadata.pool}`);
     console.log(`  Amount: ${baseResult.metadata.amount}`);
 
-    // Generate all scenarios (pass swapAmount for commission calculation)
-    const scenarios = ScenarioBuilder.generateAllScenarios(baseResult.calldata, swapType, baseResult.value);
+    // Generate all scenarios (pass swapAmount and chain for commission calculation)
+    const scenarios = ScenarioBuilder.generateAllScenarios(baseResult.calldata, swapType, baseResult.value, this.chain);
     console.log(`✓ ${scenarios.length} scenarios generated\n`);
 
     // Analyze each scenario

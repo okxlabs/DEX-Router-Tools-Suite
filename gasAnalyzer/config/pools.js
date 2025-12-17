@@ -84,6 +84,19 @@ module.exports = {
         token1: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // WETH
       },
 
+      dagSwap: {
+        uniV2: {
+          adapter: '0xc837BbEa8C7b0caC0e8928f797ceB04A34c9c06e',
+          pool: '0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc',
+        },
+        uniV3: {
+          adapter: '0x6747BcaF9bD5a5F0758Cbe08903490E45DdfACB5',
+          pool: '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640',  // WETH-USDC 0.05%
+          // sqrtPriceX96: set to 0 to use default (MIN/MAX based on direction)
+          sqrtPriceX96: '0',
+        },
+      },
+
       amounts: {
         'ERC20->ERC20': {
           fromAmount: '10000',
