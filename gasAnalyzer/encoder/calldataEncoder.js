@@ -260,26 +260,31 @@ class CalldataEncoder {
     let fromTokenAddr, toTokenAddr, routeFromToken, routeToToken;
 
     if (poolType === 'uniswapV3') {
-      // For UniV3 WETH-USDC pool: token0=WETH, token1=USDC
-      // Determine fromToken/toToken based on swapType
+      // For UniV3 pools, dynamically determine which token is WETH and which is USDC
+      // ETH: token0=USDC, token1=WETH | ARB: token0=WETH, token1=USDC
+      const poolWeth = poolInfo.token0.toLowerCase() === config.weth.toLowerCase() 
+        ? poolInfo.token0 : poolInfo.token1;
+      const poolUsdc = poolInfo.token0.toLowerCase() === config.usdc.toLowerCase() 
+        ? poolInfo.token0 : poolInfo.token1;
+      
       if (swapType === 'ERC20->ERC20') {
-        // USDC -> WETH (token1 -> token0)
-        fromTokenAddr = poolInfo.token1;  // USDC
-        toTokenAddr = poolInfo.token0;    // WETH
-        routeFromToken = poolInfo.token1;
-        routeToToken = poolInfo.token0;
+        // USDC -> WETH
+        fromTokenAddr = poolUsdc;
+        toTokenAddr = poolWeth;
+        routeFromToken = poolUsdc;
+        routeToToken = poolWeth;
       } else if (swapType === 'ETH->ERC20') {
         // ETH -> USDC: wrap ETH to WETH, swap WETH -> USDC
         fromTokenAddr = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-        toTokenAddr = poolInfo.token1;    // USDC (final output)
-        routeFromToken = poolInfo.token0; // WETH (in pool)
-        routeToToken = poolInfo.token1;   // USDC (in pool)
+        toTokenAddr = poolUsdc;           // USDC (final output)
+        routeFromToken = poolWeth;        // WETH (in pool)
+        routeToToken = poolUsdc;          // USDC (in pool)
       } else { // ERC20->ETH
         // USDC -> ETH: swap USDC -> WETH, unwrap WETH to ETH
-        fromTokenAddr = poolInfo.token1;  // USDC
+        fromTokenAddr = poolUsdc;         // USDC
         toTokenAddr = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-        routeFromToken = poolInfo.token1; // USDC (in pool)
-        routeToToken = poolInfo.token0;   // WETH (in pool)
+        routeFromToken = poolUsdc;        // USDC (in pool)
+        routeToToken = poolWeth;          // WETH (in pool)
       }
     } else {
       // UniswapV2 style - use fetched pool token0/token1
