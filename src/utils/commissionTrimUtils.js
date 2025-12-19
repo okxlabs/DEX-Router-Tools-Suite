@@ -13,11 +13,11 @@ export const applyCommissionAndTrimToJson = (baseJson, commissionData, trimData)
     let completeJson = { ...baseJson };
 
     // Check if this is a function that should NOT have commission/trim
-    const functionsWithoutCommissionTrim = ['approve', 'swapWrap'];
+    const functionsWithoutCommissionTrim = ['approve'];
     const functionName = baseJson.function?.name;
     
     if (functionsWithoutCommissionTrim.includes(functionName)) {
-        // For ERC20 and utility functions, remove any existing commission/trim data and return
+        // For ERC20 approve function, remove any existing commission/trim data and return
         delete completeJson.hasCommission;
         delete completeJson.referCount;
         delete completeJson.first;

@@ -12,64 +12,26 @@ import unxswapByOrderId from './examples/unxswapByOrderId.json';
 import unxswapTo from './examples/unxswapTo.json';
 import unxswapToWithBaseRequest from './examples/unxswapToWithBaseRequest.json';
 import dagSwapByOrderId from './examples/dagSwapByOrderId.json';
+import dagSwapTo from './examples/dagSwapTo.json';
 import approve from './examples/approve.json';
 
 /**
- * Get all available function examples organized by category
- * @returns {Array} Array of example objects with name, data, and category
+ * Get all available function examples
+ * @returns {Array} Array of example objects with name and data
  */
 export const getFunctionExamples = () => {
     return [
-        { 
-            name: 'smartSwapByOrderId', 
-            data: smartSwapByOrderId, 
-            category: 'SMART SWAP'
-        },
-        { 
-            name: 'smartSwapTo', 
-            data: smartSwapTo, 
-            category: 'SMART SWAP'
-        },
-        { 
-            name: 'uniswapV3SwapTo', 
-            data: uniswapV3SwapTo, 
-            category: 'UNISWAPV3'
-        },
-        { 
-            name: 'uniswapV3SwapToWithBaseRequest', 
-            data: uniswapV3SwapToWithBaseRequest, 
-            category: 'UNISWAPV3'
-        },
-        { 
-            name: 'unxswapByOrderId', 
-            data: unxswapByOrderId, 
-            category: 'UNXSWAP'
-        },
-        { 
-            name: 'unxswapTo', 
-            data: unxswapTo, 
-            category: 'UNXSWAP'
-        },
-        { 
-            name: 'unxswapToWithBaseRequest', 
-            data: unxswapToWithBaseRequest, 
-            category: 'UNXSWAP'
-        },
-        { 
-            name: 'dagSwapByOrderId', 
-            data: dagSwapByOrderId, 
-            category: 'DAG SWAP'
-        },
-        { 
-            name: 'swapWrap', 
-            data: swapWrap, 
-            category: 'UTILITY'
-        },
-        { 
-            name: 'approve', 
-            data: approve, 
-            category: 'ERC20'
-        }
+        { name: 'smartSwapByOrderId', data: smartSwapByOrderId },
+        { name: 'smartSwapTo', data: smartSwapTo },
+        { name: 'uniswapV3SwapTo', data: uniswapV3SwapTo },
+        { name: 'uniswapV3SwapToWithBaseRequest', data: uniswapV3SwapToWithBaseRequest },
+        { name: 'unxswapByOrderId', data: unxswapByOrderId },
+        { name: 'unxswapTo', data: unxswapTo },
+        { name: 'unxswapToWithBaseRequest', data: unxswapToWithBaseRequest },
+        { name: 'dagSwapByOrderId', data: dagSwapByOrderId },
+        { name: 'dagSwapTo', data: dagSwapTo },
+        { name: 'swapWrap', data: swapWrap },
+        { name: 'approve', data: approve }
     ];
 };
 
@@ -81,23 +43,4 @@ export const getFunctionExamples = () => {
 export const getFunctionExampleByName = (name) => {
     const examples = getFunctionExamples();
     return examples.find(example => example.name === name) || null;
-};
-
-/**
- * Get function examples filtered by category
- * @param {string} category - The category to filter by
- * @returns {Array} Array of examples in the specified category
- */
-export const getFunctionExamplesByCategory = (category) => {
-    const examples = getFunctionExamples();
-    return examples.filter(example => example.category === category);
-};
-
-/**
- * Get all available categories
- * @returns {Array} Array of unique category names
- */
-export const getAvailableCategories = () => {
-    const examples = getFunctionExamples();
-    return [...new Set(examples.map(example => example.category))];
 };

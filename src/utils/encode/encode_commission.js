@@ -8,14 +8,50 @@ const BYTE_SIZE = {
     BLOCK: 64,       // 32 bytes = 64 hex chars
 };
 
-const PADDING = '00'.repeat(11); // 11 bytes of padding for middle block
+const PADDING = '00'.repeat(10); // 10 bytes of padding for middle block (after referrerNum)
 
-// Commission structure mapping
-const COMMISSION_STRUCTURE = {
-    1: { blocks: ['middle', 'first'], name: 'SINGLE' },
-    2: { blocks: ['first', 'middle', 'second'], name: 'DUAL' },
-    3: { blocks: ['first', 'second', 'middle', 'third'], name: 'TRIPLE' },
-};
+// Ordinal names for commission blocks
+const ORDINAL_NAMES = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'];
+
+// Min/Max commission limits
+const MIN_COMMISSION_COUNT = 1;
+const MAX_COMMISSION_COUNT = 8;
+
+/**
+ * Generate commission structure dynamically based on referCount
+ * SINGLE (1): [middle, first]
+ * DUAL (2): [first, middle, last]
+ * MULTIPLE (3-8): [first, second, ..., middle, last-ordinal]
+ */
+function getCommissionStructure(referCount) {
+    if (referCount < MIN_COMMISSION_COUNT || referCount > MAX_COMMISSION_COUNT) {
+        throw new Error(`Invalid referCount: ${referCount}. Must be between ${MIN_COMMISSION_COUNT} and ${MAX_COMMISSION_COUNT}`);
+    }
+
+    if (referCount === 1) {
+        // SINGLE: [middle, first]
+        return { blocks: ['middle', 'first'], name: 'SINGLE' };
+    } else if (referCount === 2) {
+        // DUAL: [first, middle, last]
+        return { blocks: ['first', 'middle', 'last'], name: 'DUAL' };
+    } else {
+        // MULTIPLE (3-8): [first, second, ..., (n-1)th, middle, nth]
+        const blocks = [];
+        
+        // Add all commissions except the last one
+        for (let i = 0; i < referCount - 1; i++) {
+            blocks.push(ORDINAL_NAMES[i]);
+        }
+        
+        // Add middle block
+        blocks.push('middle');
+        
+        // Add the last commission
+        blocks.push(ORDINAL_NAMES[referCount - 1]);
+        
+        return { blocks, name: 'MULTIPLE' };
+    }
+}
 
 /**
  * Normalize hex string: remove 0x prefix, lowercase, and pad with zeros
@@ -41,18 +77,26 @@ function encodeCommissionBlock(commission) {
 }
 
 /**
- * Encode middle block (32 bytes): isToB + padding + token address
+ * Encode middle block (32 bytes): isToB + referrerNum + padding + token address
+ * For SINGLE and DUAL: isToB + 00 + padding(10 bytes) + token
+ * For MULTIPLE: isToB + referrerNum + padding(10 bytes) + token
  */
-function encodeMiddleBlock(middle) {
+function encodeMiddleBlock(middle, referCount) {
     if (!middle.token) {
         throw new Error('Middle block missing required field: token');
     }
 
     const toBFlag = middle.isToB !== undefined ? middle.isToB : middle.toB;
     const isToB = toBFlag ? '80' : '00';
+    
+    // For MULTIPLE mode (3-8 referrers), encode referrerNum in second byte
+    const referrerNum = (referCount >= 3 && referCount <= 8) 
+        ? normalizeHex(ethers.BigNumber.from(referCount).toHexString(), 2)
+        : '00';
+    
     const token = normalizeHex(middle.token, BYTE_SIZE.ADDRESS);
 
-    return isToB + PADDING + token;
+    return isToB + referrerNum + PADDING + token;
 }
 
 /**
@@ -63,12 +107,12 @@ export function addCommissionToCalldata(calldata, commissionData) {
         validateCommissionData(commissionData);
 
         let calldataHex = calldata.replace(/^0x/, '');
-        const structure = COMMISSION_STRUCTURE[commissionData.referCount];
+        const structure = getCommissionStructure(commissionData.referCount);
 
         // Encode blocks according to structure
         const encodedBlocks = structure.blocks.map(blockType => {
             if (blockType === 'middle') {
-                return encodeMiddleBlock(commissionData.middle);
+                return encodeMiddleBlock(commissionData.middle, commissionData.referCount);
             }
             return encodeCommissionBlock(commissionData[blockType]);
         });
@@ -89,8 +133,10 @@ export function validateCommissionData(commissionData) {
     }
 
     const { referCount } = commissionData;
-    if (!referCount || !COMMISSION_STRUCTURE[referCount]) {
-        throw new Error(`Commission data must have referCount of 1, 2, or 3, got: ${referCount}`);
+    
+    // Validate referCount range
+    if (!referCount || referCount < MIN_COMMISSION_COUNT || referCount > MAX_COMMISSION_COUNT) {
+        throw new Error(`Commission data must have referCount between ${MIN_COMMISSION_COUNT} and ${MAX_COMMISSION_COUNT}, got: ${referCount}`);
     }
 
     // Check required properties
@@ -98,28 +144,28 @@ export function validateCommissionData(commissionData) {
         throw new Error('Commission data must have middle and first properties');
     }
 
-    if (referCount === 2 && !commissionData.second) {
-        throw new Error('Dual commission data must have second property');
-    }
-
-    if (referCount === 3 && (!commissionData.second || !commissionData.third)) {
-        throw new Error('Triple commission data must have second and third properties');
-    }
-
     // Validate middle block
     if (!commissionData.middle.token) {
         throw new Error('Middle block must have token property');
     }
 
-    // Validate commission blocks
-    const commissionsToValidate = [commissionData.first];
-    if (referCount === 2) {
-        commissionsToValidate.push(commissionData.second);
-    }
-    if (referCount === 3) {
-        commissionsToValidate.push(commissionData.second, commissionData.third);
+    // Get the expected structure and validate all required blocks exist
+    const structure = getCommissionStructure(referCount);
+    const commissionsToValidate = [];
+    
+    for (const blockType of structure.blocks) {
+        if (blockType === 'middle') {
+            continue; // Already validated above
+        }
+        
+        if (!commissionData[blockType]) {
+            throw new Error(`Commission data with referCount ${referCount} must have ${blockType} property`);
+        }
+        
+        commissionsToValidate.push(commissionData[blockType]);
     }
 
+    // Validate each commission block
     for (const commission of commissionsToValidate) {
         validateCommissionBlock(commission);
     }

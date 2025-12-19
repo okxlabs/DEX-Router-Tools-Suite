@@ -13,17 +13,23 @@ export const applyCommissionAndTrimToJson = (baseJson, commissionData, trimData)
     let completeJson = { ...baseJson };
 
     // Check if this is a function that should NOT have commission/trim
-    const functionsWithoutCommissionTrim = ['approve', 'swapWrap'];
+    const functionsWithoutCommissionTrim = ['approve'];
     const functionName = baseJson.function?.name;
     
     if (functionsWithoutCommissionTrim.includes(functionName)) {
-        // For ERC20 and utility functions, remove any existing commission/trim data and return
+        // For ERC20 approve function, remove any existing commission/trim data and return
         delete completeJson.hasCommission;
         delete completeJson.referCount;
         delete completeJson.first;
         delete completeJson.middle;
         delete completeJson.second;
         delete completeJson.third;
+        delete completeJson.fourth;
+        delete completeJson.fifth;
+        delete completeJson.sixth;
+        delete completeJson.seventh;
+        delete completeJson.eighth;
+        delete completeJson.last;
         delete completeJson.hasTrim;
         delete completeJson.trimRate;
         delete completeJson.trimAddress;
@@ -50,26 +56,16 @@ export const applyCommissionAndTrimToJson = (baseJson, commissionData, trimData)
  */
 const applyCommissionData = (json, commissionData) => {
     const { 
-        commission1, 
-        commission2, 
-        commission3, 
+        commissions = [], 
         commissionToB, 
         commissionTokenAddress 
     } = commissionData;
 
-    // Generate commission data from inputs - collect only valid commissions
-    const validCommissions = [];
-    
-    if (commission1.address && commission1.rate) {
-        validCommissions.push(commission1);
-    }
-    if (commission2.address && commission2.rate) {
-        validCommissions.push(commission2);
-    }
-    if (commission3.address && commission3.rate) {
-        validCommissions.push(commission3);
-    }
-    
+    // Ordinal names for commission blocks (matching decode_commission.js)
+    const ordinalNames = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'];
+
+    // Collect only valid commissions
+    const validCommissions = commissions.filter(c => c.address && c.rate);
     const commissionCount = validCommissions.length;
     
     // Always clean up all commission properties first
@@ -79,65 +75,95 @@ const applyCommissionData = (json, commissionData) => {
     delete json.middle;
     delete json.second;
     delete json.third;
+    delete json.fourth;
+    delete json.fifth;
+    delete json.sixth;
+    delete json.seventh;
+    delete json.eighth;
+    delete json.last; // Also clean up 'last' which was used in dual mode
     
     if (commissionCount > 0) {
         json.hasCommission = true;
         json.referCount = commissionCount;
         
-        if (commissionCount === 3) {
-            // Triple commission: first, middle, second, third
+        // Determine flag and commission type based on count
+        let flag, commissionType;
+        
+        if (commissionCount === 1) {
+            // Single commission
+            flag = (isFromToken) => isFromToken ? "0x3ca20afc2aaa" : "0x3ca20afc2bbb";
+            commissionType = (isFromToken) => isFromToken ? "SINGLE_FROM_TOKEN_COMMISSION" : "SINGLE_TO_TOKEN_COMMISSION";
+        } else if (commissionCount === 2) {
+            // Dual commission
+            flag = (isFromToken) => isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb";
+            commissionType = (isFromToken) => isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION";
+        } else if (commissionCount >= 3 && commissionCount <= 8) {
+            // Multiple commission (3-8)
+            flag = (isFromToken) => isFromToken ? "0x88880afc2aaa" : "0x88880afc2bbb";
+            commissionType = (isFromToken) => isFromToken ? "MULTIPLE_FROM_TOKEN_COMMISSION" : "MULTIPLE_TO_TOKEN_COMMISSION";
+        } else {
+            // Invalid count (more than 8)
+            json.hasCommission = false;
+            return json;
+        }
+        
+        // For SINGLE: structure is [first, middle]
+        // For DUAL: structure is [first, middle, last]
+        // For MULTIPLE (3-8): structure is [first, middle, second, third, fourth, ...]
+        
+        if (commissionCount === 1) {
+            // Single commission: first, middle
             json.first = {
-                flag: validCommissions[0].isFromToken ? "0x33330afc2aaa" : "0x33330afc2bbb",
-                commissionType: validCommissions[0].isFromToken ? "TRIPLE_FROM_TOKEN_COMMISSION" : "TRIPLE_TO_TOKEN_COMMISSION",
-                rate: validCommissions[0].rate,
+                flag: flag(validCommissions[0].isFromToken),
+                commissionType: commissionType(validCommissions[0].isFromToken),
+                rate: String(validCommissions[0].rate),
                 address: validCommissions[0].address
             };
             json.middle = {
                 isToB: commissionToB,
                 token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-            };
-            json.second = {
-                flag: validCommissions[1].isFromToken ? "0x33330afc2aaa" : "0x33330afc2bbb", 
-                commissionType: validCommissions[1].isFromToken ? "TRIPLE_FROM_TOKEN_COMMISSION" : "TRIPLE_TO_TOKEN_COMMISSION",
-                rate: validCommissions[1].rate,
-                address: validCommissions[1].address
-            };
-            json.third = {
-                flag: validCommissions[2].isFromToken ? "0x33330afc2aaa" : "0x33330afc2bbb",
-                commissionType: validCommissions[2].isFromToken ? "TRIPLE_FROM_TOKEN_COMMISSION" : "TRIPLE_TO_TOKEN_COMMISSION",
-                rate: validCommissions[2].rate,
-                address: validCommissions[2].address
             };
         } else if (commissionCount === 2) {
-            // Dual commission: first, middle, second
+            // Dual commission: first, middle, last
             json.first = {
-                flag: validCommissions[0].isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb",
-                commissionType: validCommissions[0].isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION",
-                rate: validCommissions[0].rate,
+                flag: flag(validCommissions[0].isFromToken),
+                commissionType: commissionType(validCommissions[0].isFromToken),
+                rate: String(validCommissions[0].rate),
                 address: validCommissions[0].address
             };
             json.middle = {
                 isToB: commissionToB,
                 token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
             };
-            json.second = {
-                flag: validCommissions[1].isFromToken ? "0x22220afc2aaa" : "0x22220afc2bbb", 
-                commissionType: validCommissions[1].isFromToken ? "DUAL_FROM_TOKEN_COMMISSION" : "DUAL_TO_TOKEN_COMMISSION",
-                rate: validCommissions[1].rate,
+            json.last = {
+                flag: flag(validCommissions[1].isFromToken),
+                commissionType: commissionType(validCommissions[1].isFromToken),
+                rate: String(validCommissions[1].rate),
                 address: validCommissions[1].address
             };
         } else {
-            // Single commission: first, middle
+            // Multiple commission (3-8): first, middle, second, third, fourth, ...
+            // Structure: first commission as "first", middle block, then remaining as "second", "third", etc.
             json.first = {
-                flag: validCommissions[0].isFromToken ? "0x3ca20afc2aaa" : "0x3ca20afc2bbb",
-                commissionType: validCommissions[0].isFromToken ? "SINGLE_FROM_TOKEN_COMMISSION" : "SINGLE_TO_TOKEN_COMMISSION",
-                rate: validCommissions[0].rate,
+                flag: flag(validCommissions[0].isFromToken),
+                commissionType: commissionType(validCommissions[0].isFromToken),
+                rate: String(validCommissions[0].rate),
                 address: validCommissions[0].address
             };
             json.middle = {
                 isToB: commissionToB,
                 token: commissionTokenAddress || "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
             };
+            
+            // Add remaining commissions using ordinal names starting from "second"
+            for (let i = 1; i < commissionCount; i++) {
+                json[ordinalNames[i]] = {
+                    flag: flag(validCommissions[i].isFromToken),
+                    commissionType: commissionType(validCommissions[i].isFromToken),
+                    rate: String(validCommissions[i].rate),
+                    address: validCommissions[i].address
+                };
+            }
         }
     } else {
         // No commission data - explicitly set hasCommission to false
