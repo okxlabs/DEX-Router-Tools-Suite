@@ -38,16 +38,22 @@ export function packSrcToken(srcToken) {
 }
 
 /**
- * Pack receiver object into uint256
- * @param {Object} receiver - {orderId, isOneForZero, isWethUnwrap, address}
+ * Pack receiver object into uint256 (for uniswapV3SwapTo)
+ * @param {Object} receiver - {orderId, address}
  * @returns {string} Packed uint256 value
+ * 
+ * Bit layout:
+ * - bits 160-252: orderId
+ * - bits 0-159: address
+ * 
+ * Note: isOneForZero and wethUnwrap are in pools[], NOT in receiver
  */
 export function packReceiver(receiver) {
     if (typeof receiver === 'string') {
         return receiver; // Already packed
     }
     
-    const { orderId, isOneForZero, isWethUnwrap, address } = receiver;
+    const { orderId, address } = receiver;
     
     let packed = ethers.BigNumber.from(address);
     
@@ -55,14 +61,6 @@ export function packReceiver(receiver) {
     if (orderId !== undefined && orderId !== null) {
         const orderIdBN = ethers.BigNumber.from(orderId);
         packed = packed.or(orderIdBN.shl(160));
-    }
-    
-    if (isOneForZero) {
-        packed = packed.or(ONE_FOR_ZERO_MASK);
-    }
-    
-    if (isWethUnwrap) {
-        packed = packed.or(WETH_UNWRAP_MASK);
     }
     
     return packed.toString();
@@ -93,20 +91,29 @@ export function packRawdata(rawdata) {
 
 /**
  * Pack pool object into uint256 (for uniswapV3 functions)
- * @param {Object} pool - {isOneForZero, pool}
+ * @param {Object} pool - {isOneForZero, wethUnwrap, pool}
  * @returns {string} Packed uint256 value
+ * 
+ * Bit layout:
+ * - bit 255: ONE_FOR_ZERO (1 = token1->token0, 0 = token0->token1)
+ * - bit 253: WETH_UNWRAP (1 = unwrap WETH to ETH on last pool)
+ * - bits 0-159: pool address
  */
 export function packUniswapV3Pool(pool) {
     if (typeof pool === 'string') {
         return pool; // Already packed
     }
     
-    const { isOneForZero, pool: poolAddress } = pool;
+    const { isOneForZero, wethUnwrap, pool: poolAddress } = pool;
     
     let packed = ethers.BigNumber.from(poolAddress);
     
     if (isOneForZero) {
-        packed = packed.or(ONE_FOR_ZERO_MASK);
+        packed = packed.or(ONE_FOR_ZERO_MASK);  // bit 255
+    }
+    
+    if (wethUnwrap) {
+        packed = packed.or(WETH_UNWRAP_MASK);   // bit 253
     }
     
     return packed.toString();

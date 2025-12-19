@@ -1,22 +1,21 @@
 {
-    "function": {
-      "name": "uniswapV3SwapTo",
-      "selector": "0x0d5f0e3b"
-    },
+  "function": {
+    "name": "uniswapV3SwapTo",
+    "selector": "0x0d5f0e3b"
+  },
+  "receiver": {
     "orderId": "15856772274338048",
-    "receiver": {
-      "isOneForZero": false,
-      "isWethUnwrap": false,
-      "address": "0x0f7b3623b5b7dd605b81bc9f34fab63fd7c30487"
-    },
-    "amount": "392366",
-    "minReturn": "121798310",
-    "pools": [
-      {
-        "isOneForZero": true,
-        "pool": "0x2a48dbf6347ea5cdc906b4bb6a2ed27969241cde"
-      }
-    ],
-    "hasCommission": false,
-    "hasTrim": false
-  }
+    "address": "0x0f7b3623b5b7dd605b81bc9f34fab63fd7c30487"
+  },
+  "amount": "392366",
+  "minReturn": "121798310",
+  "pools": [
+    {
+      "isOneForZero": true,
+      "wethUnwrap": false,
+      "pool": "0x2a48dbf6347ea5cdc906b4bb6a2ed27969241cde"
+    }
+  ],
+  "hasCommission": false,
+  "hasTrim": false
+}

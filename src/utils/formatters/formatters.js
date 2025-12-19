@@ -231,9 +231,15 @@ function unpackRawData(rawDataValue) {
 }
 
 /**
- * Unpack a receiver uint256 value into its components
+ * Unpack receiver for uniswapV3SwapTo
  * @param {any} receiverValue - the receiver uint256 value (BigNumber or string)
- * @returns {Object} unpacked receiver with isOneForZero, isWethUnwrap, orderId, and address
+ * @returns {Object} unpacked receiver with orderId and address
+ * 
+ * Bit layout:
+ * - bits 160-252: orderId
+ * - bits 0-159: address
+ * 
+ * Note: isOneForZero and wethUnwrap are in pools[], NOT in receiver
  */
 function unpackReceiver(receiverValue) {
     try {
@@ -246,15 +252,11 @@ function unpackReceiver(receiverValue) {
         }
 
         // Extract components using bitwise operations
-        const isOneForZero = !receiverBN.and(ONE_FOR_ZERO_MASK).isZero();
-        const isWethUnwrap = !receiverBN.and(WETH_UNWRAP_MASK).isZero();
         const address = receiverBN.and(ADDRESS_MASK);
         const orderId = receiverBN.and(ORDER_ID_MASK).shr(160);
 
         return {
             orderId: orderId.toString(),
-            isOneForZero: isOneForZero,
-            isWethUnwrap: isWethUnwrap,
             address: "0x" + address.toHexString().slice(2).padStart(40, '0')
         };
     } catch (error) {
@@ -337,9 +339,14 @@ function unpackUnxswapPool(poolValue) {
 }
 
 /**
- * Unpack a single uniswapV3 pool with simple structure (isOneForZero + address)
+ * Unpack a single uniswapV3 pool with flags and address
  * @param {any} poolValue - the pool uint256 value
- * @returns {Object} unpacked pool with isOneForZero and address
+ * @returns {Object} unpacked pool with isOneForZero, wethUnwrap, and address
+ * 
+ * Bit layout:
+ * - bit 255: ONE_FOR_ZERO (1 = token1->token0, 0 = token0->token1)
+ * - bit 253: WETH_UNWRAP (1 = unwrap WETH to ETH on last pool)
+ * - bits 0-159: pool address
  */
 function unpackUniswapV3Pool(poolValue) {
     try {
@@ -353,10 +360,12 @@ function unpackUniswapV3Pool(poolValue) {
 
         // Extract components
         const isOneForZero = !poolBN.and(ONE_FOR_ZERO_MASK).isZero();
+        const wethUnwrap = !poolBN.and(WETH_UNWRAP_MASK).isZero();
         const address = poolBN.and(ADDRESS_MASK);
 
         return {
             isOneForZero: isOneForZero,
+            wethUnwrap: wethUnwrap,
             pool: "0x" + address.toHexString().slice(2).padStart(40, '0')
         };
     } catch (error) {
