@@ -7,6 +7,7 @@ import { createDecodeOperation, createEncodeOperation, formatJSON } from './scri
 import DecodeCalldata from './components/forms/DecodeCalldata';
 import EncodeCalldata from './components/forms/EncodeCalldata';
 import SimulateTX from './components/SimulateTX';
+import Utilities from './components/Utilities';
 
 function App() {
   const [activeTab, setActiveTab] = useState('decode');
@@ -146,10 +147,7 @@ function App() {
           )}
 
           {activeTab === 'utilities' && (
-            <div className="utilities-container">
-              <h2>Utilities</h2>
-              <p>Coming soon...</p>
-            </div>
+            <Utilities showToast={showToast} />
           )}
 
         </div>
