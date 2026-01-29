@@ -1,9 +1,9 @@
 import './App.css';
 import { useState } from 'react';
-import { resolve } from './utils/decode/decode_index.js';
-import { encode } from './utils/encode/encode_index.js';
-import { validateEncodedCalldata, validateDecodedJson } from './utils/core/roundtrip_validator.js';
-import { createDecodeOperation, createEncodeOperation, formatJSON } from './utils/componentUtils.js';
+import { resolve } from './scripts/decode/decode_index.js';
+import { encode } from './scripts/encode/encode_index.js';
+import { validateEncodedCalldata, validateDecodedJson } from './scripts/core/roundtrip_validator.js';
+import { createDecodeOperation, createEncodeOperation, formatJSON } from './scripts/componentUtils.js';
 import DecodeCalldata from './components/forms/DecodeCalldata';
 import EncodeCalldata from './components/forms/EncodeCalldata';
 import SimulateTX from './components/SimulateTX';
@@ -89,6 +89,12 @@ function App() {
           >
             Simulate TX
           </button>
+          <button 
+            className={`tab-button ${activeTab === 'utilities' ? 'active' : ''}`}
+            onClick={() => setActiveTab('utilities')}
+          >
+            Utilities
+          </button>
         </div>
 
         {/* Tab Content */}
@@ -137,6 +143,13 @@ function App() {
               updateSimulationStatus={updateSimulationStatus}
               showToast={showToast}
             />
+          )}
+
+          {activeTab === 'utilities' && (
+            <div className="utilities-container">
+              <h2>Utilities</h2>
+              <p>Coming soon...</p>
+            </div>
           )}
 
         </div>
