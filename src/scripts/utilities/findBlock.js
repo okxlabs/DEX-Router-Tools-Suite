@@ -98,3 +98,41 @@ export async function findBlockByTimestamp(rpcUrl, targetTimestamp, onProgress) 
     iterations: iterations
   };
 }
+
+// CLI support - run directly with: node findBlock.js <rpcUrl> <timestamp>
+const isRunningAsCLI = typeof process !== 'undefined' && process.argv && process.argv[1]?.includes('findBlock');
+
+if (isRunningAsCLI) {
+  const args = process.argv.slice(2);
+  
+  if (args.length < 2) {
+    console.log('Usage: node findBlock.js <rpcUrl> <timestamp>');
+    console.log('');
+    console.log('Examples:');
+    console.log('  node findBlock.js https://bsc-dataseed.binance.org 1704067200');
+    process.exit(1);
+  }
+
+  const [rpcUrl, timestampStr] = args;
+  let timestamp = parseInt(timestampStr);
+  
+  // Handle millisecond timestamps
+  if (timestamp > 10000000000) {
+    timestamp = Math.floor(timestamp / 1000);
+  }
+
+  console.log(`Searching for block at timestamp ${timestamp}...`);
+  
+  findBlockByTimestamp(rpcUrl, timestamp, (progress) => {
+    console.log(`[Iteration ${progress.iteration}] Block #${progress.blockNumber}, timestamp: ${progress.timestamp}`);
+  })
+    .then((result) => {
+      console.log('');
+      console.log('Result:');
+      console.log(JSON.stringify(result, null, 2));
+    })
+    .catch((error) => {
+      console.error('Error:', error.message);
+      process.exit(1);
+    });
+}
