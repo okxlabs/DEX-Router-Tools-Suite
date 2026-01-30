@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Utilities.css';
 import { findBlockByTimestamp } from '../scripts/utilities/findBlock';
+import { toChecksumAddress, isValidAddress } from '../scripts/utilities/addressChecksum';
 
 // Predefined chain RPC URLs (CORS-enabled public endpoints)
 const CHAIN_OPTIONS = [
@@ -27,6 +28,11 @@ const Utilities = ({ showToast }) => {
   
   // Ref for debounce timer
   const debounceTimer = useRef(null);
+
+  // Address checksum state
+  const [addressInput, setAddressInput] = useState('');
+  const [checksumResult, setChecksumResult] = useState(null);
+  const [addressError, setAddressError] = useState(null);
 
   // Handle chain selection change
   const handleChainChange = (chainId) => {
@@ -147,6 +153,41 @@ const Utilities = ({ showToast }) => {
     return `${ts} (${date.toUTCString()})`;
   };
 
+  // Handle address input change - auto checksum
+  const handleAddressChange = (e) => {
+    const value = e.target.value;
+    setAddressInput(value);
+    
+    if (!value.trim()) {
+      setChecksumResult(null);
+      setAddressError(null);
+      return;
+    }
+
+    if (!isValidAddress(value)) {
+      setChecksumResult(null);
+      setAddressError('Invalid address format');
+      return;
+    }
+
+    try {
+      const checksummed = toChecksumAddress(value);
+      setChecksumResult(checksummed);
+      setAddressError(null);
+    } catch (error) {
+      setChecksumResult(null);
+      setAddressError(error.message);
+    }
+  };
+
+  // Copy checksum result to clipboard
+  const copyChecksumToClipboard = () => {
+    if (checksumResult) {
+      navigator.clipboard.writeText(checksumResult);
+      showToast('Checksum address copied!', 'success');
+    }
+  };
+
   return (
     <div className="utilities-container">
       <div className="utility-section">
@@ -236,6 +277,40 @@ const Utilities = ({ showToast }) => {
         {searchError && (
           <div className="search-error">
             {searchError}
+          </div>
+        )}
+      </div>
+
+      {/* Address Checksum Section */}
+      <div className="utility-section">
+        <h3 className="section-title">Address Checksum</h3>
+        
+        <div className="form-group">
+          <label className="form-label">
+            Ethereum Address
+          </label>
+          <input
+            type="text"
+            className="foundry-input-white"
+            value={addressInput}
+            onChange={handleAddressChange}
+            placeholder="0x..."
+          />
+        </div>
+
+        {/* Checksum Result */}
+        {checksumResult && (
+          <div className="checksum-result" onClick={copyChecksumToClipboard}>
+            <span className="result-label">Checksummed Address:</span>
+            <span className="result-value">{checksumResult}</span>
+            <span className="copy-hint">Click to copy</span>
+          </div>
+        )}
+
+        {/* Address Error */}
+        {addressError && (
+          <div className="search-error">
+            {addressError}
           </div>
         )}
       </div>

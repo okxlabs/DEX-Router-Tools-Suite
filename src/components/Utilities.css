@@ -164,3 +164,54 @@
   color: var(--danger);
   font-size: 14px;
 }
+
+/* Section Title */
+.section-title {
+  color: var(--primary);
+  font-size: 18px;
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+/* Utility sections spacing */
+.utilities-container .utility-section + .utility-section {
+  margin-top: 24px;
+}
+
+/* Checksum Result */
+.checksum-result {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checksum-result:hover {
+  background-color: rgba(76, 175, 80, 0.15);
+  border-color: rgba(76, 175, 80, 0.5);
+}
+
+.checksum-result .result-label {
+  font-size: 12px;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.checksum-result .result-value {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.checksum-result .copy-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+}
