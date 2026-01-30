@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Utilities.css';
 import { findBlockByTimestamp } from '../scripts/utilities/findBlock';
 import { toChecksumAddress, isValidAddress } from '../scripts/utilities/addressChecksum';
+import { getEventTopic0 } from '../scripts/utilities/topic0Calculator';
 
 // Predefined chain RPC URLs (CORS-enabled public endpoints)
 const CHAIN_OPTIONS = [
@@ -34,6 +35,11 @@ const Utilities = ({ showToast }) => {
   const [checksumResult, setChecksumResult] = useState(null);
   const [addressError, setAddressError] = useState(null);
 
+  // Topic0 calculator state
+  const [eventInput, setEventInput] = useState('');
+  const [topic0Result, setTopic0Result] = useState(null);
+  const [topic0Error, setTopic0Error] = useState(null);
+
   // Handle chain selection change
   const handleChainChange = (chainId) => {
     setSelectedChain(chainId);
@@ -57,7 +63,7 @@ const Utilities = ({ showToast }) => {
     }
   };
 
-  // Parse input - accepts timestamp or date format (YYYY-MM-DD HH:mm)
+  // Parse input - accepts timestamp or date format (YYYY-MM-DD HH:mm:ss)
   const parseTimeInput = (input) => {
     if (!input || input.trim() === '') return null;
     
@@ -73,12 +79,12 @@ const Utilities = ({ showToast }) => {
       return ts;
     }
     
-    // Try to parse as date format: YYYY-MM-DD HH:mm or YYYY-MM-DD (treated as UTC+8)
-    const dateMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2}))?$/);
+    // Try to parse as date format: YYYY-MM-DD HH:mm:ss or YYYY-MM-DD HH:mm or YYYY-MM-DD (treated as UTC+8)
+    const dateMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
     if (dateMatch) {
-      const [, year, month, day, hour = '00', minute = '00'] = dateMatch;
+      const [, year, month, day, hour = '00', minute = '00', second = '00'] = dateMatch;
       // Create date string and parse as UTC+8
-      const dateStr = `${year}-${month}-${day}T${hour}:${minute}:00+08:00`;
+      const dateStr = `${year}-${month}-${day}T${hour}:${minute}:${second}+08:00`;
       const date = new Date(dateStr);
       if (!isNaN(date.getTime())) {
         return Math.floor(date.getTime() / 1000);
@@ -188,9 +194,40 @@ const Utilities = ({ showToast }) => {
     }
   };
 
+  // Handle event input change - auto calculate topic0
+  const handleEventInputChange = (e) => {
+    const value = e.target.value;
+    setEventInput(value);
+    
+    if (!value.trim()) {
+      setTopic0Result(null);
+      setTopic0Error(null);
+      return;
+    }
+
+    try {
+      const result = getEventTopic0(value);
+      setTopic0Result(result);
+      setTopic0Error(null);
+    } catch (error) {
+      setTopic0Result(null);
+      setTopic0Error(error.message);
+    }
+  };
+
+  // Copy topic0 to clipboard
+  const copyTopic0ToClipboard = () => {
+    if (topic0Result) {
+      navigator.clipboard.writeText(topic0Result.topic0);
+      showToast('Topic0 copied!', 'success');
+    }
+  };
+
   return (
     <div className="utilities-container">
       <div className="utility-section">
+        <h3 className="section-title">Block Finder</h3>
+        
         {/* Chain Selection and RPC URL Row */}
         <div className="chain-rpc-row">
           <div className="form-group chain-select-group">
@@ -234,7 +271,7 @@ const Utilities = ({ showToast }) => {
             className="foundry-input-white"
             value={timestampInput}
             onChange={handleTimestampChange}
-            placeholder="1704067200 or 2025-12-01 23:59"
+            placeholder="1704067200 or 2025-12-01 23:59:59 "
           />
         </div>
 
@@ -311,6 +348,46 @@ const Utilities = ({ showToast }) => {
         {addressError && (
           <div className="search-error">
             {addressError}
+          </div>
+        )}
+      </div>
+
+      {/* Topic0 Calculator Section */}
+      <div className="utility-section">
+        <h3 className="section-title">Topic0 Calculator</h3>
+        
+        <div className="form-group">
+          <label className="form-label">
+            Event Signature
+          </label>
+          <input
+            type="text"
+            className="foundry-input-white"
+            value={eventInput}
+            onChange={handleEventInputChange}
+            placeholder="Paste full event - variable names will be auto-removed"
+          />
+        </div>
+
+        {/* Topic0 Result */}
+        {topic0Result && (
+          <div className="topic0-result" onClick={copyTopic0ToClipboard}>
+            <div className="result-row">
+              <span className="result-label">Normalized Signature:</span>
+              <span className="result-value">{topic0Result.signature}</span>
+            </div>
+            <div className="result-row">
+              <span className="result-label">Topic0:</span>
+              <span className="result-value">{topic0Result.topic0}</span>
+            </div>
+            <span className="copy-hint">Click to copy topic0</span>
+          </div>
+        )}
+
+        {/* Topic0 Error */}
+        {topic0Error && (
+          <div className="search-error">
+            {topic0Error}
           </div>
         )}
       </div>

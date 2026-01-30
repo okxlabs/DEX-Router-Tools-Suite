@@ -18,26 +18,26 @@ async function rpcCall(rpcUrl, method, params = []) {
   }
 
   const data = await response.json();
-  
+
   if (data.error) {
     throw new Error(data.error.message || 'RPC error');
   }
-  
+
   return data.result;
 }
 
 // Get block by number or tag
 async function getBlock(rpcUrl, blockNumber) {
-  const blockParam = typeof blockNumber === 'number' 
-    ? '0x' + blockNumber.toString(16) 
+  const blockParam = typeof blockNumber === 'number'
+    ? '0x' + blockNumber.toString(16)
     : blockNumber;
-  
+
   const block = await rpcCall(rpcUrl, 'eth_getBlockByNumber', [blockParam, false]);
-  
+
   if (!block) {
     throw new Error(`Block ${blockNumber} not found`);
   }
-  
+
   return {
     number: parseInt(block.number, 16),
     hash: block.hash,
@@ -54,14 +54,8 @@ export async function findBlockByTimestamp(rpcUrl, targetTimestamp, onProgress) 
     throw new Error(`Target timestamp ${targetTimestamp} is in the future, latest block timestamp is ${latestTimestamp}`);
   }
 
-  const sampleSize = 100;
-  const sampleBlock = await getBlock(rpcUrl, latestBlockNumber - sampleSize);
-  const avgBlockTime = (latestTimestamp - sampleBlock.timestamp) / sampleSize;
-
-  const timeDiff = latestTimestamp - targetTimestamp;
-  const estimatedBlocksBack = Math.floor(timeDiff / avgBlockTime);
-  
-  let left = Math.max(0, latestBlockNumber - estimatedBlocksBack - 5000);
+  // Binary search from block 1 to latest
+  let left = 1;
   let right = latestBlockNumber;
   let result = null;
   let iterations = 0;
@@ -82,13 +76,14 @@ export async function findBlockByTimestamp(rpcUrl, targetTimestamp, onProgress) 
       right = mid - 1;
       result = block;
     } else {
+      // Exact match
       result = block;
       break;
     }
   }
 
   if (result === null) {
-    result = await getBlock(rpcUrl, left);
+    result = await getBlock(rpcUrl, Math.max(1, left));
   }
 
   return {
@@ -104,7 +99,7 @@ const isRunningAsCLI = typeof process !== 'undefined' && process.argv && process
 
 if (isRunningAsCLI) {
   const args = process.argv.slice(2);
-  
+
   if (args.length < 2) {
     console.log('Usage: node findBlock.js <rpcUrl> <timestamp>');
     console.log('');
@@ -115,14 +110,14 @@ if (isRunningAsCLI) {
 
   const [rpcUrl, timestampStr] = args;
   let timestamp = parseInt(timestampStr);
-  
+
   // Handle millisecond timestamps
   if (timestamp > 10000000000) {
     timestamp = Math.floor(timestamp / 1000);
   }
 
   console.log(`Searching for block at timestamp ${timestamp}...`);
-  
+
   findBlockByTimestamp(rpcUrl, timestamp, (progress) => {
     console.log(`[Iteration ${progress.iteration}] Block #${progress.blockNumber}, timestamp: ${progress.timestamp}`);
   })
