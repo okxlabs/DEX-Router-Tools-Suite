@@ -15,7 +15,8 @@ const DecodeCalldata = ({
   onButtonClick, 
   result, 
   showToast,
-  onEdit
+  onEdit,
+  onFindHeight
 }) => {
   const buttonState = useButtonState();
   const { isLoading, showSuccess, showError, lastProcessedValue, resetButtonStates, setButtonState } = buttonState;
@@ -69,6 +70,7 @@ const DecodeCalldata = ({
         title="Decoded Result"
         onCopy={handleCopy}
         onEdit={onEdit}
+        onFindHeight={onFindHeight}
       />
     </div>
   );
