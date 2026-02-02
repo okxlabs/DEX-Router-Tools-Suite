@@ -159,26 +159,27 @@ const applyTrimData = (json, trimData) => {
     const trimCount = (hasTrim1 ? 1 : 0) + (hasTrim2 ? 1 : 0);
     
     if (trimCount > 0) {
-        json.hasTrim = true;
+        // Determine trim type based on isToB flag
+        let trimType = 'toC';
         
         // Auto-convert: if only trim2 is filled, treat it as trim1
         if (!hasTrim1 && hasTrim2) {
             json.trimRate = trim2.rate;
             json.trimAddress = trim2.address;
-            // For trim2 only, there's no ToB option, so default to false
-            json.isToB = false;
+            // For trim2 only, there's no ToB option, so default to toC
+            trimType = 'toC';
         } else if (hasTrim1 && !hasTrim2) {
             // Only trim1 is filled
             json.trimRate = trim1.rate;
             json.trimAddress = trim1.address;
-            json.isToB = trim1.isToB || false;
+            trimType = trim1.isToB ? 'toB' : 'toC';
         } else if (hasTrim1 && hasTrim2) {
             // Both are filled
             json.trimRate = trim1.rate;
             json.trimAddress = trim1.address;
-            json.isToB = trim1.isToB || false;
             json.chargeRate = trim2.rate;
             json.chargeAddress = trim2.address;
+            trimType = trim1.isToB ? 'toB' : 'toC';
         }
         
         // Always add expectAmountOut and default charge values for single trim
@@ -187,6 +188,9 @@ const applyTrimData = (json, trimData) => {
             json.chargeRate = "0";
             json.chargeAddress = "0x0000000000000000000000000000000000000000";
         }
+        
+        // Set hasTrim to "toB" or "toC" based on isToB flag
+        json.hasTrim = trimType;
     } else {
         // No trim data - remove all trim-related fields
         json.hasTrim = false;
@@ -195,7 +199,6 @@ const applyTrimData = (json, trimData) => {
         delete json.expectAmountOut;
         delete json.chargeRate;
         delete json.chargeAddress;
-        delete json.isToB;
     }
 
     return json;
