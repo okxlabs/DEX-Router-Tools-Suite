@@ -44,6 +44,12 @@ export function normalizeEventSignature(eventDef) {
   if (signature.toLowerCase().startsWith('event ')) {
     signature = signature.slice(6).trim();
   }
+  
+  // Ignore everything after the closing parenthesis
+  const closingParenIndex = signature.lastIndexOf(')');
+  if (closingParenIndex !== -1) {
+    signature = signature.substring(0, closingParenIndex + 1);
+  }
 
   // Extract event name and parameters
   const match = signature.match(/^(\w+)\s*\((.*)\)$/);

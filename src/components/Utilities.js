@@ -6,18 +6,18 @@ import { getEventTopic0 } from '../scripts/utilities/topic0Calculator';
 
 // Predefined chain RPC URLs (CORS-enabled public endpoints)
 const CHAIN_OPTIONS = [
-  { id: 'eth', name: 'Ethereum', rpcUrl: 'https://eth.drpc.org' },
-  { id: 'bsc', name: 'BSC', rpcUrl: 'https://bsc-dataseed.binance.org' },
-  { id: 'arb', name: 'Arbitrum', rpcUrl: 'https://arb1.arbitrum.io/rpc' },
-  { id: 'base', name: 'Base', rpcUrl: 'https://base.drpc.org' },
-  { id: 'xlayer', name: 'X Layer', rpcUrl: 'https://xlayer.drpc.org' },
   { id: 'custom', name: 'Custom RPC', rpcUrl: '' },
+  { id: 'eth', name: 'Ethereum Mainnet', rpcUrl: 'https://eth.drpc.org' },
+  { id: 'bsc', name: 'BSC', rpcUrl: 'https://bsc-dataseed.binance.org' },
+  { id: 'base', name: 'Base', rpcUrl: 'https://base.drpc.org' },
+  { id: 'arb', name: 'Arbitrum One', rpcUrl: 'https://arb1.arbitrum.io/rpc' },
+  { id: 'xlayer', name: 'X Layer', rpcUrl: 'https://xlayer.drpc.org' },
 ];
 
 const Utilities = ({ showToast }) => {
-  // Chain selection state
+  // Chain selection state - default to Ethereum
   const [selectedChain, setSelectedChain] = useState('eth');
-  const [rpcUrl, setRpcUrl] = useState(CHAIN_OPTIONS[0].rpcUrl);
+  const [rpcUrl, setRpcUrl] = useState(CHAIN_OPTIONS.find(c => c.id === 'eth').rpcUrl);
   
   // Timestamp input state
   const [timestampInput, setTimestampInput] = useState('');
@@ -79,12 +79,19 @@ const Utilities = ({ showToast }) => {
       return ts;
     }
     
-    // Try to parse as date format: YYYY-MM-DD HH:mm:ss or YYYY-MM-DD HH:mm or YYYY-MM-DD (treated as UTC+8)
-    const dateMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    // Try to parse as date format: YYYY-M-D HH:mm:ss or YYYY-MM-DD HH:mm or YYYY-M-D (treated as UTC+8)
+    // Accepts single or double digit month/day/hour/minute/second
+    const dateMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/);
     if (dateMatch) {
       const [, year, month, day, hour = '00', minute = '00', second = '00'] = dateMatch;
+      // Pad with leading zeros for proper date parsing
+      const paddedMonth = month.padStart(2, '0');
+      const paddedDay = day.padStart(2, '0');
+      const paddedHour = hour.padStart(2, '0');
+      const paddedMinute = minute.padStart(2, '0');
+      const paddedSecond = second.padStart(2, '0');
       // Create date string and parse as UTC+8
-      const dateStr = `${year}-${month}-${day}T${hour}:${minute}:${second}+08:00`;
+      const dateStr = `${year}-${paddedMonth}-${paddedDay}T${paddedHour}:${paddedMinute}:${paddedSecond}+08:00`;
       const date = new Date(dateStr);
       if (!isNaN(date.getTime())) {
         return Math.floor(date.getTime() / 1000);

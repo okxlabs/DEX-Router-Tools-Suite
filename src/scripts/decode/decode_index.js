@@ -23,8 +23,8 @@ export function resolve(calldata) {
             else if (functionName === 'uniswapV3SwapTo' && 
                      decodedFunctions.receiver && decodedFunctions.receiver.orderId) {
                 orderId = decodedFunctions.receiver.orderId;
-                // Remove orderId from receiver to avoid duplication
-                delete decodedFunctions.receiver.orderId;
+                // Convert receiver from object to just address string
+                decodedFunctions.receiver = decodedFunctions.receiver.address;
             }
         }
         
