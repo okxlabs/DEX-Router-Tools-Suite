@@ -1,6 +1,6 @@
 import React from 'react';
 import CopyButton from './CopyButton';
-import { formatJSON } from '../../utils/componentUtils';
+import { formatJSON } from '../../scripts/componentUtils';
 
 const ResultDisplay = ({ 
   result, 

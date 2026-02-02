@@ -96,6 +96,7 @@ export function prepareSmartSwapByInvestWithRefundParams(jsonData) {
 /**
  * Prepare parameters for uniswapV3SwapTo function
  * ABI: (uint256 receiver, uint256 amount, uint256 minReturn, uint256[] pools)
+ * JSON format: { orderId: "...", receiver: "0x...", ... }
  */
 export function prepareUniswapV3SwapToParams(jsonData) {
     const { orderId, receiver, amount, minReturn, pools } = jsonData;
@@ -104,14 +105,25 @@ export function prepareUniswapV3SwapToParams(jsonData) {
         throw new Error('Missing required parameters for uniswapV3SwapTo');
     }
     
-    // Merge orderId with receiver object for packing
-    const receiverWithOrderId = {
-        ...receiver,
-        orderId: orderId || receiver.orderId // Use top-level orderId if available, otherwise use receiver.orderId
-    };
+    // Build receiver object for packing
+    // Support both new format (receiver as string) and legacy format (receiver as object)
+    let receiverForPacking;
+    if (typeof receiver === 'string') {
+        // New format: receiver is just an address string
+        receiverForPacking = {
+            orderId: orderId || '0',
+            address: receiver
+        };
+    } else {
+        // Legacy format: receiver is an object with orderId and address
+        receiverForPacking = {
+            orderId: orderId || receiver.orderId || '0',
+            address: receiver.address
+        };
+    }
     
     // Pack receiver and pools
-    const packedReceiver = packReceiver(receiverWithOrderId);
+    const packedReceiver = packReceiver(receiverForPacking);
     const packedPools = pools.map(pool => packUniswapV3Pool(pool));
     
     return [packedReceiver, amount, minReturn, packedPools];

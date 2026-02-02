@@ -84,12 +84,20 @@ const TrimPanel = forwardRef(({ onTrimChange }, ref) => {
                             />
                             <span className="rate-unit">%</span>
                         </div>
-                        <button
-                            className={`tob-toggle ${trimToB ? 'active' : ''}`}
-                            onClick={() => setTrimToB(!trimToB)}
-                        >
-                            ToB
-                        </button>
+                        <div className="trim-type-toggle">
+                            <button
+                                className={`tob-toggle ${!trimToB ? 'active' : ''}`}
+                                onClick={() => setTrimToB(false)}
+                            >
+                                ToC
+                            </button>
+                            <button
+                                className={`tob-toggle ${trimToB ? 'active' : ''}`}
+                                onClick={() => setTrimToB(true)}
+                            >
+                                ToB
+                            </button>
+                        </div>
                     </div>
                 </div>
 

@@ -15,6 +15,7 @@
     "pools": [
         {
             "isOneForZero": true,
+            "wethUnwrap": false,
             "pool": "0x94e4b2e24523cf9b3e631a6943c346df9687c723"
         }
     ],

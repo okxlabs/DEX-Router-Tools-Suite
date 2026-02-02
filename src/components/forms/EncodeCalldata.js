@@ -12,8 +12,8 @@ import {
   createCopyHandler,
   safeJSONParse,
   formatJSON
-} from '../../utils/componentUtils';
-import { applyCommissionAndTrimToJson } from '../../utils/encode/commissionTrimUtils';
+} from '../../scripts/componentUtils';
+import { applyCommissionAndTrimToJson } from '../../scripts/encode/commissionTrimUtils';
 
 const EncodeCalldata = ({ 
   value, 

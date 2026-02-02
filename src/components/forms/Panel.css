@@ -324,6 +324,25 @@
     flex: 0 0 5rem;
 }
 
+/* Trim Type Toggle (ToB/ToC) */
+.trim-type-toggle {
+    display: flex;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.trim-type-toggle .tob-toggle {
+    border: none;
+    border-radius: 0;
+    min-width: 2.5rem;
+}
+
+.trim-type-toggle .tob-toggle:first-child {
+    border-right: 1px solid var(--border-primary);
+}
+
 /* Expect Amount Out input - align left with limited width */
 .trim-section > .panel-input {
     width: auto;

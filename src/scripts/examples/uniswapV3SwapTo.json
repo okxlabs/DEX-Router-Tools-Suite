@@ -3,10 +3,8 @@
     "name": "uniswapV3SwapTo",
     "selector": "0x0d5f0e3b"
   },
-  "receiver": {
-    "orderId": "15856772274338048",
-    "address": "0x0f7b3623b5b7dd605b81bc9f34fab63fd7c30487"
-  },
+  "orderId": "15856772274338048",
+  "receiver": "0x0f7b3623b5b7dd605b81bc9f34fab63fd7c30487",
   "amount": "392366",
   "minReturn": "121798310",
   "pools": [

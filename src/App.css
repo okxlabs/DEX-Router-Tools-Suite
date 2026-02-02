@@ -38,36 +38,47 @@ html, body {
   gap: 0;
   margin-bottom: 40px;
   margin-top: 80px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0;
 }
 
 .tab-button {
   padding: 16px 32px;
   font-size: 18px;
-  font-weight: bold;
-  background-color: var(--neutral-700);
-  color: var(--text-primary);
+  font-weight: 600;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
   border: none;
   cursor: pointer;
-  transition: all 0.5s ease;
-  border-radius: 0;
-  width: 220px;
-}
-
-.tab-button:first-child {
-  border-radius: 8px 0 0 8px;
-}
-
-.tab-button:last-child {
-  border-radius: 0 8px 8px 0;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  border-radius: 8px 8px 0 0;
+  width: auto;
+  min-width: 160px;
+  position: relative;
+  margin-bottom: -1px;
 }
 
 .tab-button:hover {
-  background-color: var(--neutral-800);
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .tab-button.active {
-  background-color: var(--primary);
-  color: var(--bg-app);
+  background-color: rgba(97, 218, 251, 0.1);
+  color: var(--primary);
+  border-bottom: 3px solid var(--primary);
+}
+
+.tab-button.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(97, 218, 251, 0.15) 0%, transparent 100%);
+  border-radius: 8px 8px 0 0;
+  pointer-events: none;
 }
 
 
@@ -76,6 +87,24 @@ html, body {
   width: 100%;
   max-width: 600px;
   padding: 20px;
+}
+
+/* Utilities Page */
+.utilities-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.utilities-container h2 {
+  color: var(--primary);
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.utilities-container p {
+  color: var(--text-primary);
+  font-size: 16px;
+  opacity: 0.7;
 }
 
 /* Shared Component Styles */

@@ -8,13 +8,20 @@ import { ethers } from 'ethers';
  * 
  * Data structure:
  * - Single Trim: 64 bytes (2 x 32-byte blocks)
- *   - First 32 bytes: trim_flag + padding + expect_amount
- *   - Second 32 bytes: trim_flag + trim_rate + trim_address
+ *   - Block 1 (32 bytes): trim_flag(6) + isToBTrim(1) + padding(5) + expect_amount(20)
+ *   - Block 2 (32 bytes): trim_flag(6) + trim_rate(6) + trim_address(20)
  * 
  * - Dual Trim: 96 bytes (3 x 32-byte blocks)
- *   - First 32 bytes: trim_flag + trim_rate2 + trim_address2
- *   - Second 32 bytes: trim_flag + padding + expect_amount  
- *   - Third 32 bytes: trim_flag + trim_rate1 + trim_address1
+ *   - Block 1 (32 bytes): trim_flag(6) + charge_rate(6) + charge_address(20)
+ *   - Block 2 (32 bytes): trim_flag(6) + isToBTrim(1) + padding(5) + expect_amount(20)
+ *   - Block 3 (32 bytes): trim_flag(6) + trim_rate1(6) + trim_address1(20)
+ * 
+ * isToBTrim values:
+ * - 0x80 = toB trim
+ * - 0x00 = toC trim
+ * 
+ * Output:
+ * - hasTrim: false | "toB" | "toC"
  * 
  * Usage example:
  * const trimInfo = extractTrimInfoFromCalldata(calldata);
@@ -45,17 +52,24 @@ function parseTrimData(bytes32Hex) {
     return { flag, rate, address };
 }
 
-// Parse expected amount (from the second 32-byte block)
-function parseExpectAmount(bytes32Hex) {
+// Parse expected amount block: trim_flag(6) + isToBTrim(1) + padding(5) + expect_amount(20)
+function parseExpectAmountBlock(bytes32Hex) {
     const hex = bytes32Hex.replace(/^0x/, "");
-    // Validate flag
+    // Validate flag (first 6 bytes = 12 hex chars)
     const flag = "0x" + hex.slice(0, 12);
     if (!Object.values(TRIM_FLAGS).some(f => f.toLowerCase() === flag.toLowerCase())) {
         throw new Error(`Invalid trim flag in expect amount block: ${flag}`);
     }
-    // Take low 20 bytes as expected amount
+    // isToBTrim is 1 byte (2 hex chars) at position 12-14
+    const isToBTrimHex = hex.slice(12, 14);
+    const isToBTrim = isToBTrimHex === '80'; // 0x80 = toB, 0x00 = toC
+    const trimType = isToBTrim ? 'toB' : 'toC';
+    
+    // Take low 20 bytes as expected amount (position 24-64)
     const expectAmountHex = "0x" + hex.slice(24, 64);
-    return ethers.BigNumber.from(expectAmountHex).toString();
+    const expectAmount = ethers.BigNumber.from(expectAmountHex).toString();
+    
+    return { expectAmount, trimType };
 }
 
 // Main parsing function
@@ -85,20 +99,17 @@ function extractTrimInfoFromCalldata(calldataHex) {
             const expectAmountBlock = "0x" + calldataHex.slice(flagStart - 64, flagStart);
             
             try {
-                // First read (last 32 bytes) contains trimRate and trimAddress
-                // Second read (second-to-last 32 bytes) contains expectAmountOut
+                // Block 2 (last 32 bytes): trim_flag + trim_rate + trim_address
                 const trimData = parseTrimData(trimDataBlock);
                 
-                // For expectAmountOut, we need to extract from the second-to-last 32 bytes
-                const hex = expectAmountBlock.replace(/^0x/, "");
-                const expectAmountHex = "0x" + hex.slice(24, 64); // Take low 20 bytes
-                const expectAmountOut = ethers.BigNumber.from(expectAmountHex).toString();
+                // Block 1 (second-to-last 32 bytes): trim_flag + isToBTrim + padding + expect_amount
+                const expectData = parseExpectAmountBlock(expectAmountBlock);
                 
                 return {
-                    hasTrim: true,
+                    hasTrim: expectData.trimType, // "toB" or "toC"
                     trimRate: trimData.rate,
                     trimAddress: trimData.address,
-                    expectAmountOut: expectAmountOut,
+                    expectAmountOut: expectData.expectAmount,
                     chargeRate: "0",
                     chargeAddress: "0x0000000000000000000000000000000000000000"
                 };
@@ -135,15 +146,18 @@ function extractTrimInfoFromCalldata(calldataHex) {
                 const thirdBlock = "0x" + calldataHex.slice(flagStart - 128, flagStart - 64);
                 
                 try {
+                    // Block 3 (last 32 bytes): trim_flag + trim_rate1 + trim_address1
                     const trimData1 = parseTrimData(firstBlock);
-                    const expectAmountOut = parseExpectAmount(secondBlock);
+                    // Block 2 (second-to-last 32 bytes): trim_flag + isToBTrim + padding + expect_amount
+                    const expectData = parseExpectAmountBlock(secondBlock);
+                    // Block 1 (third-to-last 32 bytes): trim_flag + charge_rate + charge_address
                     const trimData2 = parseTrimData(thirdBlock);
                     
                     return {
-                        hasTrim: true,
+                        hasTrim: expectData.trimType, // "toB" or "toC"
                         trimRate: trimData1.rate,
                         trimAddress: trimData1.address,
-                        expectAmountOut: expectAmountOut,
+                        expectAmountOut: expectData.expectAmount,
                         chargeRate: trimData2.rate,
                         chargeAddress: trimData2.address
                     };

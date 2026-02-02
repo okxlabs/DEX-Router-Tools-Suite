@@ -6,6 +6,12 @@ const TRIM_FLAGS = {
     DUAL: "0x777777772222",   // TRIM_DUAL_FLAG (high 6 bytes)
 };
 
+// isToBTrim byte values
+const IS_TOB_TRIM = {
+    TOB: "80", // 0x80 = toB trim
+    TOC: "00", // 0x00 = toC trim
+};
+
 /**
  * Add trim data to encoded calldata
  * @param {string} calldata - The base encoded calldata
@@ -30,15 +36,19 @@ export function addTrimToCalldata(calldata, trimData) {
             
             const isDualTrim = isValidChargeRate && isValidChargeAddress;
             
+            // Get hasTrim value - defaults to "toC" if not specified or true
+            const hasTrim = (trimData.hasTrim === 'toB' || trimData.hasTrim === 'toC') 
+                ? trimData.hasTrim 
+                : 'toC';
+            
             if (isDualTrim) {
                 // DUAL TRIM: 96 bytes (3 x 32-byte blocks)
-                // Based on decode logic: thirdBlock + secondBlock + firstBlock
-                // - thirdBlock: trim_flag + trim_rate2 + trim_address2
-                // - secondBlock: trim_flag + padding + expect_amount  
-                // - firstBlock: trim_flag + trim_rate1 + trim_address1
+                // - Block 1: trim_flag + charge_rate + charge_address
+                // - Block 2: trim_flag + isToBTrim + padding + expect_amount  
+                // - Block 3: trim_flag + trim_rate1 + trim_address1
                 
                 const thirdBlock = encodeTrimBlock(chargeRate, chargeAddress, TRIM_FLAGS.DUAL);
-                const secondBlock = encodeExpectAmountBlock(trimData.expectAmountOut, TRIM_FLAGS.DUAL);
+                const secondBlock = encodeExpectAmountBlock(trimData.expectAmountOut, TRIM_FLAGS.DUAL, hasTrim);
                 const firstBlock = encodeTrimBlock(trimData.trimRate, trimData.trimAddress, TRIM_FLAGS.DUAL);
 
                 // Encode in order: third + second + first (decoder finds first, looks backwards)
@@ -46,11 +56,10 @@ export function addTrimToCalldata(calldata, trimData) {
                 
             } else {
                 // SINGLE TRIM: 64 bytes (2 x 32-byte blocks)
-                // Based on decode logic: expectAmountBlock + trimDataBlock
-                // - expectAmountBlock: trim_flag + padding + expect_amount
-                // - trimDataBlock: trim_flag + trim_rate + trim_address
+                // - Block 1: trim_flag + isToBTrim + padding + expect_amount
+                // - Block 2: trim_flag + trim_rate + trim_address
                 
-                const expectAmountBlock = encodeExpectAmountBlock(trimData.expectAmountOut, TRIM_FLAGS.SINGLE);
+                const expectAmountBlock = encodeExpectAmountBlock(trimData.expectAmountOut, TRIM_FLAGS.SINGLE, hasTrim);
                 const trimDataBlock = encodeTrimBlock(trimData.trimRate, trimData.trimAddress, TRIM_FLAGS.SINGLE);
                 // Encode in order: expect + trim (decoder finds trim, looks backwards for expect)
                 calldataHex += expectAmountBlock + trimDataBlock;
@@ -95,12 +104,13 @@ function encodeTrimBlock(rate, address, flag) {
 }
 
 /**
- * Encode expect amount block (32 bytes): flag + padding + expect_amount
+ * Encode expect amount block (32 bytes): flag(6) + isToBTrim(1) + padding(5) + expect_amount(20)
  * @param {string|number} expectAmount - Expected amount
  * @param {string} flag - Trim flag (SINGLE or DUAL)
+ * @param {string} hasTrim - Trim type: "toB" or "toC"
  * @returns {string} 64-character hex string (32 bytes)
  */
-function encodeExpectAmountBlock(expectAmount, flag) {
+function encodeExpectAmountBlock(expectAmount, flag, hasTrim) {
     try {
 
         if (!expectAmount || !flag) {
@@ -108,11 +118,13 @@ function encodeExpectAmountBlock(expectAmount, flag) {
         }
 
         const flagHex = flag.replace(/^0x/, '').toLowerCase().padStart(12, '0');
-        const padding = '00'.repeat(6); // 6 bytes padding
+        // isToBTrim: 1 byte - 0x80 for toB, 0x00 for toC
+        const isToBTrimHex = hasTrim === 'toB' ? IS_TOB_TRIM.TOB : IS_TOB_TRIM.TOC;
+        const padding = '00'.repeat(5); // 5 bytes padding (was 6, now 1 byte is isToBTrim)
         const expectBN = ethers.BigNumber.from(expectAmount.toString());
         const expectHex = expectBN.toHexString().replace(/^0x/, '').toLowerCase().padStart(40, '0'); // 20 bytes
 
-        const result = flagHex + padding + expectHex;
+        const result = flagHex + isToBTrimHex + padding + expectHex;
 
         return result;
     } catch (error) {
@@ -133,6 +145,15 @@ export function validateTrimData(trimData) {
 
     if (!trimData.trimRate || !trimData.trimAddress || !trimData.expectAmountOut) {
         throw new Error('Trim data must have trimRate, trimAddress, and expectAmountOut properties');
+    }
+
+    // Validate hasTrim value if provided (must be "toB", "toC", true, or false)
+    if (trimData.hasTrim !== undefined && 
+        trimData.hasTrim !== 'toB' && 
+        trimData.hasTrim !== 'toC' && 
+        trimData.hasTrim !== true && 
+        trimData.hasTrim !== false) {
+        throw new Error('hasTrim must be "toB", "toC", true, or false');
     }
 
     // Check for dual trim - support both old and new field names

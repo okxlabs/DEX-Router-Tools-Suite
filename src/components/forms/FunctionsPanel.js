@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Panel.css';
-import { getFunctionExamples } from '../../utils/encode/jsonFunctionUtils';
+import { getFunctionExamples } from '../../scripts/encode/jsonFunctionUtils';
 
 const FunctionsPanel = ({ onExampleSelect, showToast }) => {
     const [selectedValue, setSelectedValue] = useState('');

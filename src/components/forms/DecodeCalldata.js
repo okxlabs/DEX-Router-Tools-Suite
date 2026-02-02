@@ -7,7 +7,7 @@ import {
   handleValidationResult,
   createInputChangeHandler,
   createCopyHandler
-} from '../../utils/componentUtils';
+} from '../../scripts/componentUtils';
 
 const DecodeCalldata = ({ 
   value, 
