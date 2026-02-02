@@ -1,18 +1,12 @@
 import { ethers } from 'ethers';
 import {
-    ADDRESS_MASK,
     ONE_FOR_ZERO_MASK,
-    ORDER_ID_MASK,
     WETH_UNWRAP_MASK,
-    WEIGHT_MASK,
     REVERSE_MASK,
     IS_TOKEN0_TAX_MASK,
     IS_TOKEN1_TAX_MASK,
     WETH_MASK,
-    NUMERATOR_MASK,
     SWAP_AMOUNT_MASK,
-    DAG_INPUT_INDEX_MASK,
-    DAG_OUTPUT_INDEX_MASK
 } from '../core/masks.js';
 
 /**

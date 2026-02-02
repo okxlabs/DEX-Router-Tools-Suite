@@ -576,6 +576,15 @@ html, body {
   box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
 }
 
+.result-actions .find-height-button {
+  color: var(--info);
+  border-color: rgba(0, 123, 255, 0.3);
+}
+
+.result-actions .find-height-button:hover {
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
 /* Button Animations */
 @keyframes spin {
   0% { transform: rotate(0deg); }

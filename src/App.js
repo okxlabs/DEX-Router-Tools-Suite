@@ -37,6 +37,9 @@ function App() {
     simulationResult: null
   });
 
+  // Utilities initial timestamp - for Find Height feature
+  const [utilitiesInitialTimestamp, setUtilitiesInitialTimestamp] = useState(null);
+
   const showToast = (message, type = 'success', duration = 3000) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
@@ -65,6 +68,54 @@ function App() {
     setActiveTab('encode');
     setRightInput(formatJSON(decodedResult));
     showToast('Switched to Encode tab with decoded result!', 'success');
+  };
+
+  // Helper function to find timestamp/deadline in decoded result
+  const findTimestampInResult = (obj) => {
+    if (!obj || typeof obj !== 'object') return null;
+    
+    // Common timestamp field names in DEX router calldata (note: deadLine has capital L)
+    const timestampFields = ['deadLine', 'deadline', 'expiryTime', 'timestamp', 'expiry', 'validBefore'];
+    
+    // Check direct properties first
+    for (const field of timestampFields) {
+      if (obj[field] !== undefined) {
+        const value = obj[field];
+        // Handle BigInt string or number
+        const timestamp = typeof value === 'string' ? parseInt(value) : Number(value);
+        if (!isNaN(timestamp) && timestamp > 0) {
+          return timestamp;
+        }
+      }
+    }
+    
+    // Recursively search in nested objects (including arrays)
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const found = findTimestampInResult(obj[key]);
+        if (found) return found;
+      }
+    }
+    
+    return null;
+  };
+
+  const handleFindHeightFromDecode = (decodedResult) => {
+    // Find timestamp in decoded result
+    const timestamp = findTimestampInResult(decodedResult);
+    
+    if (!timestamp) {
+      showToast('No timestamp/deadline found in decoded result', 'error');
+      return;
+    }
+    
+    // Subtract 1 hour (3600 seconds) from timestamp
+    const adjustedTimestamp = timestamp - 3600;
+    
+    // Set the initial timestamp and navigate to utilities tab
+    setUtilitiesInitialTimestamp(adjustedTimestamp.toString());
+    setActiveTab('utilities');
+    showToast(`timestamp: ${adjustedTimestamp} (original: ${timestamp} - 1hr)`, 'success');
   };
 
   return (
@@ -116,6 +167,7 @@ function App() {
               result={decodeResult}
               showToast={showToast}
               onEdit={handleEditFromDecode}
+              onFindHeight={handleFindHeightFromDecode}
             />
           )}
 
@@ -147,7 +199,11 @@ function App() {
           )}
 
           {activeTab === 'utilities' && (
-            <Utilities showToast={showToast} />
+            <Utilities 
+              showToast={showToast} 
+              initialTimestamp={utilitiesInitialTimestamp}
+              onInitialTimestampConsumed={() => setUtilitiesInitialTimestamp(null)}
+            />
           )}
 
         </div>

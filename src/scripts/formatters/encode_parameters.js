@@ -8,7 +8,6 @@ import {
 import { 
     prepareBaseRequestTuple, 
     prepareBatchesTuples, 
-    preparePathsTuples,
     prepareDagPathsTuples 
 } from './encode_helpers.js';
 

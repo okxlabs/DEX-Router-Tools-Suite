@@ -7,6 +7,7 @@ const ResultDisplay = ({
   title = "Result", 
   onCopy, 
   onEdit,
+  onFindHeight,
   className = "result-container",
   contentClassName = "result-content"
 }) => {
@@ -26,6 +27,15 @@ const ResultDisplay = ({
               title="Edit in Encode page"
             >
               Edit
+            </button>
+          )}
+          {onFindHeight && (
+            <button
+              className="copy-button find-height-button"
+              onClick={() => onFindHeight(result)}
+              title="Find block height from timestamp (-1 hr)"
+            >
+              Find Height
             </button>
           )}
           <CopyButton
