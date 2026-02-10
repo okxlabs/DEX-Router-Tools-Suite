@@ -484,7 +484,7 @@
 
 .flow-routes-table th {
   padding: 6px 8px;
-  text-align: left;
+  text-align: center;
   color: var(--text-secondary);
   font-weight: 600;
   border-bottom: 1px solid var(--border-primary);
@@ -493,6 +493,7 @@
 
 .flow-routes-table td {
   padding: 5px 8px;
+  text-align: center;
   color: var(--text-primary);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
@@ -567,14 +568,9 @@
 
 .flow-route-weight {
   color: var(--warning);
-  text-align: right;
 }
 
 .flow-route-pct {
   color: var(--text-secondary);
-  text-align: right;
 }
 
-.flow-route-dir {
-  text-align: center;
-}
