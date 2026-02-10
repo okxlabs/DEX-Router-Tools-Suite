@@ -1,6 +1,7 @@
 import React from 'react';
 import LoadingButton from '../ui/LoadingButton';
 import ResultDisplay from '../ui/ResultDisplay';
+import FlowDiagram from '../FlowDiagram/FlowDiagram';
 import { 
   useButtonState, 
   processWithErrorHandling, 
@@ -71,6 +72,11 @@ const DecodeCalldata = ({
         onCopy={handleCopy}
         onEdit={onEdit}
         onFindHeight={onFindHeight}
+      />
+
+      <FlowDiagram
+        decodedResult={result}
+        showToast={showToast}
       />
     </div>
   );
