@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import mermaid from 'mermaid';
 import {
     supportsFlowDiagram,
@@ -7,6 +7,7 @@ import {
 } from '../../scripts/formatters/flowDiagramGenerator';
 import FlowBreakdown from './FlowBreakdown';
 import ZoomableSvg from './ZoomableSvg';
+import CommissionTrimDetails from './CommissionTrimDetails';
 import './FlowDiagram.css';
 
 // Initialize mermaid once
@@ -40,7 +41,6 @@ const FlowDiagram = ({ decodedResult, showToast }) => {
     const [error, setError] = useState(null);
     const [isRendering, setIsRendering] = useState(false);
     const [expandedEdges, setExpandedEdges] = useState({});
-    const svgRef = useRef(null);
 
     const isSupported = useMemo(() => supportsFlowDiagram(decodedResult), [decodedResult]);
 
@@ -113,10 +113,11 @@ const FlowDiagram = ({ decodedResult, showToast }) => {
                 {error && <div className="flow-diagram-error">{error}</div>}
                 {diagramReady && (
                     <div className="flow-diagram-svg-container">
-                        <div ref={svgRef} className="flow-diagram-svg" dangerouslySetInnerHTML={{ __html: svgContent }} />
+                        <div className="flow-diagram-svg" dangerouslySetInnerHTML={{ __html: svgContent }} />
                     </div>
                 )}
                 <FlowBreakdown flowData={flowData} keyPrefix="inline" expandedEdges={expandedEdges} onToggleEdge={toggleEdge} />
+                <CommissionTrimDetails decodedResult={decodedResult} />
             </div>
 
             {/* Fullscreen modal */}
@@ -133,6 +134,7 @@ const FlowDiagram = ({ decodedResult, showToast }) => {
                         <Legend />
                         <ZoomableSvg svgHtml={svgContent} className="flow-fullscreen-svg" />
                         <FlowBreakdown flowData={flowData} keyPrefix="fs" expandedEdges={expandedEdges} onToggleEdge={toggleEdge} className="flow-fullscreen-breakdown" />
+                        <CommissionTrimDetails decodedResult={decodedResult} />
                     </div>
                 </div>
             )}
