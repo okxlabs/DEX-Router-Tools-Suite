@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/DEX-Router-Tools-Suite/static/css/main.6b3e199e.css",
-    "main.js": "/DEX-Router-Tools-Suite/static/js/main.ae626046.js",
+    "main.css": "/DEX-Router-Tools-Suite/static/css/main.d22fa5b0.css",
+    "main.js": "/DEX-Router-Tools-Suite/static/js/main.3e5c8318.js",
     "static/js/448.4e8fe7c7.chunk.js": "/DEX-Router-Tools-Suite/static/js/448.4e8fe7c7.chunk.js",
     "static/js/550.891169bb.chunk.js": "/DEX-Router-Tools-Suite/static/js/550.891169bb.chunk.js",
     "static/js/841.83c328e0.chunk.js": "/DEX-Router-Tools-Suite/static/js/841.83c328e0.chunk.js",
@@ -45,8 +45,8 @@
     "static/js/491.61226433.chunk.js": "/DEX-Router-Tools-Suite/static/js/491.61226433.chunk.js",
     "static/js/449.c7d74803.chunk.js": "/DEX-Router-Tools-Suite/static/js/449.c7d74803.chunk.js",
     "index.html": "/DEX-Router-Tools-Suite/index.html",
-    "main.6b3e199e.css.map": "/DEX-Router-Tools-Suite/static/css/main.6b3e199e.css.map",
-    "main.ae626046.js.map": "/DEX-Router-Tools-Suite/static/js/main.ae626046.js.map",
+    "main.d22fa5b0.css.map": "/DEX-Router-Tools-Suite/static/css/main.d22fa5b0.css.map",
+    "main.3e5c8318.js.map": "/DEX-Router-Tools-Suite/static/js/main.3e5c8318.js.map",
     "448.4e8fe7c7.chunk.js.map": "/DEX-Router-Tools-Suite/static/js/448.4e8fe7c7.chunk.js.map",
     "550.891169bb.chunk.js.map": "/DEX-Router-Tools-Suite/static/js/550.891169bb.chunk.js.map",
     "841.83c328e0.chunk.js.map": "/DEX-Router-Tools-Suite/static/js/841.83c328e0.chunk.js.map",
@@ -84,7 +84,7 @@
     "449.c7d74803.chunk.js.map": "/DEX-Router-Tools-Suite/static/js/449.c7d74803.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6b3e199e.css",
-    "static/js/main.ae626046.js"
+    "static/css/main.d22fa5b0.css",
+    "static/js/main.3e5c8318.js"
   ]
 }
