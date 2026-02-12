@@ -11,37 +11,8 @@
   margin-right: auto;
 }
 
-/* Toggle button */
-.flow-diagram-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 10px 16px;
-  background: var(--bg-result);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-lg);
-  color: var(--primary);
-  font-size: var(--font-base);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.flow-diagram-toggle:hover {
-  background: var(--bg-hover);
-  border-color: var(--primary);
-}
-
-.flow-toggle-icon {
-  font-size: 10px;
-  width: 14px;
-  text-align: center;
-}
-
-/* Container for the expanded diagram */
+/* Container for the diagram */
 .flow-diagram-container {
-  margin-top: 8px;
   padding: 16px;
   background: var(--bg-result);
   border: 1px solid var(--border-primary);
@@ -320,6 +291,11 @@
   border: 2px solid #ff9800;
 }
 
+.flow-legend-trimcharge {
+  background: #3d1a1a;
+  border: 2px solid #dc2626;
+}
+
 /* ============================================
    Loading & Error States
    ============================================ */
@@ -460,10 +436,6 @@
   color: var(--success);
 }
 
-.flow-edge-weight {
-  background: rgba(255, 152, 0, 0.15);
-  color: var(--warning);
-}
 
 /* Routes table */
 .flow-breakdown-routes {
@@ -564,10 +536,6 @@
 
 .flow-route-addr-text {
   color: var(--text-secondary);
-}
-
-.flow-route-weight {
-  color: var(--warning);
 }
 
 .flow-route-pct {

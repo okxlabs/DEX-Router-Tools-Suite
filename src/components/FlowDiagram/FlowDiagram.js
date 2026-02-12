@@ -25,6 +25,9 @@ const Legend = () => (
         <span className="flow-legend-item">
             <span className="flow-legend-dot flow-legend-end" /> Output Token
         </span>
+        <span className="flow-legend-item">
+            <span className="flow-legend-dot flow-legend-trimcharge" /> Commission
+        </span>
     </div>
 );
 
@@ -32,7 +35,6 @@ const Legend = () => (
  * FlowDiagram — renders a Mermaid graph + detailed breakdown from decoded swap calldata.
  */
 const FlowDiagram = ({ decodedResult, showToast }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [svgContent, setSvgContent] = useState('');
     const [error, setError] = useState(null);
@@ -43,15 +45,15 @@ const FlowDiagram = ({ decodedResult, showToast }) => {
     const isSupported = useMemo(() => supportsFlowDiagram(decodedResult), [decodedResult]);
 
     const flowData = useMemo(() => {
-        if (!isSupported || !isExpanded) return null;
+        if (!isSupported) return null;
         return generateFlowData(decodedResult);
-    }, [decodedResult, isSupported, isExpanded]);
+    }, [decodedResult, isSupported]);
 
     const mermaidDef = useMemo(() => flowData ? generateMermaidDefinition(flowData) : null, [flowData]);
 
     // Render Mermaid SVG
     useEffect(() => {
-        if (!mermaidDef || !isExpanded) { setSvgContent(''); return; }
+        if (!mermaidDef) { setSvgContent(''); return; }
         let cancelled = false;
         setIsRendering(true);
         setError(null);
@@ -69,7 +71,7 @@ const FlowDiagram = ({ decodedResult, showToast }) => {
         })();
 
         return () => { cancelled = true; };
-    }, [mermaidDef, isExpanded]);
+    }, [mermaidDef]);
 
     // Reset on new decode
     useEffect(() => { setSvgContent(''); setError(null); setExpandedEdges({}); }, [decodedResult]);
@@ -97,33 +99,25 @@ const FlowDiagram = ({ decodedResult, showToast }) => {
 
     return (
         <div className="flow-diagram-wrapper">
-            {/* Toggle button */}
-            <button className="flow-diagram-toggle" onClick={() => setIsExpanded(!isExpanded)}>
-                <span className="flow-toggle-icon">{isExpanded ? '▼' : '▶'}</span>
-                <span>{isExpanded ? 'Hide Flow Diagram' : 'Show Flow Diagram'}</span>
-            </button>
-
             {/* Inline view */}
-            {isExpanded && (
-                <div className="flow-diagram-container">
-                    <div className="flow-diagram-header">
-                        <span className="flow-diagram-title">Token Flow Graph</span>
-                        <div className="flow-diagram-actions">
-                            {diagramReady && <button className="flow-expand-btn" onClick={() => setIsFullscreen(true)} title="Expand">Expand</button>}
-                            {mermaidDef && <button className="flow-copy-mermaid-btn" onClick={copyMermaid} title="Copy Mermaid definition">Copy Mermaid</button>}
-                        </div>
+            <div className="flow-diagram-container">
+                <div className="flow-diagram-header">
+                    <span className="flow-diagram-title">Token Flow Graph</span>
+                    <div className="flow-diagram-actions">
+                        {diagramReady && <button className="flow-expand-btn" onClick={() => setIsFullscreen(true)} title="Expand">Expand</button>}
+                        {mermaidDef && <button className="flow-copy-mermaid-btn" onClick={copyMermaid} title="Copy Mermaid definition">Copy Mermaid</button>}
                     </div>
-                    <Legend />
-                    {isRendering && <div className="flow-diagram-loading"><div className="flow-spinner" /><span>Rendering diagram...</span></div>}
-                    {error && <div className="flow-diagram-error">{error}</div>}
-                    {diagramReady && (
-                        <div className="flow-diagram-svg-container">
-                            <div ref={svgRef} className="flow-diagram-svg" dangerouslySetInnerHTML={{ __html: svgContent }} />
-                        </div>
-                    )}
-                    <FlowBreakdown flowData={flowData} keyPrefix="inline" expandedEdges={expandedEdges} onToggleEdge={toggleEdge} />
                 </div>
-            )}
+                <Legend />
+                {isRendering && <div className="flow-diagram-loading"><div className="flow-spinner" /><span>Rendering diagram...</span></div>}
+                {error && <div className="flow-diagram-error">{error}</div>}
+                {diagramReady && (
+                    <div className="flow-diagram-svg-container">
+                        <div ref={svgRef} className="flow-diagram-svg" dangerouslySetInnerHTML={{ __html: svgContent }} />
+                    </div>
+                )}
+                <FlowBreakdown flowData={flowData} keyPrefix="inline" expandedEdges={expandedEdges} onToggleEdge={toggleEdge} />
+            </div>
 
             {/* Fullscreen modal */}
             {isFullscreen && svgContent && (

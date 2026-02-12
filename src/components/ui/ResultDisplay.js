@@ -44,9 +44,11 @@ const ResultDisplay = ({
           />
         </div>
       </div>
-      <pre className={`base-result-content ${contentClassName}`}>
-        {formattedText}
-      </pre>
+      <div className="result-body">
+        <pre className={`base-result-content ${contentClassName}`}>
+          {formattedText}
+        </pre>
+      </div>
     </div>
   );
 };
