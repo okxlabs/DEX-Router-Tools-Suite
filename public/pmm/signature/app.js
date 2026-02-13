@@ -317,7 +317,9 @@ function calculateStructHash(order) {
     }
     
     // Hash the dynamic types as per Solidity contract
-    const permit2SignatureHash = ethers.keccak256(permit2SigBytes);
+    // Convert hex string to bytes for keccak256 to match Solidity behavior
+    // In Solidity: keccak256(bytes) - we need to hash the actual bytes, not the hex string representation
+    const permit2SignatureHash = ethers.keccak256(ethers.getBytes(permit2SigBytes));
     const permit2WitnessTypeHash = ethers.keccak256(ethers.toUtf8Bytes(order.permit2WitnessType || ""));
     
     const structData = ethers.AbiCoder.defaultAbiCoder().encode(
