@@ -29,6 +29,7 @@ jobs:
         run: yarn build
         env:
           PUBLIC_URL: /DEX-Router-Tools-Suite
+          CI: false
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
@@ -36,3 +37,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
           publish_branch: gh-pages
+          keep_files: false
