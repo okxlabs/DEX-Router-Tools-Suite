@@ -537,18 +537,6 @@ function generateSignatureData(rawInput) {
     // Calculate domain separator
     const { domainTypeHash, domainSeparator } = calculateDomainSeparator(chainId, verifyingContract);
     
-    // Calculate struct hash
-    const { typeHash, structData, structHash } = calculateStructHash(order);
-    
-    // Calculate digest
-    const digest = calculateDigest(domainSeparator, structHash);
-    
-    // Sign the digest
-    const { signature, r, s, v, signerAddress } = signDigest(privateKey, digest);
-    
-    // Recover address for verification
-    const recoveredAddress = recoverAddress(digest, signature);
-    
     // Build the full order with auto-filled values
     const fullOrder = {
         rfqId: order.rfqId,
@@ -574,7 +562,8 @@ function generateSignatureData(rawInput) {
         sigV: "-"
     };
     
-    // Sign Permit2 if usePermit2 with valid witnessType
+    // Sign Permit2 FIRST if usePermit2 with valid witnessType
+    // This must be done before calculating structHash, because structHash includes permit2Signature
     if (order.usePermit2 && order.permit2WitnessType && permit2DomainSeparator && 
         permit2DomainSeparator !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
         try {
@@ -599,12 +588,26 @@ function generateSignatureData(rawInput) {
             permit2Data.sigS = permit2Result.s;
             permit2Data.sigV = permit2Result.v;
             
-            // Update fullOrder with signed permit2Signature
+            // Update fullOrder and order with signed permit2Signature BEFORE calculating structHash
             fullOrder.permit2Signature = permit2Result.signature;
+            order.permit2Signature = permit2Result.signature;
         } catch (e) {
             console.error("Permit2 signing error:", e);
         }
     }
+    
+    // Calculate struct hash AFTER Permit2 signature is ready
+    // This ensures permit2SignatureHash uses the actual signature, not "TO_BE_SIGNED"
+    const { typeHash, structData, structHash } = calculateStructHash(order);
+    
+    // Calculate digest
+    const digest = calculateDigest(domainSeparator, structHash);
+    
+    // Sign the digest
+    const { signature, r, s, v, signerAddress } = signDigest(privateKey, digest);
+    
+    // Recover address for verification
+    const recoveredAddress = recoverAddress(digest, signature);
     
     return {
         // Full order (first in output)
