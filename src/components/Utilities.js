@@ -31,63 +31,48 @@ const CHAIN_OPTIONS = [
   { id: 'mode', name: 'Mode', rpcUrl: 'https://mainnet.mode.network' },
 ];
 
-const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed }) => {
-  // Chain selection state - default to Ethereum
-  const [selectedChain, setSelectedChain] = useState('eth');
-  const [rpcUrl, setRpcUrl] = useState(CHAIN_OPTIONS.find(c => c.id === 'eth').rpcUrl);
-  
-  // Timestamp input state
-  const [timestampInput, setTimestampInput] = useState('');
-  
+const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed, utilitiesState, updateUtilitiesState }) => {
+  const {
+    selectedChain = 'eth',
+    rpcUrl = CHAIN_OPTIONS.find(c => c.id === 'eth').rpcUrl,
+    timestampInput = '',
+    addressInput = '',
+    eventInput = '',
+    blockResult = null,
+    searchError = null,
+    checksumResult = null,
+    addressError = null,
+    topic0Result = null,
+    topic0Error = null
+  } = utilitiesState || {};
+
   // Debounced timestamp input - only triggers block search after 1500ms idle
   const debouncedTimestampInput = useDebouncedValue(timestampInput, 1500);
 
   // Handle initial timestamp from props (e.g., from Find Height button)
   useEffect(() => {
-    if (initialTimestamp) {
-      setTimestampInput(initialTimestamp);
-      // Clear the initial timestamp after consuming it
+    if (initialTimestamp && updateUtilitiesState) {
+      updateUtilitiesState({ timestampInput: initialTimestamp });
       if (onInitialTimestampConsumed) {
         onInitialTimestampConsumed();
       }
     }
-  }, [initialTimestamp, onInitialTimestampConsumed]);
-  
-  // Block finder state
-  const [blockResult, setBlockResult] = useState(null);
-  const [searchError, setSearchError] = useState(null);
-
-  // Address checksum state
-  const [addressInput, setAddressInput] = useState('');
-  const [checksumResult, setChecksumResult] = useState(null);
-  const [addressError, setAddressError] = useState(null);
-
-  // Topic0 calculator state
-  const [eventInput, setEventInput] = useState('');
-  const [topic0Result, setTopic0Result] = useState(null);
-  const [topic0Error, setTopic0Error] = useState(null);
+  }, [initialTimestamp, onInitialTimestampConsumed, updateUtilitiesState]);
 
   // Handle chain selection change
   const handleChainChange = (chainId) => {
-    setSelectedChain(chainId);
     const chain = CHAIN_OPTIONS.find(c => c.id === chainId);
-    if (chain) {
-      setRpcUrl(chain.rpcUrl);
-    }
+    updateUtilitiesState?.(chain ? { selectedChain: chainId, rpcUrl: chain.rpcUrl } : { selectedChain: chainId });
   };
 
   // Handle RPC URL change - switch to Custom if URL doesn't match any predefined chain
   const handleRpcUrlChange = (e) => {
     const newUrl = e.target.value;
-    setRpcUrl(newUrl);
-    
-    // Check if the new URL matches any predefined chain
     const matchingChain = CHAIN_OPTIONS.find(c => c.id !== 'custom' && c.rpcUrl === newUrl);
-    if (matchingChain) {
-      setSelectedChain(matchingChain.id);
-    } else {
-      setSelectedChain('custom');
-    }
+    updateUtilitiesState?.(matchingChain
+      ? { rpcUrl: newUrl, selectedChain: matchingChain.id }
+      : { rpcUrl: newUrl, selectedChain: 'custom' }
+    );
   };
 
   // Parse input - accepts timestamp or date format (YYYY-MM-DD HH:mm:ss)
@@ -134,33 +119,30 @@ const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed }) 
     
     // Only search if we have valid inputs
     if (timestamp === null || !rpcUrl) {
-      setBlockResult(null);
-      setSearchError(null);
+      updateUtilitiesState?.({ blockResult: null, searchError: null });
       return;
     }
     
     // Perform the search (debouncing is already handled by useDebouncedValue)
     const performSearch = async () => {
-      setBlockResult(null);
-      setSearchError(null);
+      updateUtilitiesState?.({ blockResult: null, searchError: null });
       
       try {
         const result = await findBlockByTimestamp(rpcUrl, timestamp);
-        setBlockResult(result);
+        updateUtilitiesState?.({ blockResult: result });
       } catch (error) {
-        // Provide user-friendly error messages
         let errorMsg = error.message;
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
           errorMsg = 'Network error: Unable to connect to RPC. The endpoint may not support CORS or is unreachable.';
         } else if (error.message.includes('HTTP error')) {
           errorMsg = `RPC error: ${error.message}`;
         }
-        setSearchError(errorMsg);
+        updateUtilitiesState?.({ searchError: errorMsg });
       }
     };
     
     performSearch();
-  }, [debouncedTimestampInput, rpcUrl]);
+  }, [debouncedTimestampInput, rpcUrl, updateUtilitiesState]);
 
   // Get the effective timestamp
   const getEffectiveTimestamp = () => {
@@ -169,7 +151,7 @@ const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed }) 
 
   // Handle input change - allow any text input
   const handleTimestampChange = (e) => {
-    setTimestampInput(e.target.value);
+    updateUtilitiesState?.({ timestampInput: e.target.value });
   };
 
   // Check if input is a date format (vs timestamp)
@@ -204,12 +186,8 @@ const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed }) 
     const currentTs = parseTimeInput(timestampInput);
     if (currentTs !== null) {
       const newTs = currentTs + (hours * 3600);
-      // Preserve original format
-      if (isDateFormat(timestampInput)) {
-        setTimestampInput(timestampToDateString(newTs));
-      } else {
-        setTimestampInput(newTs.toString());
-      }
+      const newValue = isDateFormat(timestampInput) ? timestampToDateString(newTs) : newTs.toString();
+      updateUtilitiesState?.({ timestampInput: newValue });
     }
   };
 
@@ -224,27 +202,23 @@ const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed }) 
   // Handle address input change - auto checksum
   const handleAddressChange = (e) => {
     const value = e.target.value;
-    setAddressInput(value);
+    updateUtilitiesState?.({ addressInput: value });
     
     if (!value.trim()) {
-      setChecksumResult(null);
-      setAddressError(null);
+      updateUtilitiesState?.({ checksumResult: null, addressError: null });
       return;
     }
 
     if (!isValidAddress(value)) {
-      setChecksumResult(null);
-      setAddressError('Invalid address format');
+      updateUtilitiesState?.({ checksumResult: null, addressError: 'Invalid address format' });
       return;
     }
 
     try {
       const checksummed = toChecksumAddress(value);
-      setChecksumResult(checksummed);
-      setAddressError(null);
+      updateUtilitiesState?.({ checksumResult: checksummed, addressError: null });
     } catch (error) {
-      setChecksumResult(null);
-      setAddressError(error.message);
+      updateUtilitiesState?.({ checksumResult: null, addressError: error.message });
     }
   };
 
@@ -267,21 +241,18 @@ const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed }) 
   // Handle event input change - auto calculate topic0
   const handleEventInputChange = (e) => {
     const value = e.target.value;
-    setEventInput(value);
+    updateUtilitiesState?.({ eventInput: value });
     
     if (!value.trim()) {
-      setTopic0Result(null);
-      setTopic0Error(null);
+      updateUtilitiesState?.({ topic0Result: null, topic0Error: null });
       return;
     }
 
     try {
       const result = getEventTopic0(value);
-      setTopic0Result(result);
-      setTopic0Error(null);
+      updateUtilitiesState?.({ topic0Result: result, topic0Error: null });
     } catch (error) {
-      setTopic0Result(null);
-      setTopic0Error(error.message);
+      updateUtilitiesState?.({ topic0Result: null, topic0Error: error.message });
     }
   };
 

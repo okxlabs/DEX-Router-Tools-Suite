@@ -359,41 +359,6 @@ function isBranchNode(node) {
     return node.type === 'trim' || node.type === 'charge' || node.type === 'commission';
 }
 
-/**
- * Create branch nodes and edges from a source node.
- * @param {string} sourceNodeId - Node to branch from (e.g. "0" or last node id)
- * @param {Object} options - { nodeIdPrefix, items }
- * @returns {{ nodesToAdd: Array, edgesToAdd: Array }}
- */
-function createBranch(sourceNodeId, options) {
-    const { nodeIdPrefix, items } = options;
-    if (!items?.length) return { nodesToAdd: [], edgesToAdd: [] };
-
-    const nodesToAdd = [];
-    const edgesToAdd = [];
-
-    for (const item of items) {
-        if (!item.address || isZeroAddress(item.address)) continue;
-
-        const nodeId = nodeIdPrefix ? `${nodeIdPrefix}_${item.nodeIdSuffix}` : item.nodeIdSuffix;
-
-        nodesToAdd.push({
-            id: nodeId,
-            token: item.address,
-            displayName: item.displayName || item.nodeType,
-            type: item.nodeType,
-        });
-
-        edgesToAdd.push({
-            from: sourceNodeId,
-            to: nodeId,
-            isBranchEdge: true,
-        });
-    }
-
-    return { nodesToAdd, edgesToAdd };
-}
-
 function getSwapNodeIds(flowData) {
     const numericIds = flowData.nodes
         .filter(n => !isBranchNode(n) && !isNaN(parseInt(n.id, 10)))

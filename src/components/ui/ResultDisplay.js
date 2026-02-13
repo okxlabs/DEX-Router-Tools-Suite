@@ -1,6 +1,6 @@
 import React from 'react';
 import CopyButton from './CopyButton';
-import { formatJSON } from '../../scripts/componentUtils';
+import { formatJSON, checksumAddressesInObject } from '../../scripts/componentUtils';
 
 const ResultDisplay = ({ 
   result, 
@@ -13,7 +13,12 @@ const ResultDisplay = ({
 }) => {
   if (!result) return null;
 
-  const formattedText = typeof result === 'string' ? result : formatJSON(result);
+  const formattedText = typeof result === 'string'
+    ? result
+    : formatJSON(checksumAddressesInObject(result));
+
+  // Show "Copy no 0x" button when result looks like hex calldata
+  const isHexCalldata = typeof result === 'string' && result.startsWith('0x');
 
   return (
     <div className={`base-result-container ${className}`}>
@@ -37,6 +42,15 @@ const ResultDisplay = ({
             >
               Find Height
             </button>
+          )}
+          {isHexCalldata && (
+            <CopyButton
+              text={formattedText.slice(2)}
+              onCopy={onCopy}
+              title="Copy without 0x prefix"
+            >
+              Copy no 0x
+            </CopyButton>
           )}
           <CopyButton
             text={formattedText}
