@@ -1,40 +1,47 @@
-name: Deploy to GitHub Pages
+name: Sync docs to GitHub Pages
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'public/docs/**'
+      - 'public/pmm/**'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  deploy:
+  sync-docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Checkout gh-pages into a temp dir
+        uses: actions/checkout@v4
         with:
-          node-version: 18
-          cache: yarn
+          ref: gh-pages
+          path: gh-pages-branch
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: Sync public/docs to gh-pages docs/
+        run: |
+          # Sync docs
+          mkdir -p gh-pages-branch/docs
+          cp public/docs/index.html gh-pages-branch/docs/
+          cp public/docs/app.js gh-pages-branch/docs/
+          cp public/docs/style.css gh-pages-branch/docs/
 
-      - name: Build
-        run: yarn build
-        env:
-          PUBLIC_URL: /DEX-Router-Tools-Suite
-          CI: false
+          # Sync pmm/signature
+          mkdir -p gh-pages-branch/pmm/signature
+          cp public/pmm/signature/index.html gh-pages-branch/pmm/signature/ 2>/dev/null || true
+          cp public/pmm/signature/app.js gh-pages-branch/pmm/signature/ 2>/dev/null || true
+          cp public/pmm/signature/style.css gh-pages-branch/pmm/signature/ 2>/dev/null || true
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: ./gh-pages-branch
           publish_branch: gh-pages
-          keep_files: false
