@@ -169,10 +169,17 @@ html, body {
 }
 
 .result-container {
+  display: flex;
+  flex-direction: column;
   max-height: 50vh;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
+.result-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
 
 /* Result content styles */
 .base-result-content {
@@ -533,6 +540,7 @@ html, body {
   margin-bottom: 4px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--border-primary);
+  flex-shrink: 0;
 }
 
 .result-title {

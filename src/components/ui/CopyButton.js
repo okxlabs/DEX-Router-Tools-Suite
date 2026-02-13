@@ -4,6 +4,7 @@ const CopyButton = ({
   text, 
   onCopy, 
   className = '',
+  children,
   ...props 
 }) => {
   const handleCopy = async () => {
@@ -20,9 +21,9 @@ const CopyButton = ({
       {...props}
       className={`copy-button ${className}`}
       onClick={handleCopy}
-      title="Copy to clipboard"
+      title={props.title || "Copy to clipboard"}
     >
-      Copy
+      {children || 'Copy'}
     </button>
   );
 };

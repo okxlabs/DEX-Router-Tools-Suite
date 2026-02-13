@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toChecksumAddress, isValidAddress } from './utilities/addressChecksum';
 
 /**
  * Custom hook for managing button states (loading, success, error)
@@ -181,6 +182,39 @@ export const processWithErrorHandling = async (
     return { success: false };
   }
 };
+
+/**
+ * Recursively clone an object and convert any Ethereum address strings to EIP-55 checksum format.
+ * Use this so decoded result JSON can be copied with checksummed addresses for direct use.
+ * @param {any} obj - Object, array, or value
+ * @returns {any} - Deep clone with address strings checksummed
+ */
+export function checksumAddressesInObject(obj) {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+  if (typeof obj === 'string') {
+    if (isValidAddress(obj)) {
+      try {
+        return toChecksumAddress(obj);
+      } catch {
+        return obj;
+      }
+    }
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(checksumAddressesInObject);
+  }
+  if (typeof obj === 'object') {
+    const out = {};
+    for (const key of Object.keys(obj)) {
+      out[key] = checksumAddressesInObject(obj[key]);
+    }
+    return out;
+  }
+  return obj;
+}
 
 /**
  * Formats JSON with proper indentation

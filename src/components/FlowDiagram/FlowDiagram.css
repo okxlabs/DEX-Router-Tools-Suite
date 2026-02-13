@@ -2,46 +2,13 @@
    Flow Diagram Styles
    ============================================ */
 
-/* Wrapper - sits below the result display */
+/* Wrapper - placed to the right of the decoded result in grid layout */
 .flow-diagram-wrapper {
-  margin-top: 12px;
   width: 100%;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-/* Toggle button */
-.flow-diagram-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 10px 16px;
-  background: var(--bg-result);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-lg);
-  color: var(--primary);
-  font-size: var(--font-base);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.flow-diagram-toggle:hover {
-  background: var(--bg-hover);
-  border-color: var(--primary);
-}
-
-.flow-toggle-icon {
-  font-size: 10px;
-  width: 14px;
-  text-align: center;
-}
-
-/* Container for the expanded diagram */
+/* Container for the diagram */
 .flow-diagram-container {
-  margin-top: 8px;
   padding: 16px;
   background: var(--bg-result);
   border: 1px solid var(--border-primary);
@@ -320,6 +287,11 @@
   border: 2px solid #ff9800;
 }
 
+.flow-legend-trimcharge {
+  background: #3d1a1a;
+  border: 2px solid #dc2626;
+}
+
 /* ============================================
    Loading & Error States
    ============================================ */
@@ -460,10 +432,6 @@
   color: var(--success);
 }
 
-.flow-edge-weight {
-  background: rgba(255, 152, 0, 0.15);
-  color: var(--warning);
-}
 
 /* Routes table */
 .flow-breakdown-routes {
@@ -566,11 +534,97 @@
   color: var(--text-secondary);
 }
 
-.flow-route-weight {
-  color: var(--warning);
-}
-
 .flow-route-pct {
   color: var(--text-secondary);
+}
+
+/* ============================================
+   Commission / Trim Details Section
+   ============================================ */
+
+.commission-trim-details {
+  margin-top: 16px;
+  border-top: 1px solid var(--border-primary);
+  padding-top: 12px;
+}
+
+.details-section {
+  margin-bottom: 16px;
+}
+
+.details-section:last-child {
+  margin-bottom: 0;
+}
+
+.details-title {
+  color: var(--primary);
+  font-weight: bold;
+  font-size: var(--font-base);
+  margin-bottom: 8px;
+}
+
+.details-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-xs);
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  table-layout: fixed;
+}
+
+.details-table th:nth-child(1),
+.details-table td:nth-child(1) {
+  width: 25%;
+}
+
+.details-table th:nth-child(2),
+.details-table td:nth-child(2) {
+  width: 50%;
+}
+
+.details-table th:nth-child(3),
+.details-table td:nth-child(3) {
+  width: 25%;
+}
+
+.details-table thead {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.details-table th {
+  padding: 8px 10px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-primary);
+  white-space: nowrap;
+}
+
+.details-table td {
+  padding: 6px 10px;
+  text-align: center;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.details-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.details-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.details-address {
+  color: var(--primary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.details-address:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 
