@@ -20,6 +20,18 @@ import {
 import { isRouterPathTuple } from '../core/type_checkers.js';
 
 /**
+ * Apply EIP-55 checksum to a raw hex address string.
+ * Passes through special addresses (e.g. 0xeee...eee) unchanged if getAddress throws.
+ */
+function toChecksumAddress(rawHex) {
+    try {
+        return ethers.utils.getAddress(rawHex);
+    } catch {
+        return rawHex;
+    }
+}
+
+/**
  * Convert ethers BigNumbers to strings and process nested data structures
  * @param {any} value - the value to convert
  * @returns {any} converted value
@@ -29,9 +41,9 @@ function getValue(value) {
     if (value && value._isBigNumber) {
         const hexStr = value.toHexString();
         
-        // If it looks like an address (20 bytes), convert to address format
+        // If it looks like an address (20 bytes), convert to checksummed address format
         if (hexStr.length === 42) { // 0x + 40 chars = 42 total
-            return hexStr;
+            return toChecksumAddress(hexStr);
         }
         
         // For large numbers, return decimal string
@@ -65,15 +77,8 @@ function getValue(value) {
 function formatBaseRequest(baseRequestArray, functionName) {
     const [fromToken, toToken, fromTokenAmount, minReturnAmount, deadLine] = baseRequestArray;
     
-    // Only apply _bytes32ToAddress conversion for specific functions that need it
-    const needsBytes32ToAddress = functionName && (
-        functionName === 'unxswapToWithBaseRequest' ||
-        functionName === 'uniswapV3SwapToWithBaseRequest'
-        // Add other functions here if they also need this conversion
-    );
-    
     return {
-        fromToken: needsBytes32ToAddress ? bytes32ToAddress(fromToken) : getValue(fromToken),
+        fromToken: bytes32ToAddress(fromToken),
         toToken: getValue(toToken),
         fromTokenAmount: getValue(fromTokenAmount),
         minReturnAmount: getValue(minReturnAmount),
@@ -106,8 +111,7 @@ function bytes32ToAddress(param) {
         // assembly { result := and(param, _ADDRESS_MASK) }
         const result = paramBN.and(ADDRESS_MASK);
         
-        // Convert to proper address format
-        return "0x" + result.toHexString().slice(2).padStart(40, '0');
+        return toChecksumAddress("0x" + result.toHexString().slice(2).padStart(40, '0'));
         
     } catch (error) {
         return "0x0000000000000000000000000000000000000000";
@@ -217,7 +221,7 @@ function unpackRawData(rawDataValue) {
         const weight = weightMasked.shr(160); // Shift right by 160 bits
 
         return {
-            poolAddress: "0x" + poolAddress.toHexString().slice(2).padStart(40, '0'),
+            poolAddress: toChecksumAddress("0x" + poolAddress.toHexString().slice(2).padStart(40, '0')),
             reverse: !reverseFlag.isZero(),
             weight: weight.toString()
         };
@@ -257,7 +261,7 @@ function unpackReceiver(receiverValue) {
 
         return {
             orderId: orderId.toString(),
-            address: "0x" + address.toHexString().slice(2).padStart(40, '0')
+            address: toChecksumAddress("0x" + address.toHexString().slice(2).padStart(40, '0'))
         };
     } catch (error) {
         // If unpacking fails, return the original value
@@ -328,7 +332,7 @@ function unpackUnxswapPool(poolValue) {
             WETH: isWETH,
             isOneForZero: isOneForZero,
             numerator: numeratorValue.toString(),
-            address: "0x" + address.toHexString().slice(2).padStart(40, '0')
+            address: toChecksumAddress("0x" + address.toHexString().slice(2).padStart(40, '0'))
         };
     } catch (error) {
         return {
@@ -366,7 +370,7 @@ function unpackUniswapV3Pool(poolValue) {
         return {
             isOneForZero: isOneForZero,
             wethUnwrap: wethUnwrap,
-            pool: "0x" + address.toHexString().slice(2).padStart(40, '0')
+            pool: toChecksumAddress("0x" + address.toHexString().slice(2).padStart(40, '0'))
         };
     } catch (error) {
         return {
@@ -397,7 +401,7 @@ function unpackSrcToken(srcTokenValue) {
 
         return {
             orderId: orderId.toString(),
-            address: "0x" + address.toHexString().slice(2).padStart(40, '0')
+            address: toChecksumAddress("0x" + address.toHexString().slice(2).padStart(40, '0'))
         };
     } catch (error) {
         // If unpacking fails, return the original value
@@ -469,7 +473,7 @@ function unpackDagRawData(rawDataValue) {
         const outputIndex = rawDataBN.and(DAG_OUTPUT_INDEX_MASK).shr(176); // Shift right by 176 bits
 
         return {
-            poolAddress: "0x" + poolAddress.toHexString().slice(2).padStart(40, '0'),
+            poolAddress: toChecksumAddress("0x" + poolAddress.toHexString().slice(2).padStart(40, '0')),
             reverse: !reverseFlag.isZero(),
             weight: weight.toString(),
             inputIndex: inputIndex.toString(),
@@ -518,7 +522,7 @@ function unpackFromTokenWithMode(fromTokenValue) {
         }
 
         return {
-            address: "0x" + address.toHexString().slice(2).padStart(40, '0'),
+            address: toChecksumAddress("0x" + address.toHexString().slice(2).padStart(40, '0')),
             flag: flag
         };
     } catch (error) {

@@ -361,10 +361,15 @@
 
 /* Individual edge section */
 .flow-breakdown-edge {
+  position: relative;
   margin-bottom: 6px;
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow: visible;
+}
+
+.flow-breakdown-edge:hover {
+  z-index: 10;
 }
 
 .flow-breakdown-edge-header {
@@ -436,7 +441,7 @@
 /* Routes table */
 .flow-breakdown-routes {
   padding: 0;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .flow-routes-table {
@@ -510,7 +515,7 @@
   font-size: var(--font-xs);
   color: var(--text-primary);
   white-space: nowrap;
-  z-index: 100;
+  z-index: 9999;
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
