@@ -77,6 +77,12 @@ function addrEq(a, b) {
     return a.toLowerCase() === b.toLowerCase();
 }
 
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+function isZeroAddress(addr) {
+    return !addr || addr.toLowerCase() === ZERO_ADDRESS;
+}
+
 /** Create a node object */
 function makeNode(id, tokenAddress) {
     return {
@@ -343,19 +349,145 @@ function generateSwapWrapFlowData(decodedResult) {
 }
 
 // ============================================================
+//  Branch helpers — trim/charge/commission branches from a node
+// ============================================================
+
+const COMMISSION_ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'];
+
+/** Check if node is a branch node (trim/charge/commission) */
+function isBranchNode(node) {
+    return node.type === 'trim' || node.type === 'charge' || node.type === 'commission';
+}
+
+function getSwapNodeIds(flowData) {
+    const numericIds = flowData.nodes
+        .filter(n => !isBranchNode(n) && !isNaN(parseInt(n.id, 10)))
+        .map(n => parseInt(n.id, 10));
+    const firstId = numericIds.length ? String(Math.min(...numericIds)) : null;
+    const lastId = numericIds.length ? String(Math.max(...numericIds)) : null;
+    return { firstId, lastId };
+}
+
+/** Trim/charge: create single "Trim" node from last node if trim exists */
+function injectTrimCharge(flowData, decodedResult) {
+    if (!flowData?.nodes?.length || !decodedResult?.hasTrim) return flowData;
+
+    const { lastId } = getSwapNodeIds(flowData);
+    if (lastId == null) return flowData;
+
+    const trimAddress = decodedResult.trimAddress;
+    if (!trimAddress || isZeroAddress(trimAddress)) return flowData;
+
+    // Create single "Trim" node regardless of charge
+    const trimNode = {
+        id: 'trim',
+        token: null,
+        displayName: 'Trim',
+        type: 'trim',
+    };
+    
+    const trimEdge = {
+        from: lastId,
+        to: 'trim',
+        isBranchEdge: true,
+    };
+
+    return {
+        nodes: [...flowData.nodes, trimNode],
+        edges: [...flowData.edges, trimEdge],
+    };
+}
+
+/** Commission: create nodes for fromToken and/or toToken commissions if any exist */
+function injectCommission(flowData, decodedResult) {
+    if (!flowData?.nodes?.length || !decodedResult?.hasCommission) return flowData;
+
+    const { firstId, lastId } = getSwapNodeIds(flowData);
+    if (firstId == null || lastId == null) return flowData;
+
+    const referCount = Math.min(parseInt(decodedResult.referCount, 10) || 0, 8);
+    if (referCount === 0) return flowData;
+
+    let hasFromTokenCommission = false;
+    let hasToTokenCommission = false;
+
+    // Check for commission types
+    for (let i = 0; i < referCount; i++) {
+        const key = COMMISSION_ORDINALS[i];
+        const block = decodedResult[key];
+        if (!block || !block.address || isZeroAddress(block.address)) continue;
+
+        const ct = block.commissionType || '';
+        if (ct.endsWith('FROM_TOKEN_COMMISSION')) {
+            hasFromTokenCommission = true;
+        } else if (ct.endsWith('TO_TOKEN_COMMISSION')) {
+            hasToTokenCommission = true;
+        }
+    }
+
+    let nodes = [...flowData.nodes];
+    let edges = [...flowData.edges];
+
+    // Create single "Commission" node from first node if fromToken commissions exist
+    if (hasFromTokenCommission) {
+        const fromCommissionNode = {
+            id: 'commission_from',
+            token: null,
+            displayName: 'Commission',
+            type: 'commission',
+        };
+        
+        const fromCommissionEdge = {
+            from: firstId,
+            to: 'commission_from',
+            isBranchEdge: true,
+        };
+
+        nodes.push(fromCommissionNode);
+        edges.push(fromCommissionEdge);
+    }
+
+    // Create single "Commission" node from last node if toToken commissions exist
+    if (hasToTokenCommission) {
+        const toCommissionNode = {
+            id: 'commission_to',
+            token: null,
+            displayName: 'Commission',
+            type: 'commission',
+        };
+        
+        const toCommissionEdge = {
+            from: lastId,
+            to: 'commission_to',
+            isBranchEdge: true,
+        };
+
+        nodes.push(toCommissionNode);
+        edges.push(toCommissionEdge);
+    }
+
+    return { nodes, edges };
+}
+
+// ============================================================
 //  Main entry point — dispatch to the right generator
 // ============================================================
 
 function generateFlowData(decodedResult) {
     const family = getFunctionFamily(decodedResult);
+    let flowData = null;
     switch (family) {
-        case 'dag':     return generateDagFlowData(decodedResult);
-        case 'smart':   return generateSmartSwapFlowData(decodedResult);
-        case 'unxswap': return generatePoolChainFlowData(decodedResult);
-        case 'uniV3':   return generatePoolChainFlowData(decodedResult);
-        case 'wrap':    return generateSwapWrapFlowData(decodedResult);
+        case 'dag':     flowData = generateDagFlowData(decodedResult); break;
+        case 'smart':   flowData = generateSmartSwapFlowData(decodedResult); break;
+        case 'unxswap': flowData = generatePoolChainFlowData(decodedResult); break;
+        case 'uniV3':   flowData = generatePoolChainFlowData(decodedResult); break;
+        case 'wrap':    flowData = generateSwapWrapFlowData(decodedResult); break;
         default:        return null;
     }
+    if (!flowData) return null;
+    flowData = injectTrimCharge(flowData, decodedResult);
+    flowData = injectCommission(flowData, decodedResult);
+    return flowData;
 }
 
 // ============================================================
@@ -383,8 +515,11 @@ function generateMermaidDefinition(flowData) {
     def += '}}}%%\n\n';
     def += 'graph LR\n\n';
 
-    // Nodes
-    nodes.forEach(node => {
+    const swapNodesList = nodes.filter(n => !isBranchNode(n));
+    const branchNodesList = nodes.filter(n => isBranchNode(n));
+
+    // Main flow nodes only
+    swapNodesList.forEach(node => {
         const name = node.symbol || node.shortAddr || node.displayName;
         const addrLine = node.token ? shortenAddress(node.token) : '';
         if (node.symbol && addrLine) {
@@ -396,11 +531,10 @@ function generateMermaidDefinition(flowData) {
 
     def += '\n';
 
-    // Edges
-    edges.forEach(edge => {
+    // Main flow edges only (no branch edges)
+    edges.filter(e => !e.isBranchEdge).forEach(edge => {
         const cnt = edge.routes.length;
         const label = `${edge.percentage}% &middot; ${cnt} route${cnt > 1 ? 's' : ''}`;
-        // Use dashed line for implicit edges (no real adapter)
         const isImplicit = edge.routes.length === 1 && edge.routes[0].adapter === '-';
         if (isImplicit) {
             def += `  N${edge.from} -.->|"converted"| N${edge.to}\n`;
@@ -409,10 +543,30 @@ function generateMermaidDefinition(flowData) {
         }
     });
 
+    // Branch nodes (Commission)
+    if (branchNodesList.length > 0) {
+        def += '\n';
+        branchNodesList.forEach(node => {
+            const label = node.displayName || node.id;
+            def += `  N${node.id}{{"${label}"}}\n`;
+        });
+        def += '\n';
+    }
+
+    // Branch edges (from token nodes to branch nodes)
+    edges.filter(e => e.isBranchEdge).forEach(edge => {
+        def += `  N${edge.from} -.-> N${edge.to}\n`;
+    });
+
     def += '\n';
 
     // Styling — start (green), end (orange), intermediates (blue)
-    const sorted = [...nodes].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+    const sorted = [...swapNodesList].sort((a, b) => {
+        const na = parseInt(a.id, 10);
+        const nb = parseInt(b.id, 10);
+        if (isNaN(na) || isNaN(nb)) return 0;
+        return na - nb;
+    });
     if (sorted.length >= 2) {
         def += `  style N${sorted[0].id} fill:#0d3320,stroke:#4caf50,stroke-width:3px,color:#fff\n`;
         def += `  style N${sorted[sorted.length - 1].id} fill:#3d1a00,stroke:#ff9800,stroke-width:3px,color:#fff\n`;
@@ -422,6 +576,9 @@ function generateMermaidDefinition(flowData) {
     } else if (sorted.length === 1) {
         def += `  style N${sorted[0].id} fill:#0d3320,stroke:#4caf50,stroke-width:3px,color:#fff\n`;
     }
+    branchNodesList.forEach(n => {
+        def += `  style N${n.id} fill:#3d1a1a,stroke:#dc2626,stroke-width:2px,color:#fff\n`;
+    });
 
     return def;
 }
@@ -434,8 +591,5 @@ export {
     supportsFlowDiagram,
     generateFlowData,
     generateMermaidDefinition,
-    getTokenSymbol,
-    getTokenDisplayName,
     shortenAddress,
-    KNOWN_TOKENS,
 };

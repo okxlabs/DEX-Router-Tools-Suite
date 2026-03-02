@@ -1,9 +1,9 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { resolve } from './scripts/decode/decode_index.js';
 import { encode } from './scripts/encode/encode_index.js';
 import { validateEncodedCalldata, validateDecodedJson } from './scripts/core/roundtrip_validator.js';
-import { createDecodeOperation, createEncodeOperation, formatJSON } from './scripts/componentUtils.js';
+import { createDecodeOperation, createEncodeOperation, formatJSON, checksumAddressesInObject } from './scripts/componentUtils.js';
 import DecodeCalldata from './components/forms/DecodeCalldata';
 import EncodeCalldata from './components/forms/EncodeCalldata';
 import SimulateTX from './components/SimulateTX';
@@ -40,6 +40,25 @@ function App() {
   // Utilities initial timestamp - for Find Height feature
   const [utilitiesInitialTimestamp, setUtilitiesInitialTimestamp] = useState(null);
 
+  // Utilities state - lifted to preserve all data when switching tabs
+  const [utilitiesState, setUtilitiesState] = useState({
+    selectedChain: 'eth',
+    rpcUrl: 'https://eth.drpc.org',
+    timestampInput: '',
+    addressInput: '',
+    eventInput: '',
+    blockResult: null,
+    searchError: null,
+    checksumResult: null,
+    addressError: null,
+    topic0Result: null,
+    topic0Error: null
+  });
+
+  const updateUtilitiesState = useCallback((updates) => {
+    setUtilitiesState(prev => (typeof updates === 'function' ? updates(prev) : { ...prev, ...updates }));
+  }, []);
+
   const showToast = (message, type = 'success', duration = 3000) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
@@ -64,9 +83,9 @@ function App() {
   };
 
   const handleEditFromDecode = (decodedResult) => {
-    // Navigate to encode tab and populate with decoded JSON
+    // Navigate to encode tab and populate with decoded JSON (checksummed addresses for direct use)
     setActiveTab('encode');
-    setRightInput(formatJSON(decodedResult));
+    setRightInput(formatJSON(checksumAddressesInObject(decodedResult)));
     showToast('Switched to Encode tab with decoded result!', 'success');
   };
 
@@ -203,6 +222,8 @@ function App() {
               showToast={showToast} 
               initialTimestamp={utilitiesInitialTimestamp}
               onInitialTimestampConsumed={() => setUtilitiesInitialTimestamp(null)}
+              utilitiesState={utilitiesState}
+              updateUtilitiesState={updateUtilitiesState}
             />
           )}
 

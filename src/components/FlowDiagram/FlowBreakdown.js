@@ -74,7 +74,6 @@ const EdgeRow = ({ edge, fromNode, toNode, edgeKey, isOpen, onToggle }) => (
             <span className="flow-edge-badge flow-edge-count">
                 {edge.routes.length} route{edge.routes.length > 1 ? 's' : ''}
             </span>
-            <span className="flow-edge-badge flow-edge-weight">wt: {edge.totalWeight}</span>
         </div>
 
         {isOpen && (
@@ -85,7 +84,6 @@ const EdgeRow = ({ edge, fromNode, toNode, edgeKey, isOpen, onToggle }) => (
                             <th>#</th>
                             <th>Adapter</th>
                             <th>Pool</th>
-                            <th>Weight</th>
                             <th>% of Input</th>
                             <th>Direction</th>
                         </tr>
@@ -100,9 +98,8 @@ const EdgeRow = ({ edge, fromNode, toNode, edgeKey, isOpen, onToggle }) => (
                                 <td className="flow-route-addr">
                                     <CopyableAddress address={route.pool} />
                                 </td>
-                                <td className="flow-route-weight">{route.weight}</td>
                                 <td className="flow-route-pct">
-                                    {((route.weight / 10000) * 100).toFixed(2)}%
+                                    {((route.weight / (edge.totalWeight || 10000)) * 100).toFixed(2)}%
                                 </td>
                                 <td className="flow-route-dir">
                                     {route.reverse ? 'Reverse' : 'Forward'}
@@ -125,22 +122,24 @@ const FlowBreakdown = ({ flowData, keyPrefix, expandedEdges, onToggleEdge, class
     return (
         <div className={`flow-breakdown${className ? ` ${className}` : ''}`}>
             <div className="flow-breakdown-title">Detailed Route Breakdown</div>
-            {flowData.edges.map((edge, idx) => {
-                const fromNode = flowData.nodes.find(n => n.id === edge.from);
-                const toNode = flowData.nodes.find(n => n.id === edge.to);
-                const edgeKey = `${keyPrefix}-${edge.from}->${edge.to}`;
-                return (
-                    <EdgeRow
-                        key={idx}
-                        edge={edge}
-                        fromNode={fromNode}
-                        toNode={toNode}
-                        edgeKey={edgeKey}
-                        isOpen={!!expandedEdges[edgeKey]}
-                        onToggle={onToggleEdge}
-                    />
-                );
-            })}
+            {flowData.edges
+                .filter(edge => !edge.isBranchEdge)
+                .map((edge, idx) => {
+                    const fromNode = flowData.nodes.find(n => n.id === edge.from);
+                    const toNode = flowData.nodes.find(n => n.id === edge.to);
+                    const edgeKey = `${keyPrefix}-${edge.from}->${edge.to}`;
+                    return (
+                        <EdgeRow
+                            key={idx}
+                            edge={edge}
+                            fromNode={fromNode}
+                            toNode={toNode}
+                            edgeKey={edgeKey}
+                            isOpen={!!expandedEdges[edgeKey]}
+                            onToggle={onToggleEdge}
+                        />
+                    );
+                })}
         </div>
     );
 };
