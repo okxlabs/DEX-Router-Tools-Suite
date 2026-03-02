@@ -3,6 +3,7 @@ import './Utilities.css';
 import { findBlockByTimestamp } from '../scripts/utilities/findBlock';
 import { toChecksumAddress, isValidAddress } from '../scripts/utilities/addressChecksum';
 import { getEventTopic0 } from '../scripts/utilities/topic0Calculator';
+import { splitDexRouterCalldata } from '../scripts/utilities/calldataSplitter';
 
 // Custom hook for debounced value - only updates after user stops typing
 const useDebouncedValue = (value, delay) => {
@@ -43,7 +44,10 @@ const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed, ut
     checksumResult = null,
     addressError = null,
     topic0Result = null,
-    topic0Error = null
+    topic0Error = null,
+    splitterInput = '',
+    splitterResult = null,
+    splitterError = null
   } = utilitiesState || {};
 
   // Debounced timestamp input - only triggers block search after 1500ms idle
@@ -264,6 +268,30 @@ const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed, ut
     }
   };
 
+  // Handle calldata splitter input change — auto-run on change
+  const handleSplitterInputChange = (e) => {
+    const value = e.target.value;
+    updateUtilitiesState?.({ splitterInput: value });
+
+    if (!value.trim()) {
+      updateUtilitiesState?.({ splitterResult: null, splitterError: null });
+      return;
+    }
+
+    try {
+      const { results, skipped } = splitDexRouterCalldata(value);
+      updateUtilitiesState?.({ splitterResult: { results, skipped }, splitterError: null });
+    } catch (err) {
+      updateUtilitiesState?.({ splitterResult: null, splitterError: err.message });
+    }
+  };
+
+  // Copy a single splitter result calldata to clipboard
+  const copySplitterCalldata = (calldata, index) => {
+    navigator.clipboard.writeText(calldata);
+    showToast(`#${index} calldata copied!`, 'success');
+  };
+
   return (
     <div className="utilities-container">
       <div className="utility-section">
@@ -435,6 +463,84 @@ const Utilities = ({ showToast, initialTimestamp, onInitialTimestampConsumed, ut
         {topic0Error && (
           <div className="search-error">
             {topic0Error}
+          </div>
+        )}
+      </div>
+
+      {/* DexRouter Calldata Splitter Section */}
+      <div className="utility-section">
+        <h3 className="section-title">DexRouter Calldata Splitter</h3>
+        <p className="splitter-description">
+          Notice: Only DexRouter calls with commission / trim can be split.
+        </p>
+
+        <div className="form-group">
+          <label className="form-label">Transaction Calldata</label>
+          <textarea
+            className="foundry-input-white splitter-textarea"
+            value={splitterInput}
+            onChange={handleSplitterInputChange}
+            placeholder="0x..."
+            spellCheck={false}
+          />
+        </div>
+
+        {/* Error */}
+        {splitterError && (
+          <div className="search-error">{splitterError}</div>
+        )}
+
+        {/* Results */}
+        {splitterResult && (
+          <div className="splitter-results">
+            {splitterResult.results.length === 0 ? (
+              <div className="splitter-empty">
+                No DexRouter calls found
+                {splitterResult.skipped > 0 && (
+                  <span className="splitter-skipped-hint">
+                    {' '}({splitterResult.skipped} selector occurrence{splitterResult.skipped > 1 ? 's' : ''} skipped — no commission/trim end marker)
+                  </span>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="splitter-summary">
+                  Found {splitterResult.results.length} DexRouter call{splitterResult.results.length > 1 ? 's' : ''}
+                  {splitterResult.skipped > 0 && (
+                    <span className="splitter-skipped-hint">
+                      {' '}({splitterResult.skipped} occurrence{splitterResult.skipped > 1 ? 's' : ''} skipped — no end marker)
+                    </span>
+                  )}
+                </div>
+
+                {splitterResult.results.map((item) => (
+                  <div key={item.index} className="splitter-item">
+                    <div className="splitter-item-header">
+                      <span className="splitter-item-index">#{item.index}</span>
+                      <span className="splitter-item-name">{item.funcName}</span>
+                      <button
+                        className="splitter-copy-btn"
+                        onClick={() => copySplitterCalldata(item.calldata, item.index)}
+                        title="Copy calldata"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="splitter-item-meta">
+                      <span className="splitter-meta-label">Selector:</span>
+                      <span className="splitter-meta-value">{item.selector}</span>
+                      <span className="splitter-meta-sep">·</span>
+                      <span className="splitter-meta-label">Offset:</span>
+                      <span className="splitter-meta-value">{item.byteOffset} bytes</span>
+                      <span className="splitter-meta-sep">·</span>
+                      <span className="splitter-meta-label">Length:</span>
+                      <span className="splitter-meta-value">{item.calldata.length / 2 - 1} bytes</span>
+                    </div>
+                    <div className="splitter-calldata">{item.calldata}</div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         )}
       </div>
