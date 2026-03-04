@@ -4,8 +4,8 @@
  */
 
 // Constants matching the Solidity contract
-const DOMAIN_NAME = "OnChain Labs PMM Protocol";
-const DOMAIN_VERSION = "1.0";
+const DOMAIN_NAME = "OKX Labs PMM Protocol";
+const DOMAIN_VERSION = "1.1";
 
 const ORDER_RFQ_TYPE_STRING = 
     "OrderRFQ(" +
@@ -17,6 +17,9 @@ const ORDER_RFQ_TYPE_STRING =
     "uint256 makerAmount," +
     "uint256 takerAmount," +
     "bool usePermit2," +
+    "uint256 confidenceT," +
+    "uint256 confidenceWeight," +
+    "uint256 confidenceCap," +
     "bytes permit2Signature," +
     "bytes32 permit2Witness," +
     "string permit2WitnessType" +
@@ -27,10 +30,10 @@ const EIP712_DOMAIN_TYPE_STRING =
 
 // Deployed contract addresses from DEPLOYMENT.md
 const DEPLOYED_CONTRACTS = {
-    1: "0x0bdf246b4aef9cfe4dd6eef153a1b645ac4bcbb6",      // Ethereum Mainnet
-    42161: "0x1ef032a3c471a99cc31578c8007f256d95e89896",  // Arbitrum One
-    8453: "0xed97b4331fff9dc8c40936532a04ac1400f273a5",   // Base
-    56: "0x9ff547bbb813a0e5d53742c7a5f7370dcea214a3"      // BNB Chain
+    1: "0x5035D128ef482276Aa3bCce4307ffF8961ba30F9",      // Ethereum Mainnet
+    42161: "0xcdC09a6B5211bb51F18A1Af7691B6725bB024434",  // Arbitrum One
+    8453: "0x4EFBd630205DD9B987c3BcbEe257600abC1e3C11",   // Base
+    56: "0xdD30339C4b2f7bac319Ef4Fa5c6963cc9F470B2d"      // BNB Chain
 };
 
 const CHAIN_NAMES = {
@@ -159,6 +162,9 @@ function getExampleOrders() {
                 makerAmount: MAKER_AMOUNT,
                 takerAmount: TAKER_AMOUNT,
                 usePermit2: false,
+                confidenceT: "0",
+                confidenceWeight: "0",
+                confidenceCap: "0",
                 permit2Signature: "0x",
                 permit2Witness: "0x0000000000000000000000000000000000000000000000000000000000000000",
                 permit2WitnessType: ""
@@ -180,6 +186,9 @@ function getExampleOrders() {
                 makerAmount: MAKER_AMOUNT,
                 takerAmount: TAKER_AMOUNT,
                 usePermit2: true,
+                confidenceT: "0",
+                confidenceWeight: "0",
+                confidenceCap: "0",
                 permit2Signature: "0x",
                 permit2Witness: "0x0000000000000000000000000000000000000000000000000000000000000000",
                 permit2WitnessType: ""
@@ -203,6 +212,9 @@ function getExampleOrders() {
                 makerAmount: MAKER_AMOUNT,
                 takerAmount: TAKER_AMOUNT,
                 usePermit2: true,
+                confidenceT: "0",
+                confidenceWeight: "0",
+                confidenceCap: "0",
                 permit2Signature: "TO_BE_SIGNED",
                 permit2Witness: "TO_BE_CALCULATED",
                 permit2WitnessType: "TO_BE_GENERATED"
@@ -236,6 +248,9 @@ function getExampleOrders() {
                 makerAmount: MAKER_AMOUNT,
                 takerAmount: TAKER_AMOUNT,
                 usePermit2: true,
+                confidenceT: "0",
+                confidenceWeight: "0",
+                confidenceCap: "0",
                 permit2Signature: "TO_BE_SIGNED",
                 permit2Witness: "TO_BE_CALCULATED",
                 permit2WitnessType: "TO_BE_GENERATED"
@@ -323,7 +338,7 @@ function calculateStructHash(order) {
     const permit2WitnessTypeHash = ethers.keccak256(ethers.toUtf8Bytes(order.permit2WitnessType || ""));
     
     const structData = ethers.AbiCoder.defaultAbiCoder().encode(
-        ["bytes32", "uint256", "uint256", "address", "address", "address", "uint256", "uint256", "bool", "bytes32", "bytes32", "bytes32"],
+        ["bytes32", "uint256", "uint256", "address", "address", "address", "uint256", "uint256", "bool", "uint256", "uint256", "uint256", "bytes32", "bytes32", "bytes32"],
         [
             typeHash,
             order.rfqId,
@@ -334,6 +349,9 @@ function calculateStructHash(order) {
             order.makerAmount,
             order.takerAmount,
             order.usePermit2,
+            order.confidenceT || 0,
+            order.confidenceWeight || 0,
+            order.confidenceCap || 0,
             permit2SignatureHash,
             order.permit2Witness,
             permit2WitnessTypeHash
@@ -549,6 +567,9 @@ function generateSignatureData(rawInput) {
         makerAmount: order.makerAmount,
         takerAmount: order.takerAmount,
         usePermit2: order.usePermit2,
+        confidenceT: order.confidenceT || "0",
+        confidenceWeight: order.confidenceWeight || "0",
+        confidenceCap: order.confidenceCap || "0",
         permit2Signature: order.permit2Signature,
         permit2Witness: order.permit2Witness,
         permit2WitnessType: order.permit2WitnessType
