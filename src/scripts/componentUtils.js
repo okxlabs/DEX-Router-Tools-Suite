@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { toChecksumAddress, isValidAddress } from './utilities/addressChecksum';
+import { toChecksumAddress, isValidAddress } from './utilities/addressChecksum.js';
 
 /**
  * Custom hook for managing button states (loading, success, error)
