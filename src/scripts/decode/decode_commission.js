@@ -199,38 +199,45 @@ function extractCommissionInfoFromCalldata(calldataHex) {
     // Try MULTIPLE commission (3-8 referrers)
     // Structure: [commissionN]...[commission2][middle][commission1]
     // The referrer count is encoded in the middle block's second byte
-    // Middle block is always at: calldatasize - 0x40 (second-to-last block)
+    // Middle block position is derived from flag position, not calldataHex.length,
+    // so that arbitrary data appended after commission data doesn't affect parsing.
     // ========================================================================
     for (const flag of ['0x88880afc2aaa', '0x88880afc2bbb']) {
         const flagHex = flag.replace(/^0x/, '');
         const flagIndex = calldataHex.indexOf(flagHex);
-        
+
         if (flagIndex === -1) continue;
-        
-        // Check if we have at least 4 blocks (minimum for MULTIPLE with 3 referrers)
-        if (calldataHex.length < BYTE_SIZE.BLOCK * 4) continue;
-        
+
         try {
-            // Middle block is always second-to-last (at offset 0x40 from end)
-            // In hex chars: calldataHex.length - 128 to calldataHex.length - 64
-            const middleStart = calldataHex.length - (BYTE_SIZE.BLOCK * 2);
-            const middleBlock = '0x' + calldataHex.slice(middleStart, middleStart + BYTE_SIZE.BLOCK);
-            const referrerNum = parseReferrerNumFromMiddle(middleBlock);
-            
-            // Validate referrer count
-            if (referrerNum < MIN_COMMISSION_MULTIPLE_NUM || referrerNum > MAX_COMMISSION_MULTIPLE_NUM) {
-                continue;
+            // Try each possible referrerNum (3-8) and validate against the middle block
+            // Layout: [commissionN][commission_{N-1}]...[commission_2][middle][commission_1]
+            // commissionN starts at flagIndex, so:
+            //   middle is at: flagIndex + (referrerNum - 1) * BYTE_SIZE.BLOCK
+            //   commission_1 is at: flagIndex + referrerNum * BYTE_SIZE.BLOCK
+            let referrerNum = 0;
+            let totalBlocks = 0;
+
+            for (let tryNum = MIN_COMMISSION_MULTIPLE_NUM; tryNum <= MAX_COMMISSION_MULTIPLE_NUM; tryNum++) {
+                const middleStart = flagIndex + (tryNum - 1) * BYTE_SIZE.BLOCK;
+
+                // Check if we have enough data for middle + commission_1
+                if (middleStart + BYTE_SIZE.BLOCK * 2 > calldataHex.length) continue;
+
+                const middleBlock = '0x' + calldataHex.slice(middleStart, middleStart + BYTE_SIZE.BLOCK);
+                const candidateNum = parseReferrerNumFromMiddle(middleBlock);
+
+                if (candidateNum === tryNum) {
+                    referrerNum = tryNum;
+                    totalBlocks = tryNum + 1; // N commissions + 1 middle
+                    break;
+                }
             }
-            
-            // Calculate total block count: referrerNum commissions + 1 middle
-            const totalBlocks = referrerNum + 1;
-            
-            // Verify we have enough data
-            if (calldataHex.length < BYTE_SIZE.BLOCK * totalBlocks) continue;
-            
+
+            if (referrerNum === 0) continue;
+
             // Extract blocks using findFlagAndExtractBlocks
             const result = findFlagAndExtractBlocks(calldataHex, flagHex, totalBlocks);
-            
+
             if (!result) continue;
             
             // Build return object with ordinal names
