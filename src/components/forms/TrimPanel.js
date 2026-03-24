@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import './Panel.css';
 
-// Conversion constant: 1% = 100 (4 decimals: 100% = 10^4 = 10,000)
-const PERCENTAGE_TO_RATE_MULTIPLIER = 100;
+// Conversion constant: 1% = 10 (4 decimals: 100% = 10^3 = 1,000)
+const PERCENTAGE_TO_RATE_MULTIPLIER = 10;
 
 /**
  * Convert percentage to rate value (with 4 decimals)

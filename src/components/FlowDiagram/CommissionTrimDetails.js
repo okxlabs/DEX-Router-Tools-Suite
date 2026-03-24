@@ -40,14 +40,14 @@ const CommissionTrimDetails = ({ decodedResult }) => {
         const trimAddress = decodedResult.trimAddress;
         const trimRate = decodedResult.trimRate;
         if (trimAddress && trimRate) {
-            const trimRatePct = ((parseInt(trimRate, 10) || 0) / 10000 * 100).toFixed(4);
+            const trimRatePct = ((parseInt(trimRate, 10) || 0) / 1000 * 100).toFixed(4);
             trims.push({ type: 'Trim', address: trimAddress, rate: `${trimRatePct}%` });
         }
         const chargeAddress = decodedResult.chargeAddress;
         const chargeRate = decodedResult.chargeRate;
         const chargeRateNum = parseInt(chargeRate, 10) || 0;
         if (chargeRateNum > 0 && chargeAddress && chargeAddress !== '0x0000000000000000000000000000000000000000') {
-            const chargeRatePct = (chargeRateNum / 10000 * 100).toFixed(4);
+            const chargeRatePct = (chargeRateNum / 1000 * 100).toFixed(4);
             trims.push({ type: 'Charge', address: chargeAddress, rate: `${chargeRatePct}%` });
         }
     }
